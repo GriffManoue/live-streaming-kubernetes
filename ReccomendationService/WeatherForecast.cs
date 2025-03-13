@@ -1,4 +1,4 @@
-namespace UserService;
+namespace ReccomendationService;
 
 public class WeatherForecast
 {

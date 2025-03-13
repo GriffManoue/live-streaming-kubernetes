@@ -57,3 +57,27 @@
 volumes:
   postgres-data:
   redis-data:
+
+  streamservice:
+    image: streamservice
+    build:
+      context: .
+      dockerfile: StreamService/Dockerfile
+
+  analyticsservice:
+    image: analyticsservice
+    build:
+      context: .
+      dockerfile: AnalyticsService/Dockerfile
+
+  reccomendationservice:
+    image: reccomendationservice
+    build:
+      context: .
+      dockerfile: ReccomendationService/Dockerfile
+
+  authservice:
+    image: authservice
+    build:
+      context: .
+      dockerfile: AuthService/Dockerfile

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace UserService.Controllers;
+namespace AnalyticsService.Controllers;
 
 [ApiController]
 [Route("[controller]")]
