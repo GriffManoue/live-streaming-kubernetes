@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: auth-service
-        image: ${REGISTRY_URL}/auth-service:latest
+        image: bugapeti/auth-service:latest
         ports:
         - containerPort: 8080
         env:

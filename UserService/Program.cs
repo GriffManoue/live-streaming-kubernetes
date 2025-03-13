@@ -11,7 +11,10 @@ builder.Services.AddControllers();
 
 // Add OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "UserService API", Version = "v1" });
+});
 
 // Add Health Checks
 builder.Services.AddHealthChecks()
@@ -29,7 +32,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserService v1"));
 }
 
 app.UseHttpsRedirection();

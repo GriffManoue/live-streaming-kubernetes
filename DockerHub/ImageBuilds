@@ -1,0 +1,19 @@
+docker build -t bugapeti/user-service:latest -f UserService/Dockerfile .
+docker build -t bugapeti/auth-service:latest -f AuthService/Dockerfile .
+docker build -t bugapeti/stream-service:latest -f StreamService/Dockerfile .
+docker build -t bugapeti/analytics-service:latest -f AnalyticsService/Dockerfile .
+docker build -t bugapeti/recommendation-service:latest -f ReccomendationService/Dockerfile .
+
+docker push bugapeti/user-service:latest
+docker push bugapeti/auth-service:latest
+docker push bugapeti/stream-service:latest
+docker push bugapeti/analytics-service:latest
+docker push bugapeti/recommendation-service:latest
+
+kubectl delete deployment user-service auth-service stream-service analytics-service recommendation-service
+
+kubectl apply -f UserService/k8s/deployment.yaml
+kubectl apply -f AuthService/k8s/deployment.yaml
+kubectl apply -f StreamService/k8s/deployment.yaml
+kubectl apply -f AnalyticsService/k8s/deployment.yaml
+kubectl apply -f ReccomendationService/k8s/deployment.yaml

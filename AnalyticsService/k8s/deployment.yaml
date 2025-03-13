@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: analytics-service
-        image: ${REGISTRY_URL}/analytics-service:latest
+        image: bugapeti/analytics-service:latest
         ports:
         - containerPort: 8080
         env:

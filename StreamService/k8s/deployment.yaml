@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: stream-service
-        image: ${REGISTRY_URL}/stream-service:latest
+        image: bugapeti/stream-service:latest
         ports:
         - containerPort: 8080
         env:
