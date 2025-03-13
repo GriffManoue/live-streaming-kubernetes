@@ -1,25 +1,60 @@
 name: Build and Push Multiple Docker Images
-
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - '**/Dockerfile*'
   pull_request:
     branches: [ "main" ]
-
+    paths:
+      - '**/Dockerfile*'
 jobs:
   find-dockerfiles:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      changed_dockerfiles: ${{ steps.filter-changed-dockerfiles.outputs.changed_dockerfiles }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history to identify file changes
+
+      - name: Get changed files
+        id: changed-files
+        if: github.event_name != 'workflow_dispatch'
+        uses: tj-actions/changed-files@v42
+        with:
+          files: |
+            **/Dockerfile*
+
+      - name: Filter changed Dockerfiles
+        id: filter-changed-dockerfiles
+        run: |
+          # Create a list of changed Dockerfiles
+          # If no specific Dockerfiles have changed or workflow_dispatch, this will be all Dockerfiles
+          CHANGED_FILES="${{ steps.changed-files.outputs.all_changed_files }}"
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "changed_dockerfiles=$CHANGED_FILES" >> $GITHUB_OUTPUT
+            echo "Changed Dockerfiles: $CHANGED_FILES"
+          else
+            echo "No Dockerfiles changed"
+            echo "changed_dockerfiles=" >> $GITHUB_OUTPUT
+          fi
       
       - name: Find Dockerfiles
         id: set-matrix
         run: |
-          # Find all Dockerfiles and extract their paths and directories
-          DOCKERFILES=$(find . -name "Dockerfile*" -not -path "*/\.*" | sort)
+          # Get list of changed Dockerfiles
+          CHANGED_DOCKERFILES="${{ steps.filter-changed-dockerfiles.outputs.changed_dockerfiles }}"
+          
+          # Find all Dockerfiles that changed
+          if [ -n "$CHANGED_DOCKERFILES" ]; then
+            DOCKERFILES=$CHANGED_DOCKERFILES
+          else
+            # If running manually or in another case, empty output will trigger no builds
+            DOCKERFILES=""
+          fi
           
           # Create a JSON array for the matrix
           JSON_ARRAY="["
@@ -68,7 +103,6 @@ jobs:
           
           # Print for debugging
           echo "Found Dockerfiles: $JSON_ARRAY"
-
   build-and-push:
     needs: find-dockerfiles
     runs-on: ubuntu-latest
@@ -77,7 +111,6 @@ jobs:
       matrix:
         dockerfile: ${{ fromJson(needs.find-dockerfiles.outputs.matrix) }}
       fail-fast: false
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
