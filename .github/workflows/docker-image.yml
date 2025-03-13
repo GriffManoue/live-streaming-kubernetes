@@ -1,0 +1,115 @@
+name: Build and Push Multiple Docker Images
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  find-dockerfiles:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Find Dockerfiles
+        id: set-matrix
+        run: |
+          # Find all Dockerfiles and extract their paths and directories
+          DOCKERFILES=$(find . -name "Dockerfile*" -not -path "*/\.*" | sort)
+          
+          # Create a JSON array for the matrix
+          JSON_ARRAY="["
+          FIRST=true
+          
+          for DOCKERFILE in $DOCKERFILES; do
+            DIR=$(dirname "$DOCKERFILE")
+            FILENAME=$(basename "$DOCKERFILE")
+            
+            # Skip leading ./ in directory path if present
+            DIR=${DIR#./}
+            
+            # Set image name based on directory (use directory name as image name)
+            # If Dockerfile is in root, use a default name
+            if [ "$DIR" = "." ]; then
+              IMAGE_NAME="app"
+            else
+              # Replace slashes with hyphens for Docker Hub compatibility
+              IMAGE_NAME=$(echo "$DIR" | tr '/' '-')
+            fi
+            
+            # For Dockerfile variants (like Dockerfile.prod), append the suffix to the image name
+            if [ "$FILENAME" != "Dockerfile" ]; then
+              SUFFIX=${FILENAME#Dockerfile}
+              # Remove the leading dot if present
+              SUFFIX=${SUFFIX#.}
+              if [ -n "$SUFFIX" ]; then
+                IMAGE_NAME="$IMAGE_NAME-$SUFFIX"
+              fi
+            fi
+            
+            # Add to JSON array
+            if [ "$FIRST" = true ]; then
+              FIRST=false
+            else
+              JSON_ARRAY="$JSON_ARRAY,"
+            fi
+            
+            JSON_ARRAY="$JSON_ARRAY{\"dockerfile\":\"$DOCKERFILE\",\"context\":\"$DIR\",\"image_name\":\"$IMAGE_NAME\"}"
+          done
+          
+          JSON_ARRAY="$JSON_ARRAY]"
+          
+          # Set the output for the matrix
+          echo "matrix=$JSON_ARRAY" >> $GITHUB_OUTPUT
+          
+          # Print for debugging
+          echo "Found Dockerfiles: $JSON_ARRAY"
+
+  build-and-push:
+    needs: find-dockerfiles
+    runs-on: ubuntu-latest
+    if: ${{ needs.find-dockerfiles.outputs.matrix != '[]' }}
+    strategy:
+      matrix:
+        dockerfile: ${{ fromJson(needs.find-dockerfiles.outputs.matrix) }}
+      fail-fast: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.dockerfile.image_name }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,format=short
+            type=ref,event=branch
+            type=ref,event=pr
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          # Set context to the repository root to ensure all referenced files are available
+          context: .
+          file: ${{ matrix.dockerfile.dockerfile }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
