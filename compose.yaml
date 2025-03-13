@@ -1,4 +1,4 @@
-﻿services:
+﻿﻿services:
   # Database
   postgres:
     image: postgres:latest
@@ -47,6 +47,54 @@
       redis:
         condition: service_healthy
 
+  # Auth Service
+  authservice:
+    image: authservice
+    build:
+      context: .
+      dockerfile: AuthService/Dockerfile
+    ports:
+      - "8002:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=postgres;Database=streaming;User Id=postgres;Password=postgres;
+      - ConnectionStrings__Redis=redis:6379
+      - Jwt__SecretKey=your-256-bit-secret-key-here-at-least-32-chars
+      - Jwt__Issuer=streaming-platform
+      - Jwt__Audience=streaming-users
+      - Jwt__ExpiryMinutes=60
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Stream Service
+  streamservice:
+    image: streamservice
+    build:
+      context: .
+      dockerfile: StreamService/Dockerfile
+    ports:
+      - "8003:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=postgres;Database=streaming;User Id=postgres;Password=postgres;
+      - ConnectionStrings__Redis=redis:6379
+      - Jwt__SecretKey=your-256-bit-secret-key-here-at-least-32-chars
+      - Jwt__Issuer=streaming-platform
+      - Jwt__Audience=streaming-users
+      - Jwt__ExpiryMinutes=60
+      - Rtmp__Server=rtmp://nginx-rtmp:1935/live
+      - Rtmp__StreamKeyPrefix=stream_
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nginx-rtmp:
+        condition: service_started
+
   # NGINX RTMP Server
   nginx-rtmp:
     image: tiangolo/nginx-rtmp:latest
@@ -57,27 +105,3 @@
 volumes:
   postgres-data:
   redis-data:
-
-  streamservice:
-    image: streamservice
-    build:
-      context: .
-      dockerfile: StreamService/Dockerfile
-
-  analyticsservice:
-    image: analyticsservice
-    build:
-      context: .
-      dockerfile: AnalyticsService/Dockerfile
-
-  reccomendationservice:
-    image: reccomendationservice
-    build:
-      context: .
-      dockerfile: ReccomendationService/Dockerfile
-
-  authservice:
-    image: authservice
-    build:
-      context: .
-      dockerfile: AuthService/Dockerfile

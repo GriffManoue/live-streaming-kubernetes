@@ -8,11 +8,11 @@ The application consists of the following components:
 
 ### Backend Services
 
-- **Auth Service**: Handles user authentication and authorization
-- **User Service**: Manages user profiles and relationships
-- **Stream Service**: Manages stream creation, updates, and metadata
-- **Analytics Service**: Tracks and provides analytics for streams and users
-- **Recommendation Service**: Provides personalized stream and user recommendations
+- **Auth Service**: Handles user authentication and authorization using JWT tokens ✅
+- **User Service**: Manages user profiles and relationships ✅
+- **Stream Service**: Manages stream creation, updates, and metadata, integrates with NGINX RTMP ✅
+- **Analytics Service**: Tracks and provides analytics for streams and users (to be implemented)
+- **Recommendation Service**: Provides personalized stream and user recommendations (to be implemented)
 
 ### Infrastructure
 
@@ -23,7 +23,7 @@ The application consists of the following components:
 
 ### Frontend
 
-- **Angular Frontend**: User interface for the streaming platform
+- **Angular Frontend**: User interface for the streaming platform (to be implemented)
 
 ## Domain Models
 
@@ -39,6 +39,15 @@ The application uses the repository pattern with a shared DbContext to provide a
 - Generic `IRepository<T>` interface
 - Implementation of the repository pattern in `Repository<T>`
 - Shared `ApplicationDbContext` for database access
+
+## Authentication
+
+The application uses JWT (JSON Web Tokens) for authentication:
+
+- Token generation and validation in the Auth Service
+- Password hashing with BCrypt
+- Token-based authentication across all services
+- Secure API endpoints with [Authorize] attribute
 
 ## Getting Started
 
@@ -63,6 +72,8 @@ The application uses the repository pattern with a shared DbContext to provide a
 
 3. Access the services:
    - User Service: http://localhost:8001
+   - Auth Service: http://localhost:8002
+   - Stream Service: http://localhost:8003
    - NGINX RTMP: rtmp://localhost:1935/live
 
 ### Kubernetes Deployment
@@ -70,17 +81,24 @@ The application uses the repository pattern with a shared DbContext to provide a
 1. Build and push the Docker images:
    ```
    docker build -t yourusername/user-service:latest -f UserService/Dockerfile .
+   docker build -t yourusername/auth-service:latest -f AuthService/Dockerfile .
+   docker build -t yourusername/stream-service:latest -f StreamService/Dockerfile .
+   
    docker push yourusername/user-service:latest
+   docker push yourusername/auth-service:latest
+   docker push yourusername/stream-service:latest
    ```
 
 2. Update the Kubernetes deployment files with your image registry:
    ```
-   sed -i 's/${REGISTRY_URL}/yourusername/g' UserService/k8s/deployment.yaml
+   sed -i 's/${REGISTRY_URL}/yourusername/g' */k8s/deployment.yaml
    ```
 
 3. Apply the Kubernetes configurations:
    ```
    kubectl apply -f UserService/k8s/deployment.yaml
+   kubectl apply -f AuthService/k8s/deployment.yaml
+   kubectl apply -f StreamService/k8s/deployment.yaml
    ```
 
 ## Project Structure
@@ -100,12 +118,31 @@ live-streaming-kubernetes/
 │   │   └── Services/            # Service implementations
 │   ├── k8s/                     # Kubernetes deployment files
 │   └── Dockerfile               # Docker build file
-├── AuthService/                 # Authentication service (to be implemented)
-├── StreamService/               # Stream management service (to be implemented)
+├── AuthService/                 # Authentication service
+│   ├── src/
+│   │   ├── Controllers/         # API controllers
+│   │   └── Services/            # Service implementations
+│   ├── k8s/                     # Kubernetes deployment files
+│   └── Dockerfile               # Docker build file
+├── StreamService/               # Stream management service
+│   ├── src/
+│   │   ├── Controllers/         # API controllers
+│   │   └── Services/            # Service implementations
+│   ├── k8s/                     # Kubernetes deployment files
+│   └── Dockerfile               # Docker build file
 ├── AnalyticsService/            # Analytics service (to be implemented)
 ├── RecommendationService/       # Recommendation service (to be implemented)
 └── compose.yaml                 # Docker Compose configuration
 ```
+
+## RTMP Integration
+
+The platform integrates with NGINX RTMP for live streaming:
+
+- **Stream Publishing**: Streamers can publish to the RTMP server using OBS or similar software
+- **Stream Keys**: Each user gets a unique stream key for authentication
+- **Event Handling**: The Stream Service processes RTMP events (publish/publish_done)
+- **Stream Playback**: Viewers can watch streams via HLS or DASH protocols
 
 ## Contributing
 
