@@ -95,6 +95,54 @@
       nginx-rtmp:
         condition: service_started
 
+  # Analytics Service
+  analyticsservice:
+    image: analyticsservice
+    build:
+      context: .
+      dockerfile: AnalyticsService/Dockerfile
+    ports:
+      - "8004:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=postgres;Database=streaming;User Id=postgres;Password=postgres;
+      - ConnectionStrings__Redis=redis:6379
+      - Jwt__SecretKey=your-256-bit-secret-key-here-at-least-32-chars
+      - Jwt__Issuer=streaming-platform
+      - Jwt__Audience=streaming-users
+      - Jwt__ExpiryMinutes=60
+      - Analytics__CacheExpiryMinutes=5
+      - Analytics__SampleDataEnabled=true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Recommendation Service
+  recommendationservice:
+    image: recommendationservice
+    build:
+      context: .
+      dockerfile: ReccomendationService/Dockerfile
+    ports:
+      - "8005:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=postgres;Database=streaming;User Id=postgres;Password=postgres;
+      - ConnectionStrings__Redis=redis:6379
+      - Jwt__SecretKey=your-256-bit-secret-key-here-at-least-32-chars
+      - Jwt__Issuer=streaming-platform
+      - Jwt__Audience=streaming-users
+      - Jwt__ExpiryMinutes=60
+      - Recommendation__CacheExpiryMinutes=5
+      - Recommendation__MaxRecommendations=10
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   # NGINX RTMP Server
   nginx-rtmp:
     image: tiangolo/nginx-rtmp:latest

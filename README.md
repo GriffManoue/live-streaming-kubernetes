@@ -11,8 +11,8 @@ The application consists of the following components:
 - **Auth Service**: Handles user authentication and authorization using JWT tokens ✅
 - **User Service**: Manages user profiles and relationships ✅
 - **Stream Service**: Manages stream creation, updates, and metadata, integrates with NGINX RTMP ✅
-- **Analytics Service**: Tracks and provides analytics for streams and users (to be implemented)
-- **Recommendation Service**: Provides personalized stream and user recommendations (to be implemented)
+- **Analytics Service**: Tracks and provides analytics for streams and users ✅
+- **Recommendation Service**: Provides personalized stream and user recommendations ✅
 
 ### Infrastructure
 
@@ -74,6 +74,8 @@ The application uses JWT (JSON Web Tokens) for authentication:
    - User Service: http://localhost:8001
    - Auth Service: http://localhost:8002
    - Stream Service: http://localhost:8003
+   - Analytics Service: http://localhost:8004
+   - Recommendation Service: http://localhost:8005
    - NGINX RTMP: rtmp://localhost:1935/live
 
 ### Kubernetes Deployment
@@ -83,10 +85,14 @@ The application uses JWT (JSON Web Tokens) for authentication:
    docker build -t yourusername/user-service:latest -f UserService/Dockerfile .
    docker build -t yourusername/auth-service:latest -f AuthService/Dockerfile .
    docker build -t yourusername/stream-service:latest -f StreamService/Dockerfile .
+   docker build -t yourusername/analytics-service:latest -f AnalyticsService/Dockerfile .
+   docker build -t yourusername/recommendation-service:latest -f ReccomendationService/Dockerfile .
    
    docker push yourusername/user-service:latest
    docker push yourusername/auth-service:latest
    docker push yourusername/stream-service:latest
+   docker push yourusername/analytics-service:latest
+   docker push yourusername/recommendation-service:latest
    ```
 
 2. Update the Kubernetes deployment files with your image registry:
@@ -99,6 +105,8 @@ The application uses JWT (JSON Web Tokens) for authentication:
    kubectl apply -f UserService/k8s/deployment.yaml
    kubectl apply -f AuthService/k8s/deployment.yaml
    kubectl apply -f StreamService/k8s/deployment.yaml
+   kubectl apply -f AnalyticsService/k8s/deployment.yaml
+   kubectl apply -f ReccomendationService/k8s/deployment.yaml
    ```
 
 ## Project Structure
@@ -130,8 +138,18 @@ live-streaming-kubernetes/
 │   │   └── Services/            # Service implementations
 │   ├── k8s/                     # Kubernetes deployment files
 │   └── Dockerfile               # Docker build file
-├── AnalyticsService/            # Analytics service (to be implemented)
-├── RecommendationService/       # Recommendation service (to be implemented)
+├── AnalyticsService/            # Analytics service
+│   ├── src/
+│   │   ├── Controllers/         # API controllers
+│   │   └── Services/            # Service implementations
+│   ├── k8s/                     # Kubernetes deployment files
+│   └── Dockerfile               # Docker build file
+├── ReccomendationService/       # Recommendation service
+│   ├── src/
+│   │   ├── Controllers/         # API controllers
+│   │   └── Services/            # Service implementations
+│   ├── k8s/                     # Kubernetes deployment files
+│   └── Dockerfile               # Docker build file
 └── compose.yaml                 # Docker Compose configuration
 ```
 
