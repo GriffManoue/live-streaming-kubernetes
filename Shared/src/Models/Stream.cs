@@ -1,12 +1,11 @@
-﻿using Shared.models.Enums;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Shared.models;
 
 public class Stream
 {
-    User User { get; set; }
-    string StreamName { get; set; }
-    string StreamDescription { get; set; }
-    StreamCategory StreamCategory { get; set; }
-    
+    [Required] public required User User { get; set; }
+    [Required] public required string StreamName { get; set; }
+    [Required] public required string StreamDescription { get; set; }
+    [Required] public required string StreamCategory { get; set; }
 }
