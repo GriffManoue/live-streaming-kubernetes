@@ -1,7 +1,11 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.Data;
 using Shared.Extensions;
+using Shared.Interfaces;
+using Shared.Services;
+using StackExchange.Redis;
+using UserService.Data;
+using UserService.Extensions;
 using UserService.Services;
 using System;
 
@@ -19,7 +23,7 @@ builder.Services.AddSwaggerGen(c =>
 
 // Add Health Checks with more resilient configuration
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<ApplicationDbContext>(
+    .AddDbContextCheck<UserDbContext>(
         failureStatus: HealthStatus.Degraded,
         tags: new[] { "ready" })
     .AddRedis(
@@ -29,8 +33,19 @@ builder.Services.AddHealthChecks()
         tags: new[] { "ready" },
         timeout: TimeSpan.FromSeconds(10));
 
-// Add shared services (DbContext, Redis, Repositories)
-builder.Services.AddSharedServices(builder.Configuration);
+// Add Redis caching service (still shared)
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var configOptions = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis") ?? "localhost");
+    configOptions.AbortOnConnectFail = false;
+    configOptions.ConnectRetry = 5;
+    configOptions.ReconnectRetryPolicy = new ExponentialRetry(5000);
+    return ConnectionMultiplexer.Connect(configOptions);
+});
+builder.Services.AddSingleton<ICacheService, RedisCacheService>();
+
+// Add user-specific DB context and repositories
+builder.Services.AddUserDbContext(builder.Configuration);
 
 // Add application services
 builder.Services.AddScoped<Shared.Interfaces.IUserService, UserService.Services.UserService>();

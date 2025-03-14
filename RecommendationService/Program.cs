@@ -2,9 +2,11 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
-using Shared.Data;
-using Shared.Extensions;
 using Shared.Interfaces;
+using Shared.Services;
+using StackExchange.Redis;
+using RecommendationService.Data;
+using RecommendationService.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +19,7 @@ builder.Services.AddOpenApi();
 
 // Add Health Checks
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<ApplicationDbContext>(
+    .AddDbContextCheck<RecommendationDbContext>(
         failureStatus: HealthStatus.Degraded,
         tags: new[] { "ready" })
     .AddRedis(
@@ -27,8 +29,19 @@ builder.Services.AddHealthChecks()
         new[] { "ready" },
         TimeSpan.FromSeconds(5));
 
-// Add shared services (DbContext, Redis, Repositories)
-builder.Services.AddSharedServices(builder.Configuration);
+// Add Redis caching service (shared)
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var configOptions = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis") ?? "localhost");
+    configOptions.AbortOnConnectFail = false;
+    configOptions.ConnectRetry = 5;
+    configOptions.ReconnectRetryPolicy = new ExponentialRetry(5000);
+    return ConnectionMultiplexer.Connect(configOptions);
+});
+builder.Services.AddSingleton<ICacheService, RedisCacheService>();
+
+// Add recommendation-specific DB context and repositories
+builder.Services.AddRecommendationDbContext(builder.Configuration);
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
