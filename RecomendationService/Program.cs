@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using Shared.Data;
 using Shared.Extensions;
 using Shared.Interfaces;
-using ReccomendationService.Services;
+using RecommendationService.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,7 +52,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 // Add application services
-builder.Services.AddScoped<IRecommendationService, ReccomendationService.Services.RecommendationService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService.Services.RecommendationService>();
 // The AnalyticsService will be provided by the AnalyticsService microservice
 
 var app = builder.Build();
