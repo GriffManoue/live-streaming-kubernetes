@@ -9,7 +9,7 @@ COPY ["Shared/Shared.csproj", "Shared/"]
 RUN dotnet restore "RecomendationService/RecomendationService.csproj"
 COPY . .
 WORKDIR "/src/ReccomendationService"
-RUN dotnet build "ReccomendationService.csproj" -c Release -o /app/build
+RUN dotnet build "RecomendationService.csproj" -c Release -o /app/build
 
 FROM build AS publish
 RUN dotnet publish "RecomendationService.csproj" -c Release -o /app/publish
