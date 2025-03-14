@@ -35,8 +35,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserService v1"));
     
-    // Only use HTTPS redirection in development
-    app.UseHttpsRedirection();
+    // Only use HTTPS redirection in local development, not in containers
+    var isRunningInContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+    if (!isRunningInContainer)
+    {
+        app.UseHttpsRedirection();
+    }
 }
 
 app.UseAuthorization();

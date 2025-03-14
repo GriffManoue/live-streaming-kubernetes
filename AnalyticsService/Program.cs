@@ -53,8 +53,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    // Only use HTTPS redirection in development
-    app.UseHttpsRedirection();
+    
+    // Only use HTTPS redirection in local development, not in containers
+    var isRunningInContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+    if (!isRunningInContainer)
+    {
+        app.UseHttpsRedirection();
+    }
 }
 
 app.UseAuthentication();
