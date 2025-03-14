@@ -143,6 +143,21 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+        
+  # Database Management Service
+  dbmanagementservice:
+    image: dbmanagementservice
+    build:
+      context: .
+      dockerfile: DatabaseManagementService/Dockerfile
+    ports:
+      - "8006:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=postgres;Database=streaming;User Id=postgres;Password=postgres;
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   # NGINX RTMP Server
   nginx-rtmp:

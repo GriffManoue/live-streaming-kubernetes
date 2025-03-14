@@ -1,0 +1,21 @@
+@host = http://localhost:8006
+
+### Health Check
+GET {{host}}/health
+Accept: application/json
+
+### Get Migration Status
+GET {{host}}/api/migration/status
+Accept: application/json
+
+### Get Available Migrations
+GET {{host}}/api/migration/available
+Accept: application/json
+
+### Get Applied Migrations
+GET {{host}}/api/migration/applied
+Accept: application/json
+
+### Run Migration
+POST {{host}}/api/migration/migrate
+Accept: application/json
