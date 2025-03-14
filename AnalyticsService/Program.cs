@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Shared.Data;
 using Shared.Extensions;
@@ -15,10 +16,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
-// Add Health Checks
+// Add Health Checks with more resilient configuration
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<ApplicationDbContext>()
-    .AddRedis(builder.Configuration.GetConnectionString("Redis") ?? "localhost");
+    .AddDbContextCheck<ApplicationDbContext>(
+        failureStatus: HealthStatus.Degraded,
+        tags: new[] { "ready" })
+    .AddRedis(
+        builder.Configuration.GetConnectionString("Redis") ?? "localhost",
+        name: "redis",
+        failureStatus: HealthStatus.Degraded,
+        tags: new[] { "ready" },
+        timeout: TimeSpan.FromSeconds(5));
 
 // Add shared services (DbContext, Redis, Repositories)
 builder.Services.AddSharedServices(builder.Configuration);

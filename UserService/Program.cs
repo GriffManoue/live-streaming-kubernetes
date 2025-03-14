@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Data;
 using Shared.Extensions;
 using UserService.Services;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,10 +17,17 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new() { Title = "UserService API", Version = "v1" });
 });
 
-// Add Health Checks
+// Add Health Checks with more resilient configuration
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<ApplicationDbContext>()
-    .AddRedis(builder.Configuration.GetConnectionString("Redis") ?? "localhost");
+    .AddDbContextCheck<ApplicationDbContext>(
+        failureStatus: HealthStatus.Degraded,
+        tags: new[] { "ready" })
+    .AddRedis(
+        builder.Configuration.GetConnectionString("Redis") ?? "localhost",
+        name: "redis",
+        failureStatus: HealthStatus.Degraded,
+        tags: new[] { "ready" },
+        timeout: TimeSpan.FromSeconds(5));
 
 // Add shared services (DbContext, Redis, Repositories)
 builder.Services.AddSharedServices(builder.Configuration);

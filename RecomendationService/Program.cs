@@ -17,8 +17,15 @@ builder.Services.AddOpenApi();
 
 // Add Health Checks
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<ApplicationDbContext>()
-    .AddRedis(builder.Configuration.GetConnectionString("Redis") ?? "localhost");
+    .AddDbContextCheck<ApplicationDbContext>(
+        failureStatus: HealthStatus.Degraded,
+        tags: new[] { "ready" })
+    .AddRedis(
+        builder.Configuration.GetConnectionString("Redis") ?? "localhost",
+        name: "redis",
+        failureStatus: HealthStatus.Degraded,
+        tags: new[] { "ready" },
+        timeout: TimeSpan.FromSeconds(5));
 
 // Add shared services (DbContext, Redis, Repositories)
 builder.Services.AddSharedServices(builder.Configuration);
