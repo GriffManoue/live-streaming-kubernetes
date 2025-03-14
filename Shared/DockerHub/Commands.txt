@@ -2,7 +2,7 @@ docker build -t bugapeti/userservice:latest -f UserService/Dockerfile .
 docker build -t bugapeti/authservice:latest -f AuthService/Dockerfile .
 docker build -t bugapeti/streamservice:latest -f StreamService/Dockerfile .
 docker build -t bugapeti/analyticsservice:latest -f AnalyticsService/Dockerfile .
-docker build -t bugapeti/recommendationservice:latest -f ReccomendationService/Dockerfile .
+docker build -t bugapeti/recommendationservice:latest -f RecommendationService/Dockerfile .
 
 docker push bugapeti/userservice:latest
 docker push bugapeti/authservice:latest
@@ -17,7 +17,7 @@ kubectl apply -f UserService/k8s/
 kubectl apply -f AuthService/k8s/
 kubectl apply -f StreamService/k8s/
 kubectl apply -f AnalyticsService/k8s/
-kubectl apply -f ReccomendationService/k8s/
+kubectl apply -f RecommendationService/k8s/
 kubectl apply -f Database/PostgreSQL/
 kubectl apply -f Database/Redis/
 kubectl apply -f Database/

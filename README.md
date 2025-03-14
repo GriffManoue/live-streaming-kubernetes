@@ -86,7 +86,7 @@ The application uses JWT (JSON Web Tokens) for authentication:
    docker build -t yourusername/auth-service:latest -f AuthService/Dockerfile .
    docker build -t yourusername/stream-service:latest -f StreamService/Dockerfile .
    docker build -t yourusername/analytics-service:latest -f AnalyticsService/Dockerfile .
-   docker build -t yourusername/recommendation-service:latest -f ReccomendationService/Dockerfile .
+   docker build -t yourusername/recommendation-service:latest -f RecommendationService/Dockerfile .
    
    docker push yourusername/user-service:latest
    docker push yourusername/auth-service:latest
@@ -106,7 +106,7 @@ The application uses JWT (JSON Web Tokens) for authentication:
    kubectl apply -f AuthService/k8s/deployment.yaml
    kubectl apply -f StreamService/k8s/deployment.yaml
    kubectl apply -f AnalyticsService/k8s/deployment.yaml
-   kubectl apply -f ReccomendationService/k8s/deployment.yaml
+   kubectl apply -f RecommendationService/k8s/deployment.yaml
    ```
 
 ## Project Structure
@@ -144,7 +144,7 @@ live-streaming-kubernetes/
 │   │   └── Services/            # Service implementations
 │   ├── k8s/                     # Kubernetes deployment files
 │   └── Dockerfile               # Docker build file
-├── ReccomendationService/       # Recommendation service
+├── RecommendationService/       # Recommendation service
 │   ├── src/
 │   │   ├── Controllers/         # API controllers
 │   │   └── Services/            # Service implementations

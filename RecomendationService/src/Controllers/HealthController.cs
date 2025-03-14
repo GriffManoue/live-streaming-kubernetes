@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Threading.Tasks;
 
-namespace ReccomendationService.Controllers;
+namespace RecommendationService.Controllers;
 
 [ApiController]
 [Route("health")]

@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ReccomendationService.Controllers;
+namespace RecommendationService.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

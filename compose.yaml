@@ -125,7 +125,7 @@ services:
     image: recommendationservice
     build:
       context: .
-      dockerfile: ReccomendationService/Dockerfile
+      dockerfile: RecommendationService/Dockerfile
     ports:
       - "8005:8080"
     environment:

@@ -4,17 +4,17 @@ EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY ["RecomendationService/RecomendationService.csproj", "RecomendationService/"]
+COPY ["RecommendationService/RecommendationService.csproj", "RecommendationService/"]
 COPY ["Shared/Shared.csproj", "Shared/"]
-RUN dotnet restore "RecomendationService/RecomendationService.csproj"
+RUN dotnet restore "RecommendationService/RecommendationService.csproj"
 COPY . .
-WORKDIR "/src/RecomendationService"
-RUN dotnet build "RecomendationService.csproj" -c Release -o /app/build
+WORKDIR "/src/RecommendationService"
+RUN dotnet build "RecommendationService.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "RecomendationService.csproj" -c Release -o /app/publish
+RUN dotnet publish "RecommendationService.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "RecomendationService.dll"]
+ENTRYPOINT ["dotnet", "RecommendationService.dll"]
