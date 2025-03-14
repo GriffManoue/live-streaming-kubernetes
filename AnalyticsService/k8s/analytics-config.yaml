@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: analytics-config
+data:
+  cache-expiry-minutes: "5"
+  sample-data-enabled: "true"

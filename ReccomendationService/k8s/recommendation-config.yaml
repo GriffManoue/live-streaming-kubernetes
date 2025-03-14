@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: recommendation-config
+data:
+  cache-expiry-minutes: "5"
+  max-recommendations: "10"

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rtmp-config
+data:
+  rtmp-server: "rtmp://nginx-rtmp:1935/live"
+  stream-key-prefix: "stream_"

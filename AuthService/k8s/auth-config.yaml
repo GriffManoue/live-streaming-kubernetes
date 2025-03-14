@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-config
+data:
+  jwt-issuer: "streaming-platform"
+  jwt-audience: "streaming-users"
+  jwt-expiry-minutes: "60"
