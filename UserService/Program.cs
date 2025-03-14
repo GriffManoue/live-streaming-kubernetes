@@ -27,7 +27,7 @@ builder.Services.AddHealthChecks()
         name: "redis",
         failureStatus: HealthStatus.Degraded,
         tags: new[] { "ready" },
-        timeout: TimeSpan.FromSeconds(5));
+        timeout: TimeSpan.FromSeconds(10));
 
 // Add shared services (DbContext, Redis, Repositories)
 builder.Services.AddSharedServices(builder.Configuration);
