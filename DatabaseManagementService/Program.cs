@@ -1,13 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using DatabaseManagementService.Data;
-using Microsoft.OpenApi.Models;
 using DatabaseManagementService.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Add migration services
+// Add migration services - Only MasterDbContext is explicitly configured for migrations
+// Other service-specific DbContexts (like UserDbContext) will be migrated by their respective services
 builder.Services.AddDbContext<MasterDbContext>(options =>
 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 

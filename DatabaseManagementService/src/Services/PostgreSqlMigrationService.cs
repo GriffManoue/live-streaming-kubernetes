@@ -25,12 +25,15 @@ public class PostgreSqlMigrationService : IMigrationService
 
     public async Task<bool> HasPendingMigrationsAsync()
     {
+        _logger.LogInformation("Checking if MasterDbContext has pending migrations");
         return await _masterDbContext.Database.CanConnectAsync();
     }
 
     public async Task<IEnumerable<string>> ApplyMigrationsAsync()
     {
+        _logger.LogInformation("Applying migrations for MasterDbContext only");
         await _masterDbContext.Database.MigrateAsync();
+        
         return _masterDbContext.Database.GetPendingMigrations();
     }
 }

@@ -10,8 +10,8 @@ docker push bugapeti/streamservice:latest
 docker push bugapeti/analyticsservice:latest
 docker push bugapeti/recommendationservice:latest
 
-kubectl delete deployment user-service auth-service stream-service analytics-service recommendation-service
-kubectl delete service user-service auth-service stream-service analytics-service recommendation-service
+kubectl delete deployment user-deployment auth-deployment stream-deployment analytics-deployment recommendation-deployment db-management-deployment postgres-deployment redis-deployment
+kubectl delete service user-service auth-service stream-service analytics-service recommendation-service db-management postgres redis-service
 
 kubectl apply -f UserService/k8s/
 kubectl apply -f AuthService/k8s/
