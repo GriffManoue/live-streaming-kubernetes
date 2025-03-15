@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace DatabaseManagementService.Services;
 
@@ -7,20 +8,24 @@ public interface IMigrationService
     /// <summary>
     /// Applies any pending migrations to the database
     /// </summary>
-    Task<bool> MigrateAsync();
+    /// <param name="serviceName">Optional service name to migrate specific service database</param>
+    Task<bool> MigrateAsync(string serviceName = null);
     
     /// <summary>
     /// Checks if there are any pending migrations that need to be applied
     /// </summary>
-    Task<bool> HasPendingMigrationsAsync();
+    /// <param name="serviceName">Optional service name to check specific service database</param>
+    Task<bool> HasPendingMigrationsAsync(string serviceName = null);
     
     /// <summary>
     /// Gets a list of all available migrations
     /// </summary>
-    Task<IEnumerable<string>> GetAvailableMigrationsAsync();
+    /// <param name="serviceName">Optional service name to get migrations for specific service</param>
+    Task<IEnumerable<string>> GetAvailableMigrationsAsync(string serviceName = null);
     
     /// <summary>
     /// Gets a list of applied migrations
     /// </summary>
-    Task<IEnumerable<string>> GetAppliedMigrationsAsync();
+    /// <param name="serviceName">Optional service name to get applied migrations for specific service</param>
+    Task<IEnumerable<string>> GetAppliedMigrationsAsync(string serviceName = null);
 }

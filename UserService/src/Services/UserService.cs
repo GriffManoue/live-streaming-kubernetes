@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Shared.Interfaces;
 using Shared.Models.Domain;
 using Shared.Models.User;
+using BCrypt.Net;
+
 
 namespace UserService.Services;
 
@@ -73,11 +70,9 @@ public class UserService : IUserService
             user.Phone = request.Phone;
         }
         
-        // Update password if provided
         if (!string.IsNullOrEmpty(request.Password))
         {
-            // In a real implementation, you would hash the password here
-            user.Password = request.Password;
+            user.Password =BCrypt.Net.BCrypt.HashPassword(request.Password);
         }
         
         await _userRepository.UpdateAsync(user);
@@ -99,7 +94,6 @@ public class UserService : IUserService
                 followers.Add(MapToDto(follower));
             }
         }
-        
         return followers;
     }
     

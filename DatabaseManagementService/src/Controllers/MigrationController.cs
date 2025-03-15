@@ -24,75 +24,77 @@ public class MigrationController : ControllerBase
     [HttpGet("status")]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetMigrationStatus()
+    public async Task<IActionResult> GetMigrationStatus([FromQuery] string serviceName = null)
     {
         try
         {
-            var hasPendingMigrations = await _migrationService.HasPendingMigrationsAsync();
-            return Ok(new { PendingMigrations = hasPendingMigrations });
+            var hasPendingMigrations = await _migrationService.HasPendingMigrationsAsync(serviceName);
+            return Ok(new { PendingMigrations = hasPendingMigrations, ServiceName = serviceName ?? "Default" });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking migration status");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while checking migration status");
+            _logger.LogError(ex, $"Error checking migration status {(serviceName != null ? $"for {serviceName}" : "")}");
+            return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while checking migration status {(serviceName != null ? $"for {serviceName}" : "")}");
         }
     }
 
     [HttpGet("available")]
     [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAvailableMigrations()
+    public async Task<IActionResult> GetAvailableMigrations([FromQuery] string serviceName = null)
     {
         try
         {
-            var migrations = await _migrationService.GetAvailableMigrationsAsync();
+            var migrations = await _migrationService.GetAvailableMigrationsAsync(serviceName);
             return Ok(migrations);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting available migrations");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while getting available migrations");
+            _logger.LogError(ex, $"Error getting available migrations {(serviceName != null ? $"for {serviceName}" : "")}");
+            return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting available migrations {(serviceName != null ? $"for {serviceName}" : "")}");
         }
     }
 
     [HttpGet("applied")]
     [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAppliedMigrations()
+    public async Task<IActionResult> GetAppliedMigrations([FromQuery] string serviceName = null)
     {
         try
         {
-            var migrations = await _migrationService.GetAppliedMigrationsAsync();
+            var migrations = await _migrationService.GetAppliedMigrationsAsync(serviceName);
             return Ok(migrations);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting applied migrations");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while getting applied migrations");
+            _logger.LogError(ex, $"Error getting applied migrations {(serviceName != null ? $"for {serviceName}" : "")}");
+            return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while getting applied migrations {(serviceName != null ? $"for {serviceName}" : "")}");
         }
     }
 
     [HttpPost("migrate")]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> RunMigration()
+    public async Task<IActionResult> RunMigration([FromBody] string serviceName = null)
     {
         try
         {
-            var result = await _migrationService.MigrateAsync();
+            _logger.LogInformation($"Starting migration {(serviceName != null ? $"for {serviceName}" : "for default service")}");
+            
+            var result = await _migrationService.MigrateAsync(serviceName);
             if (result)
             {
-                return Ok(new { Success = true, Message = "Migration completed successfully" });
+                return Ok(new { Success = true, Message = $"Migration completed successfully {(serviceName != null ? $"for {serviceName}" : "")}" });
             }
             else
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Migration failed");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Migration failed {(serviceName != null ? $"for {serviceName}" : "")}");
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error running migration");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while running migration");
+            _logger.LogError(ex, $"Error running migration {(serviceName != null ? $"for {serviceName}" : "")}");
+            return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while running migration {(serviceName != null ? $"for {serviceName}" : "")}");
         }
     }
 }

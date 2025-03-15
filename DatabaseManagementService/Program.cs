@@ -1,4 +1,5 @@
 using DatabaseManagementService.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +32,12 @@ if (app.Environment.IsDevelopment())
     using (var scope = app.Services.CreateScope())
     {
         var migrationService = scope.ServiceProvider.GetRequiredService<DatabaseManagementService.Services.IMigrationService>();
+        
+        // Apply default migrations
         await migrationService.MigrateAsync();
+        
+        // Note: To apply UserService migrations, use the API endpoint:
+        // POST /api/migration/migrate with body: "UserService"
     }
 
     // Only use HTTPS redirection in local development, not in containers
