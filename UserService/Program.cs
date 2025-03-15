@@ -1,13 +1,10 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.DependencyInjection;
-using Shared.Extensions;
 using Shared.Interfaces;
 using Shared.Services;
 using StackExchange.Redis;
 using UserService.Data;
 using UserService.Extensions;
-using UserService.Services;
-using System;
+
 
 var builder = WebApplication.CreateBuilder(args);
 

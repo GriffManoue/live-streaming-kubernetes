@@ -1,18 +1,26 @@
 using Microsoft.EntityFrameworkCore;
+using Shared.Data;
 using Shared.Models.Domain;
 
-namespace Shared.Data;
+namespace DatabaseManagementService.Data;
 
-public class ApplicationDbContext : BaseDbContext
+/// <summary>
+/// Master DbContext that includes all tables from all microservices.
+/// This context is only used for database migrations and administration tasks.
+/// </summary>
+public class MasterDbContext : BaseDbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    public MasterDbContext(DbContextOptions<MasterDbContext> options) : base(options)
     {
     }
     
+    // User related entities
     public DbSet<User> Users { get; set; } = null!;
-    public DbSet<LiveStream> Streams { get; set; } = null!;
-    public DbSet<StreamMetadata> StreamMetadata { get; set; } = null!;
     public DbSet<UserRelationship> UserRelationships { get; set; } = null!;
+    
+    // Stream related entities
+    public DbSet<LiveStream> LiveStreams { get; set; } = null!;
+    public DbSet<StreamMetadata> StreamMetadata { get; set; } = null!;
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,18 +34,6 @@ public class ApplicationDbContext : BaseDbContext
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
-        
-        // Configure Stream entity
-        modelBuilder.Entity<LiveStream>()
-            .HasOne(s => s.User)
-            .WithMany(u => u.Streams)
-            .HasForeignKey(s => s.UserId);
-        
-        // Configure StreamMetadata entity
-        modelBuilder.Entity<StreamMetadata>()
-            .HasOne(sm => sm.Stream)
-            .WithOne(s => s.Metadata)
-            .HasForeignKey<StreamMetadata>(sm => sm.StreamId);
         
         // Configure UserRelationship entity
         modelBuilder.Entity<UserRelationship>()
@@ -55,5 +51,19 @@ public class ApplicationDbContext : BaseDbContext
         modelBuilder.Entity<UserRelationship>()
             .HasIndex(ur => new { ur.FollowerId, ur.FollowingId })
             .IsUnique();
+            
+        // Configure LiveStream entity
+        modelBuilder.Entity<LiveStream>()
+            .HasOne(ls => ls.User)
+            .WithMany(u => u.Streams)
+            .HasForeignKey(ls => ls.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+            
+        // Configure StreamMetadata entity
+        modelBuilder.Entity<StreamMetadata>()
+            .HasOne(sm => sm.Stream)
+            .WithOne(ls => ls.Metadata)
+            .HasForeignKey<StreamMetadata>(sm => sm.StreamId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
-}
+} 

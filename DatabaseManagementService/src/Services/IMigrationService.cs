@@ -6,26 +6,14 @@ namespace DatabaseManagementService.Services;
 public interface IMigrationService
 {
     /// <summary>
-    /// Applies any pending migrations to the database
+    /// Checks if the database has any pending migrations that need to be applied
     /// </summary>
-    /// <param name="serviceName">Optional service name to migrate specific service database</param>
-    Task<bool> MigrateAsync(string serviceName = null);
-    
+    /// <returns>True if there are pending migrations, false otherwise</returns>
+    Task<bool> HasPendingMigrationsAsync();
+
     /// <summary>
-    /// Checks if there are any pending migrations that need to be applied
+    /// Applies all pending migrations to the database
     /// </summary>
-    /// <param name="serviceName">Optional service name to check specific service database</param>
-    Task<bool> HasPendingMigrationsAsync(string serviceName = null);
-    
-    /// <summary>
-    /// Gets a list of all available migrations
-    /// </summary>
-    /// <param name="serviceName">Optional service name to get migrations for specific service</param>
-    Task<IEnumerable<string>> GetAvailableMigrationsAsync(string serviceName = null);
-    
-    /// <summary>
-    /// Gets a list of applied migrations
-    /// </summary>
-    /// <param name="serviceName">Optional service name to get applied migrations for specific service</param>
-    Task<IEnumerable<string>> GetAppliedMigrationsAsync(string serviceName = null);
+    /// <returns>A collection of applied migration names, or empty if no migrations were applied</returns>
+    Task<IEnumerable<string>> ApplyMigrationsAsync();
 }

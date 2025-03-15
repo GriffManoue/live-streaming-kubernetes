@@ -1,16 +1,20 @@
-using DatabaseManagementService.Extensions;
 using Microsoft.EntityFrameworkCore;
+using DatabaseManagementService.Data;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-
 // Add migration services
-builder.Services.AddMigrationServices(builder.Configuration);
+    builder.Services.AddDbContext<MasterDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Database Management Service", Version = "v1" });
+});
 
 var app = builder.Build();
 
@@ -32,13 +36,9 @@ if (app.Environment.IsDevelopment())
     using (var scope = app.Services.CreateScope())
     {
         var migrationService = scope.ServiceProvider.GetRequiredService<DatabaseManagementService.Services.IMigrationService>();
-        
-        // Apply default migrations
-        await migrationService.MigrateAsync();
-        
-        // Note: To apply UserService migrations, use the API endpoint:
-        // POST /api/migration/migrate with body: "UserService"
+        await migrationService.ApplyMigrationsAsync();
     }
+   
 
     // Only use HTTPS redirection in local development, not in containers
     var isRunningInContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";

@@ -5,15 +5,7 @@ GET {{host}}/health
 Accept: application/json
 
 ### Get Migration Status
-GET {{host}}/api/migration/status
-Accept: application/json
-
-### Get Available Migrations
-GET {{host}}/api/migration/available
-Accept: application/json
-
-### Get Applied Migrations
-GET {{host}}/api/migration/applied
+GET {{host}}/api/migration/pending
 Accept: application/json
 
 ### Run Migration
