@@ -21,6 +21,7 @@ kubectl apply -f RecommendationService/k8s/
 kubectl apply -f Database/PostgreSQL/
 kubectl apply -f Database/Redis/
 kubectl apply -f Nginx-RTMP/
+kubectl apply -f DatabaseManagementService/k8s
 
 kubectl port-forward service/user-service 8080:80
 kubectl port-forward service/auth-service 8080:80

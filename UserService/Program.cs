@@ -48,7 +48,7 @@ builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 builder.Services.AddUserDbContext(builder.Configuration);
 
 // Add application services
-builder.Services.AddScoped<Shared.Interfaces.IUserService, UserService.Services.UserService>();
+builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
 
 var app = builder.Build();
 
@@ -70,5 +70,35 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHealthChecks("/health");
+
+// Apply database migrations on startup
+// This calls the DatabaseManagementService to run migrations for UserService
+if (app.Environment.IsDevelopment())
+{
+    try
+    {
+        using var httpClient = new HttpClient();
+        httpClient.BaseAddress = new Uri(builder.Configuration["Services:DatabaseManagementService"]);
+        
+        var content = new StringContent("\"UserService\"", System.Text.Encoding.UTF8, "application/json");
+        var response = httpClient.PostAsync("/api/migration/migrate", content).GetAwaiter().GetResult();
+        
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Database migrations applied successfully");
+        }
+        else
+        {
+            Console.WriteLine($"Failed to apply migrations: {response.StatusCode}");
+            var errorContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            Console.WriteLine($"Error details: {errorContent}");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error applying migrations: {ex.Message}");
+    }
+}
+
 
 app.Run();
