@@ -10,8 +10,8 @@ docker push bugapeti/streamservice:latest
 docker push bugapeti/analyticsservice:latest
 docker push bugapeti/recommendationservice:latest
 
-kubectl delete deployment user-deployment auth-deployment stream-deployment analytics-deployment recommendation-deployment db-management-deployment postgres-deployment redis-deployment
-kubectl delete service user-service auth-service stream-service analytics-service recommendation-service db-management postgres redis-service
+kubectl delete deployment user-deployment auth-deployment stream-deployment analytics-deployment recommendation-deployment db-management-deployment postgres-deployment redis-deployment nginx-rtmp-deployment
+kubectl delete service user-service auth-service stream-service analytics-service recommendation-service db-management postgres redis-service nginx-rtmp-service
 
 kubectl apply -f UserService/k8s/
 kubectl apply -f AuthService/k8s/
@@ -20,7 +20,7 @@ kubectl apply -f AnalyticsService/k8s/
 kubectl apply -f RecommendationService/k8s/
 kubectl apply -f Database/PostgreSQL/
 kubectl apply -f Database/Redis/
-kubectl apply -f Nginx-RTMP/
+kubectl apply -f Nginx-RTMP/k8s
 kubectl apply -f DatabaseManagementService/k8s
 
 kubectl delete -f UserService/k8s/
@@ -30,12 +30,14 @@ kubectl delete -f AnalyticsService/k8s/
 kubectl delete -f RecommendationService/k8s/
 kubectl delete -f Database/PostgreSQL/
 kubectl delete -f Database/Redis/
-kubectl delete -f Nginx-RTMP/
+kubectl delete -f Nginx-RTMP/k8s
 kubectl delete -f DatabaseManagementService/k8s
 
 kubectl port-forward service/user-service 8081:80
 kubectl port-forward service/auth-service 8082:80
-kubectl port-forward service/db-management 8083:80
 kubectl port-forward service/stream-service 8084:80
+kubectl port-forward service/analyticsservice 8086:80
+kubectl port-forward service/recommendationservice 8087:80
+kubectl port-forward service/db-management 8088:80
 kubectl port-forward service/postgres 5432:5432
 

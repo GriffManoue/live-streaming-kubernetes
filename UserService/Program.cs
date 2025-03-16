@@ -23,6 +23,7 @@ builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<U
 
 // Register the open generic repository
 builder.Services.AddScoped<IRepository<User>, Repository<User>>();
+builder.Services.AddScoped<IRepository<UserRelationship>, Repository<UserRelationship>>();
 
 // Add application services
 builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
