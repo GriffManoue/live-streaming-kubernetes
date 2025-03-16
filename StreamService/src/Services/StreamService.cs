@@ -14,17 +14,20 @@ public class StreamService : IStreamService
     private readonly IRepository<User> _userRepository;
     private readonly IRepository<StreamMetadata> _metadataRepository;
     private readonly ICacheService _cacheService;
+    private readonly IUserContext _userContext;
     
     public StreamService(
         IRepository<LiveStream> streamRepository,
         IRepository<User> userRepository,
         IRepository<StreamMetadata> metadataRepository,
-        ICacheService cacheService)
+        ICacheService cacheService,
+        IUserContext userContext)
     {
         _streamRepository = streamRepository;
         _userRepository = userRepository;
         _metadataRepository = metadataRepository;
         _cacheService = cacheService;
+        _userContext = userContext;
     }
     
     public async Task<StreamDto> GetStreamByIdAsync(Guid id)
@@ -85,8 +88,18 @@ public class StreamService : IStreamService
     
     public async Task<StreamDto> CreateStreamAsync(CreateStreamRequest request)
     {
-        // Get the user from the token (in a real implementation, this would come from the authenticated user)
-        var userId = Guid.Parse("00000000-0000-0000-0000-000000000001"); // Placeholder
+        // Validate the user's token
+        if (!await _userContext.ValidateCurrentTokenAsync())
+        {
+            throw new UnauthorizedAccessException("Invalid or expired authentication token");
+        }
+
+        // Get the authenticated user's ID
+        var userId = _userContext.GetCurrentUserId();
+        if (userId == Guid.Empty)
+        {
+            throw new UnauthorizedAccessException("User is not authenticated");
+        }
         
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null)
@@ -137,13 +150,29 @@ public class StreamService : IStreamService
     
     public async Task<StreamDto> UpdateStreamAsync(Guid id, UpdateStreamRequest request)
     {
+        // Validate the user's token
+        if (!await _userContext.ValidateCurrentTokenAsync())
+        {
+            throw new UnauthorizedAccessException("Invalid or expired authentication token");
+        }
+
         var stream = await _streamRepository.GetByIdAsync(id);
         if (stream == null)
         {
             throw new KeyNotFoundException($"Stream with ID {id} not found");
         }
         
-        // In a real implementation, check if the user is the owner of the stream
+        // Check if the current user is the owner of the stream
+        var currentUserId = _userContext.GetCurrentUserId();
+        if (currentUserId == Guid.Empty)
+        {
+            throw new UnauthorizedAccessException("User is not authenticated");
+        }
+        
+        if (stream.UserId != currentUserId)
+        {
+            throw new UnauthorizedAccessException("User is not authorized to update this stream");
+        }
         
         // Update stream properties
         if (!string.IsNullOrEmpty(request.StreamName))
@@ -173,13 +202,29 @@ public class StreamService : IStreamService
     
     public async Task EndStreamAsync(Guid id)
     {
+        // Validate the user's token
+        if (!await _userContext.ValidateCurrentTokenAsync())
+        {
+            throw new UnauthorizedAccessException("Invalid or expired authentication token");
+        }
+
         var stream = await _streamRepository.GetByIdAsync(id);
         if (stream == null)
         {
             throw new KeyNotFoundException($"Stream with ID {id} not found");
         }
         
-        // In a real implementation, check if the user is the owner of the stream
+        // Check if the current user is the owner of the stream
+        var currentUserId = _userContext.GetCurrentUserId();
+        if (currentUserId == Guid.Empty)
+        {
+            throw new UnauthorizedAccessException("User is not authenticated");
+        }
+        
+        if (stream.UserId != currentUserId)
+        {
+            throw new UnauthorizedAccessException("User is not authorized to end this stream");
+        }
         
         // End the stream
         stream.IsActive = false;

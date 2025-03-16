@@ -10,6 +10,7 @@ using Shared.Models.Domain;
 using Shared.Services;
 using StackExchange.Redis;
 using StreamService.Data;
+using StreamService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -92,6 +93,13 @@ builder.Services.AddAuthentication(options =>
 
 // Add application services
 builder.Services.AddScoped<IStreamService, StreamService.Services.StreamService>();
+
+// Add HttpContextAccessor and UserContext
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserContext, StreamService.Services.UserContext>();
+
+// Add HttpClient and AuthClient for authentication
+builder.Services.AddHttpClient<IAuthClient, StreamService.Services.AuthClient>();
 
 var app = builder.Build();
 
