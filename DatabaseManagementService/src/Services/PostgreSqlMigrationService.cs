@@ -34,6 +34,8 @@ public class PostgreSqlMigrationService : IMigrationService
         _logger.LogInformation("Applying migrations for MasterDbContext only");
         await _masterDbContext.Database.MigrateAsync();
         
+        _logger.LogDebug("Migration process completed at {Timestamp}", DateTime.UtcNow);
+        
         return _masterDbContext.Database.GetPendingMigrations();
     }
 }

@@ -14,6 +14,8 @@ options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")
 
 builder.Services.AddScoped<IMigrationService, PostgreSqlMigrationService>();
 
+builder.Logging.AddConsole();
+
 // Add swagger
 builder.Services.AddSwaggerGen(c =>
 {
