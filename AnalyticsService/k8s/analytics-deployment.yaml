@@ -16,12 +16,12 @@ spec:
     spec:
       containers:
       - name: analytics-service
-        image: bugapeti/analytics-service:latest
+        image: bugapeti/analyticsservice:latest
         ports:
         - containerPort: 8080
         env:
         - name: ASPNETCORE_ENVIRONMENT
-          value: "Production"
+          value: "Development"
         - name: ConnectionStrings__DefaultConnection
           valueFrom:
             secretKeyRef:

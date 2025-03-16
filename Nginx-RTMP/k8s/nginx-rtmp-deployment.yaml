@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: nginx-rtmp
-        image: bugapeti/nginx-rtmp:latest
+        image: bugapeti/nginx-rtmp-k8s:latest
         ports:
         - containerPort: 1935
         - containerPort: 8080
