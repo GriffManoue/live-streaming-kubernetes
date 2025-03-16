@@ -17,7 +17,6 @@ spec:
       containers:
       - name: db-management
         image: bugapeti/databasemanagementservice:latest
-        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
         env:
