@@ -3,6 +3,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using Shared.Data;
 using Shared.Interfaces;
+using Shared.Models.Domain;
 using Shared.Services;
 using StackExchange.Redis;
 using UserService.Data;
@@ -21,7 +22,7 @@ builder.Services.AddDbContext<UserDbContext>(options =>
 builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<UserDbContext>());
 
 // Register the open generic repository
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IRepository<User>, Repository<User>>();
 
 // Add application services
 builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
@@ -56,9 +57,6 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 });
 builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 
-// Add application services
-builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -69,10 +67,7 @@ if (app.Environment.IsDevelopment())
     if (!isRunningInContainer) app.UseHttpsRedirection();
 
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserService API v1");
-    });
+    app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserService API v1"); });
 }
 
 app.UseAuthorization();

@@ -1,13 +1,15 @@
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Shared.Data;
 using Shared.Interfaces;
+using Shared.Models.Domain;
 using Shared.Services;
 using StackExchange.Redis;
 using StreamService.Data;
-using StreamService.Extensions;
-using StreamService.Services;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "StreamService API", Version = "v1" });
+});
+
 // Add Health Checks with more resilient configuration
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<StreamDbContext>(
@@ -25,10 +32,10 @@ builder.Services.AddHealthChecks()
         tags: new[] { "ready" })
     .AddRedis(
         builder.Configuration.GetConnectionString("Redis") ?? "localhost",
-        name: "redis",
-        failureStatus: HealthStatus.Degraded,
-        tags: new[] { "ready" },
-        timeout: TimeSpan.FromSeconds(5));
+        "redis",
+        HealthStatus.Degraded,
+        new[] { "ready" },
+        TimeSpan.FromSeconds(5));
 
 // Add Redis caching service (shared)
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -41,29 +48,47 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 });
 builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 
-// Add stream-specific DB context and repositories
-builder.Services.AddStreamDbContext(builder.Configuration);
+// Add StreamDbContext
+builder.Services.AddDbContext<StreamDbContext>(options =>
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), npgsqlOptions =>
+    {
+        npgsqlOptions.EnableRetryOnFailure(
+            5,
+            TimeSpan.FromSeconds(30),
+            null);
+    });
+});
+
+// Register StreamDbContext as IDbContext for dependency injection
+builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<StreamDbContext>());
+
+// Register repositories for Stream-specific entities
+builder.Services.AddScoped<IRepository<LiveStream>, Repository<LiveStream>>();
+builder.Services.AddScoped<IRepository<StreamMetadata>, Repository<StreamMetadata>>();
+builder.Services.AddScoped<IRepository<User>, Repository<User>>();
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "streaming-platform",
-        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "streaming-users",
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? "your-256-bit-secret-key-here-at-least-32-chars"))
-    };
-});
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "streaming-platform",
+            ValidAudience = builder.Configuration["Jwt:Audience"] ?? "streaming-users",
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ??
+                                       "your-256-bit-secret-key-here-at-least-32-chars"))
+        };
+    });
 
 // Add application services
 builder.Services.AddScoped<IStreamService, StreamService.Services.StreamService>();
@@ -74,13 +99,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    
+
     // Only use HTTPS redirection in local development, not in containers
     var isRunningInContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
-    if (!isRunningInContainer)
-    {
-        app.UseHttpsRedirection();
-    }
+    if (!isRunningInContainer) app.UseHttpsRedirection();
+
+    app.UseSwagger();
+    app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserService API v1"); });
 }
 
 app.UseAuthentication();
