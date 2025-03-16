@@ -20,6 +20,9 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new() { Title = "Database Management Service", Version = "v1" });
 });
 
+// Add health checks
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -28,7 +31,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     using (var scope = app.Services.CreateScope())
     {
-        var migrationService = scope.ServiceProvider.GetRequiredService<DatabaseManagementService.Services.IMigrationService>();
+        var migrationService = scope.ServiceProvider.GetRequiredService<IMigrationService>();
         await migrationService.ApplyMigrationsAsync();
     }
 
