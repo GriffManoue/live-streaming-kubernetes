@@ -25,14 +25,14 @@ public class AuthDbContext : BaseDbContext
             .HasIndex(u => u.Email)
             .IsUnique();
             
-        // Exclude navigation properties that are not needed for this service
-        modelBuilder.Entity<User>()
-            .Metadata.FindNavigation(nameof(User.Streams))?.SetPropertyAccessMode(PropertyAccessMode.Field);
-            
-        modelBuilder.Entity<User>()
-            .Metadata.FindNavigation(nameof(User.FollowingRelationships))?.SetPropertyAccessMode(PropertyAccessMode.Field);
+         // Exclude navigation properties that are not needed for this service
+    modelBuilder.Entity<User>()
+        .Ignore(u => u.Streams);
         
-        modelBuilder.Entity<User>()
-            .Metadata.FindNavigation(nameof(User.FollowedByRelationships))?.SetPropertyAccessMode(PropertyAccessMode.Field);
+    modelBuilder.Entity<User>()
+        .Ignore(u => u.FollowingRelationships);
+    
+    modelBuilder.Entity<User>()
+        .Ignore(u => u.FollowedByRelationships);
     }
 }
