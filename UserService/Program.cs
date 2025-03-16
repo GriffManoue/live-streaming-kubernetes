@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.OpenApi.Models;
+using Shared.Data;
 using Shared.Interfaces;
+using Shared.Models.Domain;
 using Shared.Services;
 using StackExchange.Redis;
 using UserService.Data;
@@ -14,11 +17,15 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Add repository pattern
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<User>));
+builder.Services.AddScoped(typeof(IRepository<UserRelationship>), typeof(Repository<UserRelationship>));
+
 // Add OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { Title = "UserService API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "UserService API", Version = "v1" });
 });
 
 // Add Health Checks with more resilient configuration
@@ -28,10 +35,10 @@ builder.Services.AddHealthChecks()
         tags: new[] { "ready" })
     .AddRedis(
         builder.Configuration.GetConnectionString("Redis") ?? "localhost",
-        name: "redis",
-        failureStatus: HealthStatus.Degraded,
-        tags: new[] { "ready" },
-        timeout: TimeSpan.FromSeconds(10));
+        "redis",
+        HealthStatus.Degraded,
+        new[] { "ready" },
+        TimeSpan.FromSeconds(10));
 
 // Add Redis caching service (still shared)
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -51,13 +58,10 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
-{   
+{
     // Only use HTTPS redirection in local development, not in containers
     var isRunningInContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
-    if (!isRunningInContainer)
-    {
-        app.UseHttpsRedirection();
-    }
+    if (!isRunningInContainer) app.UseHttpsRedirection();
 }
 
 app.UseAuthorization();
