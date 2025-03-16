@@ -8,7 +8,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // Add migration services - Only MasterDbContext is explicitly configured for migrations
-// Other service-specific DbContexts (like UserDbContext) will be migrated by their respective services
 builder.Services.AddDbContext<MasterDbContext>(options =>
 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -44,6 +43,12 @@ if (app.Environment.IsDevelopment())
     {
         app.UseHttpsRedirection();
     }
+
+     app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "DatabaseManagementService API v1");
+    });
 }
 
 app.UseAuthorization();

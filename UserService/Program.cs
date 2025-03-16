@@ -3,7 +3,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using Shared.Data;
 using Shared.Interfaces;
-using Shared.Models.Domain;
 using Shared.Services;
 using StackExchange.Redis;
 using UserService.Data;
@@ -17,9 +16,15 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add repository pattern
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<User>));
-builder.Services.AddScoped(typeof(IRepository<UserRelationship>), typeof(Repository<UserRelationship>));
+
+// Register UserDbContext as IDbContext for dependency injection
+builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<UserDbContext>());
+
+// Register the open generic repository
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+// Add application services
+builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
 
 // Add OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -62,6 +67,12 @@ if (app.Environment.IsDevelopment())
     // Only use HTTPS redirection in local development, not in containers
     var isRunningInContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
     if (!isRunningInContainer) app.UseHttpsRedirection();
+
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserService API v1");
+    });
 }
 
 app.UseAuthorization();
