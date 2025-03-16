@@ -37,9 +37,9 @@ public class StreamDbContext : BaseDbContext
             
         // Exclude navigation properties that are not needed for this service
         modelBuilder.Entity<User>()
-            .Metadata.FindNavigation(nameof(User.FollowingRelationships))?.SetPropertyAccessMode(PropertyAccessMode.Field);
-        
-        modelBuilder.Entity<User>()
-            .Metadata.FindNavigation(nameof(User.FollowedByRelationships))?.SetPropertyAccessMode(PropertyAccessMode.Field);
+        .Ignore(u => u.FollowingRelationships);
+    
+    modelBuilder.Entity<User>()
+        .Ignore(u => u.FollowedByRelationships);
     }
 }
