@@ -25,5 +25,6 @@ kubectl apply -f DatabaseManagementService/k8s
 
 kubectl port-forward service/user-service 8080:80
 kubectl port-forward service/auth-service 8080:80
+kubectl port-forward service/db-management 8080:80
 kubectl port-forward service/postgres 5432:5432
 

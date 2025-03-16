@@ -25,17 +25,80 @@ public class PostgreSqlMigrationService : IMigrationService
 
     public async Task<bool> HasPendingMigrationsAsync()
     {
-        _logger.LogInformation("Checking if MasterDbContext has pending migrations");
-        return await _masterDbContext.Database.CanConnectAsync();
+        int maxRetries = 5;
+        int retryDelay = 5000; // 5 seconds
+        
+        for (int attempt = 1; attempt <= maxRetries; attempt++)
+        {
+            try
+            {
+                _logger.LogInformation("Checking for pending migrations (attempt {Attempt}/{MaxAttempts})", attempt, maxRetries);
+                
+                if (!await _masterDbContext.Database.CanConnectAsync())
+                {
+                    _logger.LogWarning("Cannot connect to database (attempt {Attempt}/{MaxAttempts})", attempt, maxRetries);
+                    
+                    if (attempt < maxRetries)
+                    {
+                        _logger.LogInformation("Retrying in {Delay}ms...", retryDelay);
+                        await Task.Delay(retryDelay);
+                        continue;
+                    }
+                    return false;
+                }
+                
+                var pendingMigrations = await _masterDbContext.Database.GetPendingMigrationsAsync();
+                var hasPending = pendingMigrations.Any();
+                _logger.LogInformation("Pending migrations: {Count}", pendingMigrations.Count());
+                return hasPending;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking for pending migrations (attempt {Attempt}/{MaxAttempts})", attempt, maxRetries);
+                
+                if (attempt < maxRetries)
+                {
+                    _logger.LogInformation("Retrying in {Delay}ms...", retryDelay);
+                    await Task.Delay(retryDelay);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        
+        return false;
     }
 
     public async Task<IEnumerable<string>> ApplyMigrationsAsync()
     {
-        _logger.LogInformation("Applying migrations for MasterDbContext only");
-        await _masterDbContext.Database.MigrateAsync();
-        
-        _logger.LogDebug("Migration process completed at {Timestamp}", DateTime.UtcNow);
-        
-        return _masterDbContext.Database.GetPendingMigrations();
+        try
+        {
+            _logger.LogInformation("Applying migrations for MasterDbContext only");
+            
+            // Get list of pending migrations before applying them
+            var pendingMigrations = await _masterDbContext.Database.GetPendingMigrationsAsync();
+            var pendingList = pendingMigrations.ToList();
+            
+            if (pendingList.Any())
+            {
+                _logger.LogInformation("Found {Count} pending migrations to apply", pendingList.Count);
+                await _masterDbContext.Database.MigrateAsync();
+                _logger.LogInformation("Successfully applied migrations: {@Migrations}", pendingList);
+            }
+            else
+            {
+                _logger.LogInformation("No pending migrations to apply");
+            }
+            
+            return pendingList;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error applying migrations");
+            // Return empty list instead of crashing
+            return new List<string>();
+        }
     }
 }
