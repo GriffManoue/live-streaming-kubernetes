@@ -5,9 +5,11 @@ using Shared.Interfaces;
 using Shared.Services;
 using StackExchange.Redis;
 using AnalyticsService.Data;
-using AnalyticsService.Extensions;
-using AnalyticsService.Services;
 using System.Text;
+using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+using Shared.Models.Domain;
+using Shared.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,11 @@ builder.Services.AddControllers();
 
 // Add OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "AnalyticsService API", Version = "v1" });
+});
+
 builder.Services.AddOpenApi();
 
 // Add Health Checks with more resilient configuration
@@ -42,7 +49,23 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 
 // Add analytics-specific DB context and repositories
-builder.Services.AddAnalyticsDbContext(builder.Configuration);
+builder.Services.AddDbContext<AnalyticsDbContext>(options =>
+        {
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), npgsqlOptions =>
+            {
+                npgsqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorCodesToAdd: null);
+            });
+        });
+        
+        // Register AnalyticsDbContext as IDbContext for dependency injection
+        builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<AnalyticsDbContext>());
+        
+        // Register repositories for Analytics-specific entities
+        builder.Services.AddScoped<IRepository<User>, Repository<User>>();
+        builder.Services.AddScoped<IRepository<LiveStream>, Repository<LiveStream>>();
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
@@ -81,6 +104,9 @@ if (app.Environment.IsDevelopment())
     {
         app.UseHttpsRedirection();
     }
+
+    app.UseSwagger();
+    app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "AnalyticsService API v1"); });
 }
 
 app.UseAuthentication();
