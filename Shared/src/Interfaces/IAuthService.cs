@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Shared.Models.Auth;
 
 namespace Shared.Interfaces;
