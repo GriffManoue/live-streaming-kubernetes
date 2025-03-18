@@ -1,0 +1,40 @@
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.dashboard-toolbar {
+  display: flex;
+  justify-content: space-between;
+  z-index: 2;
+}
+
+.dashboard-sidenav-container {
+  flex: 1;
+  min-height: 0;
+}
+
+.dashboard-sidenav {
+  width: 250px;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.dashboard-content {
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+
+.active-link {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: var(--primary);
+  
+  .mat-icon {
+    color: var(--primary);
+  }
+}
+
+.user-info {
+  padding: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}

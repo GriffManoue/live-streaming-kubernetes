@@ -1,0 +1,70 @@
+<div class="dashboard-container">
+  <mat-toolbar color="primary" class="dashboard-toolbar">
+    <div class="flex items-center">
+      <button mat-icon-button (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="ml-2 text-xl font-bold">Streaming Platform</span>
+    </div>
+    
+    <div class="flex-grow"></div>
+    
+    <div class="flex items-center">
+      <button mat-raised-button color="accent" class="mr-4" (click)="startStream()">
+        <mat-icon>videocam</mat-icon>
+        Start Streaming
+      </button>
+      
+      <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="User menu">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <button mat-menu-item routerLink="/dashboard/profile">
+          <mat-icon>person</mat-icon>
+          <span>Profile</span>
+        </button>
+        <button mat-menu-item routerLink="/token-management">
+          <mat-icon>vpn_key</mat-icon>
+          <span>API Tokens</span>
+        </button>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>exit_to_app</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
+    </div>
+  </mat-toolbar>
+
+  <mat-sidenav-container class="dashboard-sidenav-container">
+    <mat-sidenav #sidenav mode="side" opened class="dashboard-sidenav">
+      <div class="user-info p-4 border-b border-gray-200">
+        <div class="flex items-center">
+          <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+            @if (currentUser?.profilePictureUrl) {
+              <img [src]="currentUser.profilePictureUrl" alt="Profile picture" class="w-full h-full object-cover">
+            } @else {
+              <mat-icon class="text-gray-600">person</mat-icon>
+            }
+          </div>
+          <div class="ml-3">
+            <div class="font-medium">{{ currentUser?.username || 'User' }}</div>
+            <div class="text-xs text-gray-500">{{ currentUser?.email || '' }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <mat-nav-list>
+        @for (link of navLinks; track link.path) {
+          <a mat-list-item [routerLink]="link.path" routerLinkActive="active-link">
+            <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
+            <span matListItemTitle>{{ link.label }}</span>
+          </a>
+        }
+      </mat-nav-list>
+    </mat-sidenav>
+    
+    <mat-sidenav-content class="dashboard-content">
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

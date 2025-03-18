@@ -1,0 +1,60 @@
+<div class="flex justify-center items-center min-h-screen bg-gray-100">
+  <mat-card class="w-full max-w-md p-6 shadow-lg">
+    <mat-card-header class="flex justify-center mb-6">
+      <mat-card-title class="text-2xl font-bold text-primary">Login</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+        @if (error) {
+          <mat-error class="mb-4">{{error}}</mat-error>
+        }
+        
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="username" type="text" required>
+          <mat-error *ngIf="submitted && f['username'].errors">
+            Username is required
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" type="password" required>
+          <mat-error *ngIf="submitted && f['password'].errors">
+            Password is required
+          </mat-error>
+        </mat-form-field>
+        
+        <div class="flex items-center mb-4">
+          <mat-checkbox formControlName="rememberMe" color="primary">
+            Remember me
+          </mat-checkbox>
+          <span class="flex-grow"></span>
+          <a routerLink="/auth/forgot-password" class="text-primary hover:underline">
+            Forgot Password?
+          </a>
+        </div>
+        
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit" 
+          class="w-full py-2"
+          [disabled]="loading">
+          @if (loading) {
+            <mat-spinner diameter="20" class="mr-2"></mat-spinner>
+          }
+          Login
+        </button>
+        
+        <div class="text-center mt-4">
+          Don't have an account?
+          <a routerLink="/auth/register" class="text-primary hover:underline ml-1">
+            Register
+          </a>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
