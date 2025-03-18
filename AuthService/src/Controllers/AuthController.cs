@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Interfaces;
 using Shared.Models.Auth;
@@ -106,6 +107,31 @@ public class AuthController : ControllerBase
             });
         }
     }
+
+    [HttpPost("stream-token")]
+    [Authorize] 
+    public async Task<ActionResult<AuthResult>> GenerateStreamToken([FromBody] StreamTokenRequest request)
+    {
+        try
+        {
+            var result = await _authService.GenerateStreamTokenAsync(request.StreamId);
+            
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+            
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new AuthResult
+            {
+                Success = false,
+                Error = $"Internal server error: {ex.Message}"
+            });
+        }
+    }
 }
 
 public class ValidateTokenRequest
@@ -116,4 +142,9 @@ public class ValidateTokenRequest
 public class RevokeTokenRequest
 {
     public string Token { get; set; } = string.Empty;
+}
+
+public class StreamTokenRequest
+{
+    public Guid StreamId { get; set; }
 }

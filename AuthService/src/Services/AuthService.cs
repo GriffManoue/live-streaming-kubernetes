@@ -12,15 +12,18 @@ public class AuthService : IAuthService
     private readonly IRepository<User> _userRepository;
     private readonly ITokenService _tokenService;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     
     public AuthService(
         IRepository<User> userRepository,
         ITokenService tokenService,
-        IPasswordHasher passwordHasher)
+        IPasswordHasher passwordHasher,
+        IHttpContextAccessor httpContextAccessor)
     {
         _userRepository = userRepository;
         _tokenService = tokenService;
         _passwordHasher = passwordHasher;
+        _httpContextAccessor = httpContextAccessor;
     }
     
     public async Task<AuthResult> RegisterAsync(RegisterRequest request)
@@ -166,5 +169,45 @@ public class AuthService : IAuthService
         // In a real implementation, you would add the token to a blacklist
         // or invalidate it in some way. For simplicity, we'll just return.
         await Task.CompletedTask;
+    }
+
+    public async Task<AuthResult> GenerateStreamTokenAsync(Guid streamId)
+    {
+        // Get the current user's claims
+        var currentUser = await GetCurrentUserAsync();
+        if (currentUser == null)
+        {
+            return new AuthResult
+            {
+                Success = false,
+                Error = "User not found"
+            };
+        }
+
+        // Generate a new stream-specific token
+        var token = _tokenService.GenerateStreamToken(currentUser, streamId);
+
+        return new AuthResult
+        {
+            Success = true,
+            Token = token,
+            ExpiresAt = DateTime.UtcNow.AddHours(24),
+            UserId = currentUser.Id
+        };
+    }
+
+    private async Task<User?> GetCurrentUserAsync()
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext == null) return null;
+
+        var userIdClaim = httpContext.User.FindFirst("sub")?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+        {
+            return null;
+        }
+
+        var users = await _userRepository.GetAllAsync();
+        return users.FirstOrDefault(u => u.Id == userId);
     }
 }

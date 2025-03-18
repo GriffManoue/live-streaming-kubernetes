@@ -7,6 +7,7 @@ namespace Shared.Interfaces;
 public interface ITokenService
 {
     string GenerateToken(User user);
+    string GenerateStreamToken(User user, Guid streamId);
     bool ValidateToken(string token);
     ClaimsPrincipal GetPrincipalFromToken(string token);
 }
