@@ -33,6 +33,7 @@
               }
             ],
             "styles": [
+              "node_modules/@videogular/ngx-videogular/fonts/videogular.css",
               "@angular/material/prebuilt-themes/cyan-orange.css",
               "src/styles.scss"
             ],
