@@ -1,53 +1,13 @@
-<mat-toolbar color="primary" class="header-toolbar">
-  <!-- Logo and Title Section -->
-  <div class="logo-container">
-    <button mat-icon-button aria-label="Home button">
-      <mat-icon>videocam</mat-icon>
-    </button>
-    <span class="site-title">LiveStream</span>
+<header class="border-b shadow-md p-3 w-full max-h-20 fixed top-0 z-50" >
+  <div class="flex align-middle items-center justify-between max-w-screen-2xl mx-auto">
+    <img routerLink="/" src="/images/logo.png" alt="app logo" class="max-h-16">
+    <nav class="flex gap-3 my-2 uppercase text-2xl">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+      <a routerLink="/shop" routerLinkActive="active">Shop</a>
+    </nav>
+    <div class="flex gap-3 align-middle">
+      <button mat-stroked-button>Login</button>
+      <button mat-stroked-button>Register</button>
+    </div>
   </div>
-
-  <!-- Navigation Links -->
-  <div class="nav-links">
-    <button mat-button routerLink="/">Home</button>
-    <button mat-button routerLink="/discover">Discover</button>
-    <button mat-button routerLink="/channels">Channels</button>
-    <button mat-button routerLink="/categories">Categories</button>
-  </div>
-
-  <!-- Spacer to push login to right -->
-  <span class="spacer"></span>
-
-  <!-- User Authentication Section -->
-  <div class="auth-section">
-    <ng-container *ngIf="!isLoggedIn; else loggedInTemplate">
-      <button mat-button routerLink="/register">Sign Up</button>
-      <button mat-raised-button color="accent" (click)="login()">Login</button>
-    </ng-container>
-    
-    <ng-template #loggedInTemplate>
-      <button mat-icon-button [matMenuTriggerFor]="userMenu">
-        <mat-icon>account_circle</mat-icon>
-      </button>
-      <mat-menu #userMenu="matMenu">
-        <button mat-menu-item routerLink="/profile">
-          <mat-icon>person</mat-icon>
-          <span>Profile</span>
-        </button>
-        <button mat-menu-item routerLink="/dashboard">
-          <mat-icon>dashboard</mat-icon>
-          <span>Dashboard</span>
-        </button>
-        <button mat-menu-item routerLink="/settings">
-          <mat-icon>settings</mat-icon>
-          <span>Settings</span>
-        </button>
-        <mat-divider></mat-divider>
-        <button mat-menu-item (click)="logout()">
-          <mat-icon>exit_to_app</mat-icon>
-          <span>Logout</span>
-        </button>
-      </mat-menu>
-    </ng-template>
-  </div>
-</mat-toolbar>
+</header>
