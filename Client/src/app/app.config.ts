@@ -14,10 +14,17 @@ export const appConfig: ApplicationConfig = {
     providePrimeNG({
         theme: {
             preset: Material,
+            options: {
+              cssLayer: {
+                  name: 'primeng',
+                  order: 'theme, base, primeng'
+              }
+          }
             
         },
         ripple: true,
-        inputVariant: 'filled' 
+        inputVariant: 'filled',
+       
     })
   ]
 };

@@ -1,0 +1,53 @@
+:host {
+    ::ng-deep {
+        .p-menubar {
+            padding: 0;
+            background: transparent;
+            border: none;
+
+            .p-menubar-root-list {
+                gap: 0.5rem;
+
+                .p-menuitem-link {
+                    color: white;
+                    border-radius: 0.25rem;
+                    transition: background-color 0.2s;
+
+                    &:hover {
+                        background-color: rgba(255, 255, 255, 0.1);
+                    }
+
+                    .p-menuitem-icon {
+                        margin-right: 0.5rem;
+                    }
+                }
+            }
+        }
+
+        .p-inputtext {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+
+            &::placeholder {
+                color: rgba(255, 255, 255, 0.7);
+            }
+
+            &:focus {
+                outline: none;
+                box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        .p-avatar {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+        }
+    }
+}

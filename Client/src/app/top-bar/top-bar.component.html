@@ -1,1 +1,30 @@
-<p>top-bar works!</p>
+<div class="w-full shadow-md bg-primary">
+  <div class="container mx-auto px-4">
+    <div class="flex items-center justify-between py-3">
+      <!-- Logo and navigation -->
+      <div class="flex items-center">
+        <div class="text-white text-xl font-bold mr-8">LiveStream</div>
+        <p-menubar [model]="items" styleClass="bg-transparent border-none">
+          <ng-template pTemplate="start">
+            <!-- Logo is already shown above -->
+          </ng-template>
+          <ng-template pTemplate="end">
+            <div class="flex items-center">
+              <span class="p-input-icon-left mr-3">
+                <i class="pi pi-search"></i>
+                <input type="text" pInputText placeholder="Search" class="p-inputtext-sm" />
+              </span>
+              <p-button icon="pi pi-bell" styleClass="p-button-text p-button-rounded text-white"></p-button>
+              <p-avatar icon="pi pi-user" styleClass="ml-2" shape="circle"></p-avatar>
+            </div>
+          </ng-template>
+        </p-menubar>
+      </div>
+      
+      <!-- Mobile menu button (only visible on small screens) -->
+      <div class="lg:hidden">
+        <p-button icon="pi pi-bars" styleClass="p-button-text p-button-rounded text-white"></p-button>
+      </div>
+    </div>
+  </div>
+</div>
