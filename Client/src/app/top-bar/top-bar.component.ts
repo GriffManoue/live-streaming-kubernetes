@@ -19,7 +19,7 @@ import { MenuItem } from 'primeng/api';
     AvatarModule
   ],
   templateUrl: './top-bar.component.html',
-  styleUrl: './top-bar.component.scss'
+  styleUrl: './top-bar.component.css'
 })
 export class TopBarComponent {
   items: MenuItem[];
