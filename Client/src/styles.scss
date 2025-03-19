@@ -4,7 +4,7 @@
 
 html {
     height: 100%;
-    color-scheme: light;
+    color-scheme: dark; 
     @include mat.theme((color: mat.$violet-palette,
             typography: Roboto,
             density: 0));

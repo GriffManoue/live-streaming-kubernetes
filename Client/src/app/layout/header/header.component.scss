@@ -1,0 +1,58 @@
+.header-toolbar {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  margin-right: 16px;
+  
+  .site-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-left: 8px;
+    letter-spacing: 0.5px;
+  }
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  
+  button {
+    margin: 0 4px;
+    font-weight: 400;
+  }
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.auth-section {
+  display: flex;
+  align-items: center;
+  
+  button {
+    margin-left: 8px;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .nav-links button span {
+    display: none;
+  }
+  
+  .site-title {
+    display: none;
+  }
+}
+
+// Hover effects
+.nav-links button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
