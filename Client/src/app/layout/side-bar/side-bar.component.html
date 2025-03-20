@@ -1,1 +1,34 @@
-<p>side-bar works!</p>
+<div class="static-sidebar">
+    <p-scrollPanel [style]="{width: '100%', height: '95vh'}">
+        <div class="stream-list">
+            <p-card *ngFor="let stream of streams" 
+                    styleClass="stream-card mb-3" 
+                    [header]="stream.title">
+                <ng-template pTemplate="header">
+                    <div class="stream-thumbnail">
+                        <!-- Placeholder for stream thumbnail -->
+                        <div class="placeholder-image">
+                            <i class="pi pi-video" style="font-size: 2rem"></i>
+                        </div>
+                    </div>
+                </ng-template>
+                
+                <div class="stream-info">
+                    <p><strong>Streamer:</strong> {{stream.user}}</p>
+                    <p><strong>Category:</strong> {{stream.category}}</p>
+                    <p><i class="pi pi-users"></i> {{stream.viewers}} viewers</p>
+                </div>
+                
+                <ng-template pTemplate="footer">
+                    <div class="stream-actions">
+                        <p-button label="Watch" icon="pi pi-play" styleClass="p-button-sm"></p-button>
+                    </div>
+                </ng-template>
+            </p-card>
+            
+            <div *ngIf="streams.length === 0" class="no-streams">
+                <p>No streams available right now</p>
+            </div>
+        </div>
+    </p-scrollPanel>
+</div>
