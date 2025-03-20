@@ -8,7 +8,7 @@
         </div>
       </ng-template>
 
-      <form (ngSubmit)="onSubmit()">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
         <!-- Error message -->
         <p-message *ngIf="registerError" severity="error" [text]="errorMessage" styleClass="w-full mb-4"></p-message>
 
@@ -20,16 +20,15 @@
               <label for="username" class="ml-2">Username</label>
               <i class="pi pi-user ml-2"></i>
             </div>
-            <input 
-              id="username" 
-              type="text" 
-              pInputText 
-              [(ngModel)]="username" 
-              name="username" 
-              class="w-full" 
-              placeholder="Enter your username"
-              [disabled]="loading"
-            />
+            <input id="username" type="text" pInputText formControlName="username" class="w-full"
+              placeholder="Enter your username" [disabled]="loading"
+              [ngClass]="{'ng-invalid ng-dirty': f['username'].touched && f['username'].invalid}" />
+            <small class="p-error block mt-1" *ngIf="f['username'].touched && f['username'].errors?.['required']">
+              Username is required
+            </small>
+            <small class="p-error block mt-1" *ngIf="f['username'].touched && f['username'].errors?.['minlength']">
+              Username must be at least 3 characters
+            </small>
           </div>
 
           <!-- Email field -->
@@ -38,35 +37,34 @@
               <label for="email" class="ml-2">Email</label>
               <i class="pi pi-envelope ml-2"></i>
             </div>
-            <input 
-              id="email" 
-              type="email" 
-              pInputText 
-              [(ngModel)]="email" 
-              name="email" 
-              class="w-full" 
-              placeholder="Enter your email"
-              [disabled]="loading"
-            />
+            <input id="email" type="email" pInputText formControlName="email" class="w-full"
+              placeholder="Enter your email" [disabled]="loading"
+              [ngClass]="{'ng-invalid ng-dirty': f['email'].touched && f['email'].invalid}" />
+            <small class="p-error block mt-1" *ngIf="f['email'].touched && f['email'].errors?.['required']">
+              Email is required
+            </small>
+            <small class="p-error block mt-1" *ngIf="f['email'].touched && f['email'].errors?.['email']">
+              Please enter a valid email address
+            </small>
           </div>
 
-           <!-- Phone field -->
-           <div class="col-6 field mb-3">
+          <!-- Phone field -->
+          <div class="col-6 field mb-3">
             <div class="flex align-items-center mb-1">
               <label for="phone" class="ml-2">Phone</label>
               <i class="pi pi-phone ml-2"></i>
             </div>
-            <input 
-              id="phone" 
-              type="text" 
-              pInputText 
-              [(ngModel)]="phone" 
-              name="phone" 
-              class="w-full" 
-              placeholder="Enter your phone number"
-              [disabled]="loading"
-            />
+            <input id="phone" type="text" pInputText formControlName="phone" class="w-full"
+              placeholder="Enter your phone number" [disabled]="loading"
+              [ngClass]="{'ng-invalid ng-dirty': f['phone'].touched && f['phone'].invalid}" />
+            <small class="p-error block mt-1" *ngIf="f['phone'].touched && f['phone'].errors?.['required']">
+              Phone number is required
+            </small>
+            <small class="p-error block mt-1" *ngIf="f['phone'].touched && f['phone'].errors?.['pattern']">
+              Please enter a valid phone number
+            </small>
           </div>
+
 
           <!-- First Name field -->
           <div class="col-6 field mb-3">
@@ -74,16 +72,12 @@
               <label for="firstName" class="ml-2">First Name</label>
               <i class="pi pi-user ml-2"></i>
             </div>
-            <input 
-              id="firstName" 
-              type="text" 
-              pInputText 
-              [(ngModel)]="firstName" 
-              name="firstName" 
-              class="w-full" 
-              placeholder="Enter your first name"
-              [disabled]="loading"
-            />
+            <input id="firstName" type="text" pInputText formControlName="firstName" class="w-full"
+              placeholder="Enter your first name" [disabled]="loading"
+              [ngClass]="{'ng-invalid ng-dirty': f['firstName'].touched && f['firstName'].invalid}" />
+            <small class="p-error block mt-1" *ngIf="f['firstName'].touched && f['firstName'].errors?.['required']">
+              First name is required
+            </small>
           </div>
 
           <!-- Last Name field -->
@@ -92,17 +86,14 @@
               <label for="lastName" class="ml-2">Last Name</label>
               <i class="pi pi-user ml-2"></i>
             </div>
-            <input 
-              id="lastName" 
-              type="text" 
-              pInputText 
-              [(ngModel)]="lastName" 
-              name="lastName" 
-              class="w-full" 
-              placeholder="Enter your last name"
-              [disabled]="loading"
-            />
+            <input id="lastName" type="text" pInputText formControlName="lastName" class="w-full"
+              placeholder="Enter your last name" [disabled]="loading"
+              [ngClass]="{'ng-invalid ng-dirty': f['lastName'].touched && f['lastName'].invalid}" />
+            <small class="p-error block mt-1" *ngIf="f['lastName'].touched && f['lastName'].errors?.['required']">
+              Last name is required
+            </small>
           </div>
+
 
           <!-- Password field -->
           <div class="col-6 field mb-3">
@@ -110,17 +101,15 @@
               <label for="password" class="ml-2">Password</label>
               <i class="pi pi-lock ml-2"></i>
             </div>
-            <p-password 
-              id="password" 
-              [(ngModel)]="password" 
-              name="password" 
-              [toggleMask]="true"
-              [feedback]="false"
-              [disabled]="loading"
-              styleClass="w-full" 
-              inputStyleClass="w-full"
-              placeholder="Enter your password"
-            ></p-password>
+            <p-password id="password" formControlName="password" [toggleMask]="true" [feedback]="true"
+              [disabled]="loading" styleClass="w-full" inputStyleClass="w-full" placeholder="Enter your password"
+              [ngClass]="{'ng-invalid ng-dirty': f['password'].touched && f['password'].invalid}"></p-password>
+            <small class="p-error block mt-1" *ngIf="f['password'].touched && f['password'].errors?.['required']">
+              Password is required
+            </small>
+            <small class="p-error block mt-1" *ngIf="f['password'].touched && f['password'].errors?.['minlength']">
+              Password must be at least 8 characters
+            </small>
           </div>
 
           <!-- Confirm Password field -->
@@ -129,34 +118,29 @@
               <label for="confirmPassword" class="ml-2">Confirm Password</label>
               <i class="pi pi-lock ml-2"></i>
             </div>
-            <p-password 
-              id="confirmPassword" 
-              [(ngModel)]="confirmPassword" 
-              name="confirmPassword" 
-              [toggleMask]="true"
-              [feedback]="false"
-              [disabled]="loading"
-              styleClass="w-full" 
-              inputStyleClass="w-full"
-              placeholder="Confirm your password"
-            ></p-password>
+            <p-password id="confirmPassword" formControlName="confirmPassword" [toggleMask]="true" [feedback]="false"
+              [disabled]="loading" styleClass="w-full" inputStyleClass="w-full" placeholder="Confirm your password"
+              [ngClass]="{'ng-invalid ng-dirty': f['confirmPassword'].touched && f['confirmPassword'].invalid}"></p-password>
+            <small class="p-error block mt-1"
+              *ngIf="f['confirmPassword'].touched && f['confirmPassword'].errors?.['required']">
+              Please confirm your password
+            </small>
+            <small class="p-error block mt-1"
+              *ngIf="registerForm.errors?.['passwordMismatch'] && f['confirmPassword'].touched && !f['confirmPassword'].errors?.['required']">
+              Passwords do not match
+            </small>
           </div>
 
           <!-- Remember me checkbox -->
           <div class="col-12 field-checkbox mb-3">
-            <p-checkbox [(ngModel)]="rememberMe" [binary]="true" inputId="rememberMe" name="rememberMe"></p-checkbox>
+            <p-checkbox formControlName="rememberMe" [binary]="true" inputId="rememberMe"></p-checkbox>
             <label for="rememberMe" class="ml-2">Remember me</label>
           </div>
 
           <!-- Register button -->
           <div class="col-12 field mb-3">
-            <p-button 
-              type="submit" 
-              label="Sign Up" 
-              icon="pi pi-user-plus" 
-              styleClass="w-full" 
-              [loading]="loading"
-            ></p-button>
+            <p-button type="submit" label="Sign Up" icon="pi pi-user-plus" styleClass="w-full"
+              [loading]="loading"></p-button>
           </div>
         </div>
       </form>

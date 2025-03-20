@@ -8,7 +8,7 @@
         </div>
       </ng-template>
 
-      <form (ngSubmit)="onSubmit()">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <!-- Error message -->
         <p-message *ngIf="loginError" severity="error" [text]="errorMessage" styleClass="w-full mb-4"></p-message>
 
@@ -18,8 +18,19 @@
             <label for="username" class="ml-2">Username</label>
             <i class="pi pi-user ml-2"></i>
           </div>
-          <input id="username" type="text" pInputText [(ngModel)]="username" name="username" class="w-full"
-            placeholder="Enter your username" [disabled]="loading" />
+          <input 
+            id="username" 
+            type="text" 
+            pInputText 
+            formControlName="username" 
+            class="w-full"
+            placeholder="Enter your username" 
+            [disabled]="loading" 
+            [ngClass]="{'ng-invalid ng-dirty': f['username'].touched && f['username'].invalid}"
+          />
+          <small class="p-error block mt-1" *ngIf="f['username'].touched && f['username'].errors?.['required']">
+            Username is required
+          </small>
         </div>
 
         <!-- Password field -->
@@ -28,25 +39,41 @@
             <label for="password" class="block ml-2">Password</label>
             <i class="pi pi-lock ml-2"></i>
           </div>
-          <p-password id="password" [(ngModel)]="password" name="password" [toggleMask]="true" [feedback]="false"
-            [disabled]="loading" styleClass="w-full" inputStyleClass="w-full"
-            placeholder="Enter your password"></p-password>
+          <p-password 
+            id="password" 
+            formControlName="password" 
+            [toggleMask]="true" 
+            [feedback]="false"
+            [disabled]="loading" 
+            styleClass="w-full" 
+            inputStyleClass="w-full"
+            placeholder="Enter your password"
+            [ngClass]="{'ng-invalid ng-dirty': f['password'].touched && f['password'].invalid}"
+          ></p-password>
+          <small class="p-error block mt-1" *ngIf="f['password'].touched && f['password'].errors?.['required']">
+            Password is required
+          </small>
         </div>
 
         <!-- Remember me checkbox -->
         <div class="field-checkbox mb-4">
-          <p-checkbox [(ngModel)]="rememberMe" [binary]="true" inputId="rememberMe" name="rememberMe"></p-checkbox>
+          <p-checkbox formControlName="rememberMe" [binary]="true" inputId="rememberMe"></p-checkbox>
           <label for="rememberMe" class="ml-2">Remember me</label>
         </div>
 
         <!-- Login button -->
         <div class="field mb-4">
-          <p-button type="submit" label="Sign In" icon="pi pi-sign-in" styleClass="w-full"
-            [loading]="loading"></p-button>
+          <p-button 
+            type="submit" 
+            label="Sign In" 
+            icon="pi pi-sign-in" 
+            styleClass="w-full"
+            [loading]="loading"
+          ></p-button>
         </div>
       </form>
 
-      <p-divider>
+      <p-divider align="center">
         <span class="text-sm">OR</span>
       </p-divider>
 

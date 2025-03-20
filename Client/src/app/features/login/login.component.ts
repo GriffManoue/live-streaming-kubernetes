@@ -1,6 +1,6 @@
-import { Component, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -17,7 +17,7 @@ import { LoginService } from '../../services/login/login.service';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     RouterModule,
     ButtonModule,
     InputTextModule,
@@ -32,15 +32,16 @@ import { LoginService } from '../../services/login/login.service';
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
-
-  username: string = '';
-  password: string = '';
-  rememberMe: boolean = false;
+  loginForm!: FormGroup;
   loginError: boolean = false;
   errorMessage: string = '';
   loading: boolean = false;
 
-  constructor(private router: Router, private loginService: LoginService) {}
+  constructor(
+    private router: Router, 
+    private loginService: LoginService,
+    private fb: FormBuilder
+  ) {}
 
   ngOnInit() {
     const token = localStorage.getItem('auth_token');
@@ -48,25 +49,46 @@ export class LoginComponent implements OnInit {
     if (token) {
       this.router.navigate(['/home']);
     }
+    
+    this.initForm();
   }
 
+  initForm(): void {
+    this.loginForm = this.fb.group({
+      username: ['', [Validators.required]],
+      password: ['', [Validators.required]],
+      rememberMe: [false]
+    });
+  }
+
+  // Convenience getter for easy access to form fields
+  get f() { return this.loginForm.controls; }
+
   onSubmit() {
-    if (!this.username || !this.password) {
+    // Mark all fields as touched to trigger validation display
+    Object.keys(this.loginForm.controls).forEach(key => {
+      const control = this.loginForm.get(key);
+      control?.markAsTouched();
+    });
+
+    if (this.loginForm.invalid) {
       this.loginError = true;
-      this.errorMessage = 'Username and password are required';
+      this.errorMessage = 'Please correct the form errors';
       return;
     }
 
     this.loading = true;
     this.loginError = false;
 
-    // Here you would typically call your auth service
+    // Form values
+    const formValues = this.loginForm.value;
+
     // Simulating API call with timeout
     setTimeout(() => {
       // For demo purposes - in real app you would validate with your AuthService
-      if (this.username === 'demo' && this.password === 'password') {
+      if (formValues.username === 'demo' && formValues.password === 'password') {
         this.loginError = false;
-        this.loginService.login('demo-token', this.rememberMe);
+        this.loginService.login('demo-token', formValues.rememberMe);
         this.router.navigate(['/home']);
       } else {
         this.loginError = true;
