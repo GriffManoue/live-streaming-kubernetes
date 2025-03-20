@@ -12,12 +12,14 @@
         <!-- Error message -->
         <p-message *ngIf="registerError" severity="error" [text]="errorMessage" styleClass="w-full mb-4"></p-message>
 
-        <!-- Username field -->
-        <div class="field mb-4">
-        <div class="flex align-items-center mb-1">
-          <label for="username" class="ml-2">Username</label>
-          <i class="pi pi-user ml-2"></i>
-        </div>
+        <!-- Grid layout for form fields -->
+        <div class="grid">
+          <!-- Username field -->
+          <div class="col-12 field mb-3">
+            <div class="flex align-items-center mb-1">
+              <label for="username" class="ml-2">Username</label>
+              <i class="pi pi-user ml-2"></i>
+            </div>
             <input 
               id="username" 
               type="text" 
@@ -28,14 +30,86 @@
               placeholder="Enter your username"
               [disabled]="loading"
             />
-        </div>
+          </div>
 
-        <!-- Password field -->
-        <div class="field mb-4">
-        <div class="flex align-items-center mb-1">
-            <label for="password" class="ml-2">Password</label>
-            <i class="pi pi-lock ml-2"></i>
-        </div>
+          <!-- Email field -->
+          <div class="col-6 field mb-3">
+            <div class="flex align-items-center mb-1">
+              <label for="email" class="ml-2">Email</label>
+              <i class="pi pi-envelope ml-2"></i>
+            </div>
+            <input 
+              id="email" 
+              type="email" 
+              pInputText 
+              [(ngModel)]="email" 
+              name="email" 
+              class="w-full" 
+              placeholder="Enter your email"
+              [disabled]="loading"
+            />
+          </div>
+
+           <!-- Phone field -->
+           <div class="col-6 field mb-3">
+            <div class="flex align-items-center mb-1">
+              <label for="phone" class="ml-2">Phone</label>
+              <i class="pi pi-phone ml-2"></i>
+            </div>
+            <input 
+              id="phone" 
+              type="text" 
+              pInputText 
+              [(ngModel)]="phone" 
+              name="phone" 
+              class="w-full" 
+              placeholder="Enter your phone number"
+              [disabled]="loading"
+            />
+          </div>
+
+          <!-- First Name field -->
+          <div class="col-6 field mb-3">
+            <div class="flex align-items-center mb-1">
+              <label for="firstName" class="ml-2">First Name</label>
+              <i class="pi pi-user ml-2"></i>
+            </div>
+            <input 
+              id="firstName" 
+              type="text" 
+              pInputText 
+              [(ngModel)]="firstName" 
+              name="firstName" 
+              class="w-full" 
+              placeholder="Enter your first name"
+              [disabled]="loading"
+            />
+          </div>
+
+          <!-- Last Name field -->
+          <div class="col-6 field mb-3">
+            <div class="flex align-items-center mb-1">
+              <label for="lastName" class="ml-2">Last Name</label>
+              <i class="pi pi-user ml-2"></i>
+            </div>
+            <input 
+              id="lastName" 
+              type="text" 
+              pInputText 
+              [(ngModel)]="lastName" 
+              name="lastName" 
+              class="w-full" 
+              placeholder="Enter your last name"
+              [disabled]="loading"
+            />
+          </div>
+
+          <!-- Password field -->
+          <div class="col-6 field mb-3">
+            <div class="flex align-items-center mb-1">
+              <label for="password" class="ml-2">Password</label>
+              <i class="pi pi-lock ml-2"></i>
+            </div>
             <p-password 
               id="password" 
               [(ngModel)]="password" 
@@ -47,14 +121,14 @@
               inputStyleClass="w-full"
               placeholder="Enter your password"
             ></p-password>
-        </div>
+          </div>
 
-        <!-- Confirm Password field -->
-        <div class="field mb-4">
-        <div class="flex align-items-center mb-1">
-          <label for="confirmPassword" class="ml-2">Confirm Password</label>
-          <i class="pi pi-lock ml-2"></i>
-        </div>
+          <!-- Confirm Password field -->
+          <div class="col-6 field mb-3">
+            <div class="flex align-items-center mb-1">
+              <label for="confirmPassword" class="ml-2">Confirm Password</label>
+              <i class="pi pi-lock ml-2"></i>
+            </div>
             <p-password 
               id="confirmPassword" 
               [(ngModel)]="confirmPassword" 
@@ -66,23 +140,24 @@
               inputStyleClass="w-full"
               placeholder="Confirm your password"
             ></p-password>
-        </div>
+          </div>
 
-        <!-- Remember me checkbox -->
-        <div class="field-checkbox mb-4">
-          <p-checkbox [(ngModel)]="rememberMe" [binary]="true" inputId="rememberMe" name="rememberMe"></p-checkbox>
-          <label for="rememberMe" class="ml-2">Remember me</label>
-        </div>
+          <!-- Remember me checkbox -->
+          <div class="col-12 field-checkbox mb-3">
+            <p-checkbox [(ngModel)]="rememberMe" [binary]="true" inputId="rememberMe" name="rememberMe"></p-checkbox>
+            <label for="rememberMe" class="ml-2">Remember me</label>
+          </div>
 
-        <!-- Register button -->
-        <div class="field mb-4">
-          <p-button 
-            type="submit" 
-            label="Sign Up" 
-            icon="pi pi-user-plus" 
-            styleClass="w-full" 
-            [loading]="loading"
-          ></p-button>
+          <!-- Register button -->
+          <div class="col-12 field mb-3">
+            <p-button 
+              type="submit" 
+              label="Sign Up" 
+              icon="pi pi-user-plus" 
+              styleClass="w-full" 
+              [loading]="loading"
+            ></p-button>
+          </div>
         </div>
       </form>
 

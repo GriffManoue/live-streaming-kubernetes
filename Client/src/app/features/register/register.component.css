@@ -11,7 +11,7 @@
 
 .register-card-container {
   width: 100%;
-  max-width: 450px;
+  max-width: 600px; /* Increased to accommodate the grid layout */
 }
 
 .register-card {
@@ -34,10 +34,44 @@
   width: 100%;
 }
 
+/* Support for PrimeNG grid layout */
+:host ::ng-deep .grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -0.5rem;
+  margin-left: -0.5rem;
+  margin-top: -0.5rem;
+}
+
+:host ::ng-deep .col-6,
+:host ::ng-deep .col-12 {
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .col-6 {
+  width: 50%;
+}
+
+:host ::ng-deep .col-12 {
+  width: 100%;
+}
+
 .text-primary {
   color: var(--primary-color);
 }
 
 .text-center {
   text-align: center;
+}
+
+/* Responsive grid for small screens */
+@media screen and (max-width: 576px) {
+  :host ::ng-deep .col-6 {
+    width: 100%;
+  }
+  
+  .register-card-container {
+    max-width: 100%;
+  }
 }

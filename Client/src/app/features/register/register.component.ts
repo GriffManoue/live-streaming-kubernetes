@@ -33,8 +33,12 @@ import { LoginService } from '../../services/login/login.service';
 })
 export class RegisterComponent {
   username: string = '';
+  email: string = '';
   password: string = '';
   confirmPassword: string = '';
+  firstName: string = '';
+  lastName: string = '';
+  phone: string = '';
   rememberMe: boolean = false;
   registerError: boolean = false;
   errorMessage: string = '';
@@ -43,7 +47,7 @@ export class RegisterComponent {
   constructor(private router: Router, private loginService: LoginService) {}
 
   onSubmit() {
-    if (!this.username || !this.password || !this.confirmPassword) {
+    if (!this.username || !this.email || !this.password || !this.confirmPassword || !this.firstName || !this.lastName || !this.phone) {
       this.registerError = true;
       this.errorMessage = 'All fields are required';
       return;
