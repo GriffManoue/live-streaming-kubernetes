@@ -1,0 +1,29 @@
+.stream-thumbnail {
+  overflow: hidden;
+  position: relative;
+}
+
+.stream-thumbnail:hover i {
+  transform: scale(1.1);
+  transition: transform 0.3s ease;
+}
+
+h1 {
+  color: var(--primary-700);
+  border-bottom: 2px solid var(--primary-300);
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .ml-72 {
+    margin-left: 240px;
+  }
+}
+
+@media (max-width: 576px) {
+  .ml-72 {
+    margin-left: 0;
+  }
+}
