@@ -11,7 +11,7 @@ export class LoginService {
     return this.loggedIn.asObservable();
   }
 
-  private hasToken(): boolean {
+  hasToken(): boolean {
     return !!localStorage.getItem('auth_token') || !!sessionStorage.getItem('auth_token');
   }
 

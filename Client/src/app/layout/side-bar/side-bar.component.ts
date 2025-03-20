@@ -30,7 +30,6 @@ export class SideBarComponent implements OnInit {
   ngOnInit() {
     this.loginService.isLoggedIn.subscribe(loggedIn => {
       this.isLoggedIn = loggedIn;
-      console.log('Logged in:', this.isLoggedIn);
     });
 
     // Mock data - replace with actual API call to your streamer service
