@@ -1,4 +1,4 @@
-<div *ngif="isLoggedIn" class="static-sidebar">
+<div *ngIf="isLoggedIn" class="static-sidebar">
     <div class="streamer-list" style="padding-top: 1rem;">
         <p-card *ngFor="let streamer of streamers" 
                 styleClass="streamer-card mb-3">

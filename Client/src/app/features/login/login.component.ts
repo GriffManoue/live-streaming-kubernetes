@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -10,6 +10,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DividerModule } from 'primeng/divider';
 import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
+import { LoginService } from '../../services/login/login.service';
 
 @Component({
   selector: 'app-login',
@@ -31,6 +32,8 @@ import { MessageModule } from 'primeng/message';
   styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
+  @Output() loginSuccess: boolean = false;
+
   username: string = '';
   password: string = '';
   rememberMe: boolean = false;
@@ -38,13 +41,13 @@ export class LoginComponent implements OnInit {
   errorMessage: string = '';
   loading: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private loginService: LoginService) {}
 
   ngOnInit() {
     const token = localStorage.getItem('auth_token');
     //todo: check if token is valid
     if (token) {
-      this.router.navigate(['/']);
+      this.router.navigate(['/home']);
     }
   }
 
@@ -63,13 +66,10 @@ export class LoginComponent implements OnInit {
     setTimeout(() => {
       // For demo purposes - in real app you would validate with your AuthService
       if (this.username === 'demo' && this.password === 'password') {
-        // Store token in localStorage if rememberMe is checked
-        if (this.rememberMe) {
-          localStorage.setItem('auth_token', 'demo-token');
-        } else {
-          sessionStorage.setItem('auth_token', 'demo-token');
-        }
-        this.router.navigate(['/']);
+        this.loginSuccess = true;
+        this.loginError = false;
+        this.loginService.login('demo-token', this.rememberMe);
+        this.router.navigate(['/home']);
       } else {
         this.loginError = true;
         this.errorMessage = 'Invalid username or password';

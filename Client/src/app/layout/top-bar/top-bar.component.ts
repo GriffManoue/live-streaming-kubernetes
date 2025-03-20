@@ -9,7 +9,7 @@ import { MenuItem } from 'primeng/api';
 import { StreamCategories } from '../../models/enums/stream-categories';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
-import { UserDto } from '../../models/user/user-dto';
+import { LoginService } from '../../services/login/login.service';
 
 @Component({
   selector: 'app-top-bar',
@@ -28,36 +28,39 @@ import { UserDto } from '../../models/user/user-dto';
   styleUrl: './top-bar.component.css'
 })
 export class TopBarComponent {
-  @Input() isLoggedIn: boolean = false;
+  isLoggedIn: boolean = false;
   
   items: MenuItem[] = []; // Menu items for the top bar
   isDarkMode: boolean; // Initialize dark mode state
   
   
-  constructor() {
-    if (this.isLoggedIn) {
-    this.items = [
-      {
-        label: 'Home',
-        icon: 'pi pi-video',
-        routerLink: '/',
-        routerLinkActiveOptions: { exact: true }
-      },
-      {
-        label: 'Categories',
-        icon: 'pi pi-list',
-        routerLink: '/categories',
-        routerLinkActiveOptions: { exact: true },
-        items: Object.values(StreamCategories).map(category => ({
-          label: category.name,
-          icon: category.icon,
-          routerLink: `/categories/${category.name.toLowerCase()}`,
-          routerLinkActiveOptions: { exact: true }
-        }))
-
+  constructor(private loginService: LoginService) {
+    this.loginService.isLoggedIn.subscribe(loggedIn => {
+      this.isLoggedIn = loggedIn;
+      if (this.isLoggedIn) {
+        this.items = [
+          {
+            label: 'Home',
+            icon: 'pi pi-video',
+            routerLink: '/',
+            routerLinkActiveOptions: { exact: true }
+          },
+          {
+            label: 'Categories',
+            icon: 'pi pi-list',
+            routerLink: '/categories',
+            routerLinkActiveOptions: { exact: true },
+            items: Object.values(StreamCategories).map(category => ({
+              label: category.name,
+              icon: category.icon,
+              routerLink: `/categories/${category.name.toLowerCase()}`,
+              routerLinkActiveOptions: { exact: true }
+            }))
+    
+          }
+        ];
       }
-    ];
-  }
+    });
 
     // Check local storage for dark mode preference
     const darkMode = localStorage.getItem('darkMode');

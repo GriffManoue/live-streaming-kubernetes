@@ -4,6 +4,8 @@ import { PanelModule } from 'primeng/panel';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
+import { LoginService } from '../../services/login/login.service';
+
 
 @Component({
   selector: 'app-side-bar',
@@ -19,11 +21,18 @@ import { AvatarModule } from 'primeng/avatar';
   styleUrl: './side-bar.component.css'
 })
 export class SideBarComponent implements OnInit {
-  @Input() isLoggedIn: boolean = false;
+  isLoggedIn: boolean = false;
 
   streamers: any[] = [];
 
+  constructor(private loginService: LoginService) {}
+
   ngOnInit() {
+    this.loginService.isLoggedIn.subscribe(loggedIn => {
+      this.isLoggedIn = loggedIn;
+      console.log('Logged in:', this.isLoggedIn);
+    });
+
     // Mock data - replace with actual API call to your streamer service
     this.streamers = [
       { id: 1, name: 'gamer123', followers: 1250, category: 'Gaming', isLive: true },
