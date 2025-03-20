@@ -18,6 +18,7 @@ export const appConfig: ApplicationConfig = {
                   name: 'primeng',
                   order: 'theme, base, primeng'
               },
+              darkModeSelector: '.my-app-dark'
           }
 
         },

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PanelModule } from 'primeng/panel';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
-import { ScrollPanelModule } from 'primeng/scrollpanel';
+import { AvatarModule } from 'primeng/avatar';
 
 @Component({
   selector: 'app-side-bar',
@@ -13,22 +13,22 @@ import { ScrollPanelModule } from 'primeng/scrollpanel';
     PanelModule,
     CardModule,
     ButtonModule,
-    ScrollPanelModule
+    AvatarModule
   ],
   templateUrl: './side-bar.component.html',
   styleUrl: './side-bar.component.css'
 })
 export class SideBarComponent implements OnInit {
-  streams: any[] = [];
+  streamers: any[] = [];
 
   ngOnInit() {
-    // Mock data - replace with actual API call to your stream service
-    this.streams = [
-      { id: 1, title: 'Gaming Stream', user: 'gamer123', viewers: 1250, category: 'Gaming' },
-      { id: 2, title: 'Music Session', user: 'musician456', viewers: 750, category: 'Music' },
-      { id: 3, title: 'Coding Tutorial', user: 'coder789', viewers: 500, category: 'Technology' },
-      { id: 4, title: 'Art Creation', user: 'artist101', viewers: 320, category: 'Art' },
-      { id: 5, title: 'Cooking Show', user: 'chef555', viewers: 890, category: 'Food' }
+    // Mock data - replace with actual API call to your streamer service
+    this.streamers = [
+      { id: 1, name: 'gamer123', followers: 1250, category: 'Gaming', isLive: true },
+      { id: 2, name: 'musician456', followers: 750, category: 'Music', isLive: false },
+      { id: 3, name: 'coder789', followers: 500, category: 'Technology', isLive: true },
+      { id: 4, name: 'artist101', followers: 320, category: 'Art', isLive: false },
+      { id: 5, name: 'chef555', followers: 890, category: 'Food', isLive: true }
     ];
   }
 }

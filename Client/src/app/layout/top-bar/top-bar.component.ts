@@ -7,6 +7,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuItem } from 'primeng/api';
 import { StreamCategories } from '../../enums/stream-categories';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-top-bar',
@@ -17,13 +19,16 @@ import { StreamCategories } from '../../enums/stream-categories';
     ButtonModule,
     MenubarModule,
     InputTextModule,
-    AvatarModule
+    AvatarModule,
+    ToggleSwitchModule,
+    FormsModule
   ],
   templateUrl: './top-bar.component.html',
   styleUrl: './top-bar.component.css'
 })
 export class TopBarComponent {
   items: MenuItem[];
+  isDarkMode: boolean; // Initialize dark mode state
   
   constructor() {
     this.items = [
@@ -47,5 +52,28 @@ export class TopBarComponent {
 
       }
     ];
+
+    // Check local storage for dark mode preference
+    const darkMode = localStorage.getItem('darkMode');
+    const isDarkMode = darkMode === 'true';
+    this.isDarkMode = isDarkMode === true; // Convert string to boolean
+    const element = document.querySelector('html');
+    if (element) {
+      // Apply dark mode class if preference is set
+      element.classList.toggle('my-app-dark', isDarkMode);
+    }
   }
+
+  
+toggleDarkMode() {
+  const element = document.querySelector('html');
+  if (element) {
+    // Toggle the dark mode class on the html
+
+  element.classList.toggle('my-app-dark');
+  }
+  // Update the dark mode state in local storage
+  const isDarkMode = element?.classList.contains('my-app-dark');
+  localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
+}
 }
