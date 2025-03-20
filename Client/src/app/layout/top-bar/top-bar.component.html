@@ -1,0 +1,22 @@
+<header  class="border-b shadow-md p-3 w-full max-h-20 fixed top-0 z-50 bg-surface-500" >
+  <p-menubar [model]="items" styleClass="bg-emphasis text-white">
+    <ng-template pTemplate="start">
+      <div class="flex align-items-center">   
+        <span class="font-bold text-xl">KubeStream</span>
+      </div>
+    </ng-template>
+    <ng-template #item let-item let-root="root">
+      <a pRipple class="flex items-center p-menubar-item-link">
+        <i *ngIf="item.icon" [ngClass]="['pi', item.icon]"></i>
+        <span>{{ item.label }}</span>
+        <i *ngIf="item.items" [ngClass]="['ml-auto pi', root ? 'pi-angle-down' : 'pi-angle-right']"></i>
+    </a>
+  </ng-template>
+    <ng-template pTemplate="end">
+      <div class="flex align-items-center gap-2">
+        <p-button icon="pi pi-user" label="Profile"  styleClass="text-white"></p-button>
+        <p-button icon="pi pi-cog" label="Settings" styleClass="text-white"></p-button>
+      </div>
+    </ng-template>
+  </p-menubar>
+</header>

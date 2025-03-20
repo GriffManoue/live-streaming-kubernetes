@@ -2,10 +2,8 @@ import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
-import Aura from '@primeng/themes/aura';
-
-
 import { routes } from './app.routes';
+import ColorPreset from '../ColorPreset';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,8 +12,14 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     providePrimeNG({
         theme: {
-            preset: Aura
-            
+            preset: ColorPreset,
+            options: {
+              cssLayer: {
+                  name: 'primeng',
+                  order: 'theme, base, primeng'
+              },
+          }
+
         },
         ripple: true,
         inputVariant: 'filled',

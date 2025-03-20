@@ -6,6 +6,7 @@ import { MenubarModule } from 'primeng/menubar';
 import { InputTextModule } from 'primeng/inputtext';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuItem } from 'primeng/api';
+import { StreamCategories } from '../../enums/stream-categories';
 
 @Component({
   selector: 'app-top-bar',
@@ -28,18 +29,22 @@ export class TopBarComponent {
     this.items = [
       {
         label: 'Home',
-        icon: 'pi pi-home',
-        routerLink: '/'
-      },
-      {
-        label: 'Live Streams',
         icon: 'pi pi-video',
-        routerLink: '/streams'
+        routerLink: '/',
+        routerLinkActiveOptions: { exact: true }
       },
       {
         label: 'Categories',
         icon: 'pi pi-list',
-        routerLink: '/categories'
+        routerLink: '/categories',
+        routerLinkActiveOptions: { exact: true },
+        items: Object.values(StreamCategories).map(category => ({
+          label: category.name,
+          icon: category.icon,
+          routerLink: `/categories/${category.name.toLowerCase()}`,
+          routerLinkActiveOptions: { exact: true }
+        }))
+
       }
     ];
   }
