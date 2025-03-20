@@ -11,6 +11,7 @@ import { DividerModule } from 'primeng/divider';
 import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
 import { LoginService } from '../../services/login/login.service';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -40,6 +41,7 @@ export class RegisterComponent implements OnInit {
   constructor(
     private router: Router, 
     private loginService: LoginService,
+    private authService: AuthService,
     private fb: FormBuilder
   ) {}
 
@@ -91,24 +93,32 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    this.loading = true;
     this.registerError = false;
 
     // Form values
     const formValues = this.registerForm.value;
 
-    // Simulating API call with timeout
-    setTimeout(() => {
-      // For demo purposes - in real app you would validate with your AuthService
-      if (formValues.username === 'demo' && formValues.password === 'password') {
+    let registerRequest = {
+      username: formValues.username,
+      email: formValues.email,
+      firstName: formValues.firstName,
+      lastName: formValues.lastName,
+      phone: formValues.phone,
+      password: formValues.password,
+    }
+
+    this.authService.register(registerRequest).subscribe({
+      next: (response) => {
         this.registerError = false;
-        this.loginService.login('demo-token', formValues.rememberMe);
-        this.router.navigate(['/home']);
-      } else {
+
+        // Handle successful registration
+        this.router.navigate(['/login']);
+      },
+      error: (error) => {
         this.registerError = true;
-        this.errorMessage = 'Registration failed';
+        this.errorMessage = error.error.message || 'Registration failed';
       }
-      this.loading = false;
-    }, 1000);
+    });
+
   }
 }

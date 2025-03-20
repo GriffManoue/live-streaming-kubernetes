@@ -25,7 +25,6 @@
             formControlName="username" 
             class="w-full"
             placeholder="Enter your username" 
-            [disabled]="loading" 
             [ngClass]="{'ng-invalid ng-dirty': f['username'].touched && f['username'].invalid}"
           />
           <small class="p-error block mt-1" *ngIf="f['username'].touched && f['username'].errors?.['required']">
@@ -44,7 +43,6 @@
             formControlName="password" 
             [toggleMask]="true" 
             [feedback]="false"
-            [disabled]="loading" 
             styleClass="w-full" 
             inputStyleClass="w-full"
             placeholder="Enter your password"

@@ -11,6 +11,8 @@ import { DividerModule } from 'primeng/divider';
 import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
 import { LoginService } from '../../services/login/login.service';
+import { AuthService } from '../../services/auth/auth.service';
+import { LoginRequest } from '../../models/auth/login-request.model';
 
 @Component({
   selector: 'app-login',
@@ -39,8 +41,9 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private router: Router, 
-    private loginService: LoginService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private loginService: LoginService
   ) {}
 
   ngOnInit() {
@@ -76,25 +79,27 @@ export class LoginComponent implements OnInit {
       this.errorMessage = 'Please correct the form errors';
       return;
     }
-
-    this.loading = true;
+    
     this.loginError = false;
 
     // Form values
     const formValues = this.loginForm.value;
 
-    // Simulating API call with timeout
-    setTimeout(() => {
-      // For demo purposes - in real app you would validate with your AuthService
-      if (formValues.username === 'demo' && formValues.password === 'password') {
+    let loginRequest: LoginRequest = {
+      username: formValues.username,
+      password: formValues.password,
+    }
+
+    this.authService.login(loginRequest).subscribe({
+      next: (response) => {
         this.loginError = false;
-        this.loginService.login('demo-token', formValues.rememberMe);
+        this.loginService.login(response.token, formValues.rememberMe);
         this.router.navigate(['/home']);
-      } else {
+      },
+      error: (error) => {
         this.loginError = true;
         this.errorMessage = 'Invalid username or password';
       }
-      this.loading = false;
-    }, 1000);
+    });
   }
 }

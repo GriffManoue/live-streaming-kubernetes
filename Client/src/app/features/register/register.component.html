@@ -21,7 +21,7 @@
               <i class="pi pi-user ml-2"></i>
             </div>
             <input id="username" type="text" pInputText formControlName="username" class="w-full"
-              placeholder="Enter your username" [disabled]="loading"
+              placeholder="Enter your username" 
               [ngClass]="{'ng-invalid ng-dirty': f['username'].touched && f['username'].invalid}" />
             <small class="p-error block mt-1" *ngIf="f['username'].touched && f['username'].errors?.['required']">
               Username is required
@@ -38,7 +38,7 @@
               <i class="pi pi-envelope ml-2"></i>
             </div>
             <input id="email" type="email" pInputText formControlName="email" class="w-full"
-              placeholder="Enter your email" [disabled]="loading"
+              placeholder="Enter your email"
               [ngClass]="{'ng-invalid ng-dirty': f['email'].touched && f['email'].invalid}" />
             <small class="p-error block mt-1" *ngIf="f['email'].touched && f['email'].errors?.['required']">
               Email is required
@@ -55,7 +55,7 @@
               <i class="pi pi-phone ml-2"></i>
             </div>
             <input id="phone" type="text" pInputText formControlName="phone" class="w-full"
-              placeholder="Enter your phone number" [disabled]="loading"
+              placeholder="Enter your phone number" 
               [ngClass]="{'ng-invalid ng-dirty': f['phone'].touched && f['phone'].invalid}" />
             <small class="p-error block mt-1" *ngIf="f['phone'].touched && f['phone'].errors?.['required']">
               Phone number is required
@@ -73,7 +73,7 @@
               <i class="pi pi-user ml-2"></i>
             </div>
             <input id="firstName" type="text" pInputText formControlName="firstName" class="w-full"
-              placeholder="Enter your first name" [disabled]="loading"
+              placeholder="Enter your first name" 
               [ngClass]="{'ng-invalid ng-dirty': f['firstName'].touched && f['firstName'].invalid}" />
             <small class="p-error block mt-1" *ngIf="f['firstName'].touched && f['firstName'].errors?.['required']">
               First name is required
@@ -87,7 +87,7 @@
               <i class="pi pi-user ml-2"></i>
             </div>
             <input id="lastName" type="text" pInputText formControlName="lastName" class="w-full"
-              placeholder="Enter your last name" [disabled]="loading"
+              placeholder="Enter your last name" 
               [ngClass]="{'ng-invalid ng-dirty': f['lastName'].touched && f['lastName'].invalid}" />
             <small class="p-error block mt-1" *ngIf="f['lastName'].touched && f['lastName'].errors?.['required']">
               Last name is required
@@ -102,7 +102,7 @@
               <i class="pi pi-lock ml-2"></i>
             </div>
             <p-password id="password" formControlName="password" [toggleMask]="true" [feedback]="true"
-              [disabled]="loading" styleClass="w-full" inputStyleClass="w-full" placeholder="Enter your password"
+               styleClass="w-full" inputStyleClass="w-full" placeholder="Enter your password"
               [ngClass]="{'ng-invalid ng-dirty': f['password'].touched && f['password'].invalid}"></p-password>
             <small class="p-error block mt-1" *ngIf="f['password'].touched && f['password'].errors?.['required']">
               Password is required
@@ -119,7 +119,7 @@
               <i class="pi pi-lock ml-2"></i>
             </div>
             <p-password id="confirmPassword" formControlName="confirmPassword" [toggleMask]="true" [feedback]="false"
-              [disabled]="loading" styleClass="w-full" inputStyleClass="w-full" placeholder="Confirm your password"
+               styleClass="w-full" inputStyleClass="w-full" placeholder="Confirm your password"
               [ngClass]="{'ng-invalid ng-dirty': f['confirmPassword'].touched && f['confirmPassword'].invalid}"></p-password>
             <small class="p-error block mt-1"
               *ngIf="f['confirmPassword'].touched && f['confirmPassword'].errors?.['required']">
