@@ -12,16 +12,10 @@ public class StreamDbContext : BaseDbContext
     
     public DbSet<LiveStream> Streams { get; set; } = null!;
     public DbSet<StreamMetadata> StreamMetadata { get; set; } = null!;
-    public DbSet<User> Users { get; set; } = null!; // Need User for relationships
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
-        // Configure User entity - minimal configuration needed for references
-        modelBuilder.Entity<User>()
-            .HasIndex(u => u.Username)
-            .IsUnique();
         
         // Configure Stream entity
         modelBuilder.Entity<LiveStream>()
@@ -34,12 +28,5 @@ public class StreamDbContext : BaseDbContext
             .HasOne(sm => sm.Stream)
             .WithOne(s => s.Metadata)
             .HasForeignKey<StreamMetadata>(sm => sm.StreamId);
-            
-        // Exclude navigation properties that are not needed for this service
-        modelBuilder.Entity<User>()
-        .Ignore(u => u.FollowingRelationships);
-    
-    modelBuilder.Entity<User>()
-        .Ignore(u => u.FollowedByRelationships);
     }
 }

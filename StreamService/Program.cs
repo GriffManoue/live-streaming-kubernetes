@@ -10,6 +10,7 @@ using Shared.Models.Domain;
 using Shared.Services;
 using StackExchange.Redis;
 using StreamService.Data;
+using StreamService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,7 +67,12 @@ builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<S
 // Register repositories for Stream-specific entities
 builder.Services.AddScoped<IRepository<LiveStream>, Repository<LiveStream>>();
 builder.Services.AddScoped<IRepository<StreamMetadata>, Repository<StreamMetadata>>();
-builder.Services.AddScoped<IRepository<User>, Repository<User>>();
+
+// Add HttpClient for the UserService
+builder.Services.AddHttpClient<IUserServiceClient, UserServiceClient>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
@@ -92,7 +98,6 @@ builder.Services.AddAuthentication(options =>
 
 // Add application services
 builder.Services.AddScoped<IStreamService, StreamService.Services.StreamService>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
