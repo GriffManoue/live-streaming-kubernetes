@@ -13,3 +13,4 @@ kubectl apply -f StreamService/k8s/
 kubectl apply -f AnalyticsService/k8s/
 kubectl apply -f RecommendationService/k8s/
 kubectl apply -f Nginx-RTMP/k8s
+kubectl apply -f Client/k8s/

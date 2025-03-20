@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: client
-        image: yourusername/client:latest
+        image: bugapeti/client-k8s:latest
         ports:
         - containerPort: 80
         resources:
