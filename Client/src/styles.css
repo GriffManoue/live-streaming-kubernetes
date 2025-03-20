@@ -2,7 +2,3 @@
 @import"tailwindcss";
 @import "tailwindcss-primeui";
 @import "primeicons/primeicons.css";
-
-body {
-  background-color: var(--surface-500);
-}
