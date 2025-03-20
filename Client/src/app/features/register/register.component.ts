@@ -1,4 +1,4 @@
-import { Component, OnInit, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -13,7 +13,7 @@ import { MessageModule } from 'primeng/message';
 import { LoginService } from '../../services/login/login.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-register',
   standalone: true,
   imports: [
     CommonModule,
@@ -28,49 +28,46 @@ import { LoginService } from '../../services/login/login.service';
     MessagesModule,
     MessageModule
   ],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  templateUrl: './register.component.html',
+  styleUrl: './register.component.css'
 })
-export class LoginComponent implements OnInit {
-
+export class RegisterComponent {
   username: string = '';
   password: string = '';
+  confirmPassword: string = '';
   rememberMe: boolean = false;
-  loginError: boolean = false;
+  registerError: boolean = false;
   errorMessage: string = '';
   loading: boolean = false;
 
   constructor(private router: Router, private loginService: LoginService) {}
 
-  ngOnInit() {
-    const token = localStorage.getItem('auth_token');
-    //todo: check if token is valid
-    if (token) {
-      this.router.navigate(['/home']);
-    }
-  }
-
   onSubmit() {
-    if (!this.username || !this.password) {
-      this.loginError = true;
-      this.errorMessage = 'Username and password are required';
+    if (!this.username || !this.password || !this.confirmPassword) {
+      this.registerError = true;
+      this.errorMessage = 'All fields are required';
+      return;
+    }
+
+    if (this.password !== this.confirmPassword) {
+      this.registerError = true;
+      this.errorMessage = 'Passwords do not match';
       return;
     }
 
     this.loading = true;
-    this.loginError = false;
+    this.registerError = false;
 
-    // Here you would typically call your auth service
     // Simulating API call with timeout
     setTimeout(() => {
       // For demo purposes - in real app you would validate with your AuthService
       if (this.username === 'demo' && this.password === 'password') {
-        this.loginError = false;
+        this.registerError = false;
         this.loginService.login('demo-token', this.rememberMe);
         this.router.navigate(['/home']);
       } else {
-        this.loginError = true;
-        this.errorMessage = 'Invalid username or password';
+        this.registerError = true;
+        this.errorMessage = 'Registration failed';
       }
       this.loading = false;
     }, 1000);

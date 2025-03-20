@@ -1,0 +1,99 @@
+<div class="register-container">
+  <div class="register-card-container">
+    <p-card styleClass="register-card">
+      <ng-template pTemplate="header">
+        <div class="register-header">
+          <h1 class="text-center font-bold text-2xl">KubeStream</h1>
+          <h2 class="text-center text-lg">Sign Up</h2>
+        </div>
+      </ng-template>
+
+      <form (ngSubmit)="onSubmit()">
+        <!-- Error message -->
+        <p-message *ngIf="registerError" severity="error" [text]="errorMessage" styleClass="w-full mb-4"></p-message>
+
+        <!-- Username field -->
+        <div class="field mb-4">
+          <label for="username" class="block mb-1">Username</label>
+          <span class="p-input-icon-left w-full">
+            <i class="pi pi-user"></i>
+            <input 
+              id="username" 
+              type="text" 
+              pInputText 
+              [(ngModel)]="username" 
+              name="username" 
+              class="w-full" 
+              placeholder="Enter your username"
+              [disabled]="loading"
+            />
+          </span>
+        </div>
+
+        <!-- Password field -->
+        <div class="field mb-4">
+          <label for="password" class="block mb-1">Password</label>
+          <span class="p-input-icon-left w-full">
+            <i class="pi pi-lock"></i>
+            <p-password 
+              id="password" 
+              [(ngModel)]="password" 
+              name="password" 
+              [toggleMask]="true"
+              [feedback]="false"
+              [disabled]="loading"
+              styleClass="w-full" 
+              inputStyleClass="w-full"
+              placeholder="Enter your password"
+            ></p-password>
+          </span>
+        </div>
+
+        <!-- Confirm Password field -->
+        <div class="field mb-4">
+          <label for="confirmPassword" class="block mb-1">Confirm Password</label>
+          <span class="p-input-icon-left w-full">
+            <i class="pi pi-lock"></i>
+            <p-password 
+              id="confirmPassword" 
+              [(ngModel)]="confirmPassword" 
+              name="confirmPassword" 
+              [toggleMask]="true"
+              [feedback]="false"
+              [disabled]="loading"
+              styleClass="w-full" 
+              inputStyleClass="w-full"
+              placeholder="Confirm your password"
+            ></p-password>
+          </span>
+        </div>
+
+        <!-- Remember me checkbox -->
+        <div class="field-checkbox mb-4">
+          <p-checkbox [(ngModel)]="rememberMe" [binary]="true" inputId="rememberMe" name="rememberMe"></p-checkbox>
+          <label for="rememberMe" class="ml-2">Remember me</label>
+        </div>
+
+        <!-- Register button -->
+        <div class="field mb-4">
+          <p-button 
+            type="submit" 
+            label="Sign Up" 
+            icon="pi pi-user-plus" 
+            styleClass="w-full" 
+            [loading]="loading"
+          ></p-button>
+        </div>
+      </form>
+
+      <p-divider align="center">
+        <span class="text-sm">OR</span>
+      </p-divider>
+
+      <!-- Login link -->
+      <div class="field mt-4 text-center">
+        <p>Already have an account? <a routerLink="/login" class="text-primary font-medium">Sign In</a></p>
+      </div>
+    </p-card>
+  </div>
+</div>

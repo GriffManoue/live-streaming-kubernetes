@@ -1,0 +1,43 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--surface-ground);
+  padding: 2rem;
+  /* Account for the top bar height */
+  padding-top: calc(4rem + 2rem);
+}
+
+.register-card-container {
+  width: 100%;
+  max-width: 450px;
+}
+
+.register-card {
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.register-header {
+  padding: 1.5rem 0;
+  background-color: var(--surface-card);
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+}
+
+:host ::ng-deep .p-card .p-card-content {
+  padding: 1.5rem;
+}
+
+:host ::ng-deep .p-password input {
+  width: 100%;
+}
+
+.text-primary {
+  color: var(--primary-color);
+}
+
+.text-center {
+  text-align: center;
+}
