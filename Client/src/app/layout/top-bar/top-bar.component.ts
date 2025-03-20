@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -6,9 +6,10 @@ import { MenubarModule } from 'primeng/menubar';
 import { InputTextModule } from 'primeng/inputtext';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuItem } from 'primeng/api';
-import { StreamCategories } from '../../enums/stream-categories';
+import { StreamCategories } from '../../models/enums/stream-categories';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
+import { UserDto } from '../../models/user/user-dto';
 
 @Component({
   selector: 'app-top-bar',
@@ -27,10 +28,14 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './top-bar.component.css'
 })
 export class TopBarComponent {
-  items: MenuItem[];
+  @Input() isLoggedIn: boolean = false;
+  
+  items: MenuItem[] = []; // Menu items for the top bar
   isDarkMode: boolean; // Initialize dark mode state
   
+  
   constructor() {
+    if (this.isLoggedIn) {
     this.items = [
       {
         label: 'Home',
@@ -52,6 +57,7 @@ export class TopBarComponent {
 
       }
     ];
+  }
 
     // Check local storage for dark mode preference
     const darkMode = localStorage.getItem('darkMode');

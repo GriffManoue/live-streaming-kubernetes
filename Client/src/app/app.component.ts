@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { DemoComponent } from './demo/demo.component';
 import { TopBarComponent } from './layout/top-bar/top-bar.component';
 import { SideBarComponent } from './layout/side-bar/side-bar.component';
+import { UserDto } from './models/user/user-dto';
 
 @Component({
   selector: 'app-root',
@@ -16,5 +17,5 @@ import { SideBarComponent } from './layout/side-bar/side-bar.component';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'Client';
+  title = 'KubeStream';
 }

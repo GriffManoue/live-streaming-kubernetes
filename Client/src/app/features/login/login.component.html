@@ -1,1 +1,85 @@
-<p>login works!</p>
+<div class="login-container">
+  <div class="login-card-container">
+    <p-card styleClass="login-card">
+      <ng-template pTemplate="header">
+        <div class="login-header">
+          <h1 class="text-center font-bold text-2xl">KubeStream</h1>
+          <h2 class="text-center text-lg">Sign In</h2>
+        </div>
+      </ng-template>
+
+      <form (ngSubmit)="onSubmit()">
+        <!-- Error message -->
+        <p-message *ngIf="loginError" severity="error" [text]="errorMessage" styleClass="w-full mb-4"></p-message>
+
+        <!-- Username field -->
+        <div class="field mb-4">
+          <label for="username" class="block mb-1">Username</label>
+          <span class="p-input-icon-left w-full">
+            <i class="pi pi-user"></i>
+            <input 
+              id="username" 
+              type="text" 
+              pInputText 
+              [(ngModel)]="username" 
+              name="username" 
+              class="w-full" 
+              placeholder="Enter your username"
+              [disabled]="loading"
+            />
+          </span>
+        </div>
+
+        <!-- Password field -->
+        <div class="field mb-4">
+          <label for="password" class="block mb-1">Password</label>
+          <span class="p-input-icon-left w-full">
+            <i class="pi pi-lock"></i>
+            <p-password 
+              id="password" 
+              [(ngModel)]="password" 
+              name="password" 
+              [toggleMask]="true"
+              [feedback]="false"
+              [disabled]="loading"
+              styleClass="w-full" 
+              inputStyleClass="w-full"
+              placeholder="Enter your password"
+            ></p-password>
+          </span>
+        </div>
+
+        <!-- Remember me checkbox -->
+        <div class="field-checkbox mb-4">
+          <p-checkbox [(ngModel)]="rememberMe" [binary]="true" inputId="rememberMe" name="rememberMe"></p-checkbox>
+          <label for="rememberMe" class="ml-2">Remember me</label>
+        </div>
+
+        <!-- Login button -->
+        <div class="field mb-4">
+          <p-button 
+            type="submit" 
+            label="Sign In" 
+            icon="pi pi-sign-in" 
+            styleClass="w-full" 
+            [loading]="loading"
+          ></p-button>
+        </div>
+      </form>
+
+      <p-divider align="center">
+        <span class="text-sm">OR</span>
+      </p-divider>
+
+      <!-- Register link -->
+      <div class="field mt-4 text-center">
+        <p>Don't have an account? <a routerLink="/register" class="text-primary font-medium">Sign Up</a></p>
+      </div>
+
+      <!-- Forgot password link -->
+      <div class="field mt-2 text-center">
+        <a routerLink="/forgot-password" class="text-primary">Forgot Password?</a>
+      </div>
+    </p-card>
+  </div>
+</div>

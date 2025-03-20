@@ -1,24 +1,20 @@
 <header  class="border-b shadow-md p-3 w-full max-h-20 fixed top-0 z-50 bg-surface-500" >
-  <p-menubar [model]="items" styleClass="bg-emphasis ">
+  <p-menubar  [model]="items" styleClass="bg-emphasis ">
     <ng-template pTemplate="start">
       <div class="flex align-items-center">   
         <span class="font-bold text-xl">KubeStream</span>
       </div>
     </ng-template>
-    <ng-template #item let-item let-root="root">
-      <a pRipple class="flex items-center p-menubar-item-link">
-        <i *ngIf="item.icon" [ngClass]="['pi', item.icon]"></i>
-        <span>{{ item.label }}</span>
-        <i *ngIf="item.items" [ngClass]="['ml-auto pi', root ? 'pi-angle-down' : 'pi-angle-right']"></i>
-    </a>
-  </ng-template>
     <ng-template pTemplate="end">
       <div class="flex align-items-center gap-2">
         <i class="pi pi-sun mr-1 flex items-center my-auto" style="font-size: 1.2rem;"></i>
         <p-toggleswitch [(ngModel)]="isDarkMode"  (onChange)="toggleDarkMode()"  class="flex items-center my-auto"/>
         <i class="pi pi-moon ml-1 flex items-center my-auto" style="font-size: 1.2rem;"></i>
-        <p-button icon="pi pi-user" label="Profile" ></p-button>
-        <p-button icon="pi pi-cog" label="Settings" ></p-button>
+        <p-button *ngIf="isLoggedIn" icon="pi pi-user" label="Profile"></p-button>
+        <p-button *ngIf="isLoggedIn" icon="pi pi-cog" label="Settings" ></p-button>
+        <p-button *ngIf="!isLoggedIn" icon="pi pi-sign-in" label="Login" routerLink="/login"></p-button>
+        <p-button *ngIf="!isLoggedIn" icon="pi pi-user-plus" label="Register" routerLink="/register"></p-button>
+
       </div>
     </ng-template>
   </p-menubar>
