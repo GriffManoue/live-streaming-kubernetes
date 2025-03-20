@@ -1,15 +1,13 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Shared.Interfaces;
+using Microsoft.AspNetCore.Http;
 
-namespace StreamService.Services;
+
+namespace Shared.Services;
 
 public class UserContext : IUserContext
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ICacheService _cacheService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public UserContext(IHttpContextAccessor httpContextAccessor, ICacheService cacheService)
     {
@@ -23,7 +21,7 @@ public class UserContext : IUserContext
         if (httpContext == null) return Guid.Empty;
 
         var userIdClaim = httpContext.User.FindFirst("sub")?.Value;
-        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId)) 
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             return Guid.Empty;
 
         return userId;
