@@ -28,5 +28,18 @@ public class StreamDbContext : BaseDbContext
             .HasOne(sm => sm.Stream)
             .WithOne(s => s.Metadata)
             .HasForeignKey<StreamMetadata>(sm => sm.StreamId);
+
+        // Configure UserRelationship entity
+        modelBuilder.Entity<UserRelationship>()
+            .HasOne(ur => ur.Follower)
+            .WithMany(u => u.FollowingRelationships)
+            .HasForeignKey(ur => ur.FollowerId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<UserRelationship>()
+            .HasOne(ur => ur.Following)
+            .WithMany(u => u.FollowedByRelationships)
+            .HasForeignKey(ur => ur.FollowingId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
