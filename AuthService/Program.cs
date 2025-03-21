@@ -30,6 +30,8 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 // Add application services
 builder.Services.AddScoped<IAuthService, AuthService.Services.AuthService>();
 
+// Add IHttpContextAccessor
+builder.Services.AddHttpContextAccessor();
 
 // Add OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
