@@ -1,8 +1,8 @@
 # Use an official Node.js runtime as a parent image
-FROM node:22 as builder
+FROM node as builder
 
 # Set the working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY /Client/package*.json ./
@@ -19,11 +19,9 @@ RUN npm run build
 # Stage 2: Serve the app with Nginx
 FROM nginx:alpine
 
-# Copy the custom nginx.conf if it exists
-COPY /Client/k8s/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy the built Angular app from the previous stage
-COPY --from=builder /usr/src/app/dist/client /usr/share/nginx/html
+COPY --from=builder app/dist/client/browser /usr/share/nginx/html
 
 # Expose port 80
 EXPOSE 80
