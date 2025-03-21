@@ -98,6 +98,8 @@ builder.Services.AddAuthentication(options =>
 
 // Add application services
 builder.Services.AddScoped<IStreamService, StreamService.Services.StreamService>();
+builder.Services.AddScoped<IUserContext, UserContext>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
