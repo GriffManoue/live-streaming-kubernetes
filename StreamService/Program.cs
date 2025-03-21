@@ -96,6 +96,9 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+// Register IHttpContextAccessor for dependency injection
+builder.Services.AddHttpContextAccessor();
+
 // Add application services
 builder.Services.AddScoped<IStreamService, StreamService.Services.StreamService>();
 builder.Services.AddScoped<IUserContext, UserContext>();
