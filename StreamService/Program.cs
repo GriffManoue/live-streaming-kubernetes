@@ -101,13 +101,14 @@ builder.Services.AddAuthentication(options =>
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin",
-        new CorsPolicyBuilder()
-            .WithOrigins(" http://client-service.default.svc.cluster.local")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials()
-            .Build());
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
 });
 
 // Register IHttpContextAccessor for dependency injection
@@ -131,6 +132,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserService API v1"); });
 }
+
+// IMPORTANT: Place UseCors before Authentication/Authorization
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();

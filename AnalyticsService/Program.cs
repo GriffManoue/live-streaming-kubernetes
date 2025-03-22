@@ -68,6 +68,19 @@ builder.Services.AddDbContext<AnalyticsDbContext>(options =>
         builder.Services.AddScoped<IRepository<User>, Repository<User>>();
         builder.Services.AddScoped<IRepository<LiveStream>, Repository<LiveStream>>();
 
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -87,18 +100,6 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? "your-256-bit-secret-key-here-at-least-32-chars"))
     };
-});
-
-// Add CORS policy
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowSpecificOrigin",
-        new CorsPolicyBuilder()
-            .WithOrigins(" http://client-service.default.svc.cluster.local")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials()
-            .Build());
 });
 
 // Add application services
@@ -121,6 +122,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "AnalyticsService API v1"); });
 }
+
+// IMPORTANT: Place UseCors before Authentication/Authorization
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -69,6 +69,19 @@ builder.Services.AddScoped<IRepository<User>, Repository<User>>();
 builder.Services.AddScoped<IRepository<LiveStream>, Repository<LiveStream>>();
 builder.Services.AddScoped<IRepository<UserRelationship>, Repository<UserRelationship>>();
 
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
     {
@@ -91,18 +104,6 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-    // Add CORS policy
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowSpecificOrigin",
-        new CorsPolicyBuilder()
-            .WithOrigins(" http://client-service.default.svc.cluster.local")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials()
-            .Build());
-});
-
 // Add application services
 builder.Services.AddScoped<IRecommendationService, RecommendationService.Services.RecommendationService>();
 // The AnalyticsService will be provided by the AnalyticsService microservice
@@ -121,6 +122,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "RecommendationService API v1"); });
 }
+
+// IMPORTANT: Place UseCors before Authentication/Authorization
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();

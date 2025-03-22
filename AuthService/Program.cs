@@ -91,13 +91,14 @@ builder.Services.AddAuthentication(options =>
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowSpecificOrigin",
-        new CorsPolicyBuilder()
-            .WithOrigins("http://localhost:80") // Update this to match your client URL
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials()
-            .Build());
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
 });
 
 // Add application services
@@ -116,6 +117,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "AuthService API v1"); });
 }
+
+// IMPORTANT: Place UseCors before Authentication/Authorization
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();

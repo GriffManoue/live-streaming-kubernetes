@@ -15,6 +15,19 @@ builder.Services.AddScoped<IMigrationService, PostgreSqlMigrationService>();
 
 builder.Logging.AddConsole();
 
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
 // Add swagger
 builder.Services.AddSwaggerGen(c =>
 {
@@ -50,6 +63,9 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "DatabaseManagementService API v1");
     });
 }
+
+// IMPORTANT: Add CORS middleware
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 app.MapControllers();
