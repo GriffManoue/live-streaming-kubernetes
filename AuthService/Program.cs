@@ -2,6 +2,7 @@ using System.Text;
 using AuthService.Data;
 using AuthService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
@@ -87,6 +88,18 @@ builder.Services.AddAuthentication(options =>
                                        "your-256-bit-secret-key-here-at-least-32-chars"))
         };
     });
+
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        new CorsPolicyBuilder()
+            .WithOrigins(" http://client-service.default.svc.cluster.local")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .Build());
+});
 
 // Add application services
 builder.Services.AddScoped<ITokenService, TokenService>();

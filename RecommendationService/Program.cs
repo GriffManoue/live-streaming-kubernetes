@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Shared.Models.Domain;
 using Shared.Data;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,6 +90,18 @@ builder.Services.AddAuthentication(options =>
                                        "your-256-bit-secret-key-here-at-least-32-chars"))
         };
     });
+
+    // Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        new CorsPolicyBuilder()
+            .WithOrigins(" http://client-service.default.svc.cluster.local")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .Build());
+});
 
 // Add application services
 builder.Services.AddScoped<IRecommendationService, RecommendationService.Services.RecommendationService>();

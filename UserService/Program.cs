@@ -1,6 +1,10 @@
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Shared.Data;
 using Shared.Interfaces;
 using Shared.Models.Domain;
@@ -35,6 +39,27 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "UserService API", Version = "v1" });
 });
 
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "streaming-platform",
+            ValidAudience = builder.Configuration["Jwt:Audience"] ?? "streaming-users",
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ??
+                                       "your-256-bit-secret-key-here-at-least-32-chars"))
+        };
+    });
+
 // Add Health Checks with more resilient configuration
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<UserDbContext>(
@@ -46,6 +71,18 @@ builder.Services.AddHealthChecks()
         HealthStatus.Degraded,
         new[] { "ready" },
         TimeSpan.FromSeconds(10));
+
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        new CorsPolicyBuilder()
+            .WithOrigins(" http://client-service.default.svc.cluster.local")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .Build());
+});
 
 // Add Redis caching service (still shared)
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
