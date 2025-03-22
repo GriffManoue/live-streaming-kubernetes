@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backendapi-deployment
+  labels:
+    app: backendapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backendapi
+  template:
+    metadata:
+      labels:
+        app: backendapi
+    spec:
+      containers:
+      - name: backendapi
+        image: your-dockerhub-username/backendapi:latest # Replace with your image
+        ports:
+        - containerPort: 80
