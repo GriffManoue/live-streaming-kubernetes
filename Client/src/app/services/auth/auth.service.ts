@@ -8,7 +8,6 @@ import { RegisterRequest } from '../../models/auth/register-request.model';
 import { ValidateTokenRequest } from '../../models/auth/validate-token-request.model';
 import { RevokeTokenRequest } from '../../models/auth/revoke-token-request.model';
 import { StreamTokenRequest } from '../../models/auth/stream-token-request.model';
-import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -16,9 +15,7 @@ import { environment } from '../../../environments/environment';
 export class AuthService extends ServiceBase {
 
   constructor(http: HttpClient) {
-    // Use the API URL from environment config or default to relative path
-    // This makes it work in both Kubernetes and local development
-    super(http, environment.apiUrl ? `${environment.apiUrl}/auth` : '/api/auth');
+    super(http, 'http://auth-service.default.svc.cluster.local/api');
   }
 
   register(request: RegisterRequest): Observable<AuthResult> {
