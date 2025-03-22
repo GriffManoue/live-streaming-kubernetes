@@ -23,6 +23,9 @@ FROM nginx:alpine
 # Copy the built Angular app from the previous stage
 COPY --from=builder app/dist/client/browser /usr/share/nginx/html
 
+# Copy the Nginx configuration file
+COPY /Client/nginx.conf /etc/nginx/conf.d/default.conf
+
 # Expose port 80
 EXPOSE 80
 
