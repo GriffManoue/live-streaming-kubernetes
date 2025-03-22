@@ -77,7 +77,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
         new CorsPolicyBuilder()
-            .WithOrigins(" http://client-service.default.svc.cluster.local")
+            .WithOrigins("http://client-service.default.svc.cluster.local")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials()

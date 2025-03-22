@@ -21,7 +21,6 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
 // Register UserDbContext as IDbContext for dependency injection
 builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
 
@@ -84,7 +83,7 @@ builder.Services.AddAuthentication(options =>
             ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "streaming-platform",
             ValidAudience = builder.Configuration["Jwt:Audience"] ?? "streaming-users",
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ??
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? 
                                        "your-256-bit-secret-key-here-at-least-32-chars"))
         };
     });
@@ -94,7 +93,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
         new CorsPolicyBuilder()
-            .WithOrigins(" http://client-service.default.svc.cluster.local")
+            .WithOrigins("http://localhost:80") // Update this to match your client URL
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials()
