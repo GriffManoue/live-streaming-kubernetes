@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { UserDto } from '../../models/user/user-dto';
 import { ServiceBase } from '../service-base';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,8 @@ import { ServiceBase } from '../service-base';
 export class UserService extends ServiceBase {
 
   constructor(http: HttpClient) {
-    super(http, 'http://user-service.default.svc.cluster.local/api' );
+    // Use the API URL from environment config or default to relative path
+    super(http, environment.apiUrl ? `${environment.apiUrl}/user` : '/api/user');
   }
 
   getUserById(id: string): Observable<UserDto> {
