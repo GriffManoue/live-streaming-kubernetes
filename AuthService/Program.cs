@@ -119,7 +119,12 @@ if (app.Environment.IsDevelopment())
 }
 
 // IMPORTANT: Place UseCors before Authentication/Authorization
-app.UseCors("AllowAll");
+// Replace the existing UseCors call with a more specific configuration.
+app.UseCors(builder => builder
+    .WithOrigins("http://localhost") // Replace with your client's actual origin
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowCredentials());
 
 app.UseAuthentication();
 app.UseAuthorization();
