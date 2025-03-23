@@ -14,3 +14,5 @@ kubectl apply -f AnalyticsService/k8s/
 kubectl apply -f RecommendationService/k8s/
 kubectl apply -f Nginx-RTMP/k8s
 kubectl apply -f Client/k8s/
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.0/deploy/static/provider/cloud/deploy.yaml

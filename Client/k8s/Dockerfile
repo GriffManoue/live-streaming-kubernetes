@@ -19,15 +19,11 @@ RUN npm run build
 # Stage 2: Serve the app with Nginx
 FROM nginx:alpine
 
-
 # Copy the built Angular app from the previous stage
 COPY --from=builder app/dist/client/browser /usr/share/nginx/html
 
 # Copy the Nginx configuration file
 COPY /Client/k8s/nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 80
-EXPOSE 80
 
 # Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

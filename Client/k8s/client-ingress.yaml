@@ -9,7 +9,7 @@ spec:
       http:
         paths:
           # Route to Angular Frontend
-          - path: /()(.*)
+          - path: /
             pathType: Prefix
             backend:
               service:
@@ -18,7 +18,7 @@ spec:
                   number: 80
 
           # Route to User Service
-          - path: /api/user(/|$)(.*)
+          - path: /api/user
             pathType: Prefix
             backend:
               service:
@@ -27,7 +27,7 @@ spec:
                   number: 80
 
           # Route to Auth Service
-          - path: /api/auth(/|$)(.*)
+          - path: /api/auth
             pathType: Prefix
             backend:
               service:
@@ -36,7 +36,7 @@ spec:
                   number: 80
 
           # Route to Stream Service
-          - path: /api/stream(/|$)(.*)
+          - path: /api/stream
             pathType: Prefix
             backend:
               service:
@@ -45,7 +45,7 @@ spec:
                   number: 80
           
           # Route to Analytics Service
-          - path: /api/analytics(/|$)(.*)
+          - path: /api/analytics
             pathType: Prefix
             backend:
               service:
@@ -54,7 +54,7 @@ spec:
                   number: 80
 
           # Route to Recommendation Service
-          - path: /api/recommendation(/|$)(.*)
+          - path: /api/recommendation
             pathType: Prefix
             backend:
               service:
