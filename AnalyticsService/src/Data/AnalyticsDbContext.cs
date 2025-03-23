@@ -33,8 +33,8 @@ public class AnalyticsDbContext : BaseDbContext
             .Metadata.FindNavigation(nameof(User.FollowingRelationships))?.SetPropertyAccessMode(PropertyAccessMode.Field);
         
         modelBuilder.Entity<User>()
-            .Metadata.FindNavigation(nameof(User.FollowedByRelationships))?.SetPropertyAccessMode(PropertyAccessMode.Field);
-            
+            .Ignore(u => u.FollowedByRelationships);
+
         modelBuilder.Entity<LiveStream>()
             .Metadata.FindNavigation(nameof(LiveStream.Metadata))?.SetPropertyAccessMode(PropertyAccessMode.Field);
     }
