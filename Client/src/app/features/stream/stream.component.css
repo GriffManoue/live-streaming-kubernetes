@@ -1,0 +1,35 @@
+/* Remove full-width black bar and adjust video container */
+
+/* Set background color for the video player */
+video {
+  background-color: #000; /* Set the desired background color */
+  border-radius: 20px; /* Set the desired border radius for rounded edges */
+}
+
+/* Fix aspect ratio and maintain proper sizing */
+.aspect-video {
+  aspect-ratio: 16 / 9; /* Maintain a 16:9 aspect ratio */
+  max-width: 75%; /* Set a maximum width for the video player */
+  margin: 0 auto; /* Center the video player horizontally */
+}
+
+/* Style for tags based on category */
+:host ::ng-deep .p-tag {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Stream metadata styling */
+.stream-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.metadata-item {
+  display: flex;
+  align-items: center;
+  color: var(--text-color-secondary);
+  font-size: 0.9rem;
+}

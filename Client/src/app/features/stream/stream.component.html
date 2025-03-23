@@ -1,1 +1,65 @@
-<p>stream works!</p>
+<div class="p-4 mt-16 ml-72">
+  <!-- Loading state -->
+  <div *ngIf="loading" class="flex justify-center items-center h-96">
+    <p-progressSpinner styleClass="w-8rem h-8rem" strokeWidth="4" animationDuration=".5s"></p-progressSpinner>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error && !loading" class="flex flex-col items-center justify-center h-96">
+    <i class="pi pi-exclamation-circle text-5xl text-red-500 mb-4"></i>
+    <h2 class="text-xl font-semibold mb-2">Stream Error</h2>
+    <p class="text-gray-600">{{ error }}</p>
+    <p-button label="Go Back" icon="pi pi-arrow-left" styleClass="mt-4" routerLink="/home"></p-button>
+  </div>
+
+  <!-- Stream content -->
+  <div *ngIf="!loading && !error" class="grid grid-cols-1 gap-6">
+    <div class="col-span-1">
+      <!-- Video player -->
+      <div class="rounded-lg overflow-hidden shadow-lg">
+        <video #videoPlayer 
+               class="w-full aspect-video" 
+               controls 
+               autoplay></video>
+      </div>
+
+      <!-- Stream info -->
+      <p-card styleClass="mt-4">
+        <div class="flex flex-col md:flex-row md:justify-between md:items-center">
+          <div>
+            <h1 class="text-2xl font-bold mb-2">{{ streamData.streamName }}</h1>
+            <p class="mb-3">{{ streamData.streamDescription }}</p>
+            
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center">
+                <p-avatar [label]="streamData.username.charAt(0).toUpperCase()" 
+                          styleClass="mr-2" 
+                          shape="circle"></p-avatar>
+                <span class="font-semibold">{{ streamData.username }}</span>
+              </div>
+              
+              <p-tag [value]="streamData.streamCategory" 
+                     [severity]="getCategorySeverity(streamData.streamCategory)"></p-tag>
+              
+              <div class="flex items-center">
+                <i class="pi pi-users mr-1"></i>
+                <span>{{ streamData.viewerCount | number }} viewers</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-3 md:mt-0">
+            <p-button label="Follow" icon="pi pi-user-plus" styleClass="p-button-outlined mr-2"></p-button>
+            <p-button label="Share" icon="pi pi-share-alt"></p-button>
+          </div>
+        </div>
+        
+        <div class="mt-4">
+          <p class="text-sm text-gray-500">
+            Started streaming {{ streamData.createdAt | date:'medium' }}
+          </p>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>
