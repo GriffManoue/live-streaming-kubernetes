@@ -1,1 +1,87 @@
-<p>settings works!</p>
+<div class="settings-container">
+  <div class="settings-card-container">
+    <p-card styleClass="settings-card">
+      <ng-template pTemplate="header">
+        <div class="settings-header">
+          <h1 class="text-center font-bold text-2xl">KubeStream</h1>
+          <h2 class="text-center text-lg">Stream Settings</h2>
+        </div>
+      </ng-template>
+
+      <form [formGroup]="streamForm" (ngSubmit)="onSubmit()">
+        <!-- Stream Name field -->
+        <div class="field mb-4">
+          <div class="flex align-items-center mb-1">
+            <label for="streamName" class="ml-2">Stream Name</label>
+            <i class="pi pi-video ml-2"></i>
+          </div>
+          <input 
+            id="streamName" 
+            type="text" 
+            pInputText 
+            formControlName="streamName" 
+            class="w-full"
+            placeholder="Enter your stream name" 
+            [ngClass]="{'ng-invalid ng-dirty': streamForm.get('streamName')?.touched && streamForm.get('streamName')?.invalid}"
+          />
+          <small class="p-error block mt-1" *ngIf="streamForm.get('streamName')?.touched && streamForm.get('streamName')?.errors?.['required']">
+            Stream name is required
+          </small>
+        </div>
+
+        <!-- Stream Description field -->
+        <div class="field mb-4">
+          <div class="flex align-items-center mb-1">
+            <label for="streamDescription" class="ml-2">Stream Description</label>
+            <i class="pi pi-info-circle ml-2"></i>
+          </div>
+          <input 
+            id="streamDescription" 
+            type="text" 
+            pInputText 
+            formControlName="streamDescription" 
+            class="w-full"
+            placeholder="Enter your stream description" 
+          />
+        </div>
+
+        <!-- Stream Category field -->
+        <div class="field mb-4">
+          <div class="flex align-items-center mb-1">
+            <label for="streamCategory" class="ml-2">Stream Category</label>
+            <i class="pi pi-tag ml-2"></i>
+          </div>
+          <p-dropdown 
+            id="streamCategory" 
+            [options]="categories" 
+            formControlName="streamCategory" 
+            placeholder="Select a Category"
+            styleClass="w-full"
+            [ngClass]="{'ng-invalid ng-dirty': streamForm.get('streamCategory')?.touched && streamForm.get('streamCategory')?.invalid}"
+          ></p-dropdown>
+          <small class="p-error block mt-1" *ngIf="streamForm.get('streamCategory')?.touched && streamForm.get('streamCategory')?.errors?.['required']">
+            Stream category is required
+          </small>
+        </div>
+
+        <!-- Active Switch -->
+        <div class="field-checkbox mb-4">
+          <div class="flex align-items-center">
+            <p-inputSwitch id="isActive" formControlName="isActive"></p-inputSwitch>
+            <label for="isActive" class="ml-2">Stream Active</label>
+          </div>
+        </div>
+
+        <!-- Save button -->
+        <div class="field mb-4">
+          <p-button 
+            type="submit" 
+            label="Save Settings" 
+            icon="pi pi-save" 
+            styleClass="w-full"
+          ></p-button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</div>

@@ -11,10 +11,9 @@
         <p-toggleswitch [(ngModel)]="isDarkMode"  (onChange)="toggleDarkMode()"  class="flex items-center my-auto"/>
         <i class="pi pi-moon ml-1 flex items-center my-auto" style="font-size: 1.2rem;"></i>
         <p-button *ngIf="isLoggedIn" icon="pi pi-user" label="Profile"></p-button>
-        <p-button *ngIf="isLoggedIn" icon="pi pi-cog" label="MyStream" ></p-button>
+        <p-button *ngIf="isLoggedIn" icon="pi pi-cog" label="Settings" routerLink="/settings/{{userId}}"></p-button>
         <p-button *ngIf="!isLoggedIn" icon="pi pi-sign-in" label="Login" routerLink="/login"></p-button>
         <p-button *ngIf="!isLoggedIn" icon="pi pi-user-plus" label="Register" routerLink="/register"></p-button>
-
       </div>
     </ng-template>
   </p-menubar>

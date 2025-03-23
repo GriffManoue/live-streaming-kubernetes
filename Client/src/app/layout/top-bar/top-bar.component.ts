@@ -29,6 +29,7 @@ import { LoginService } from '../../services/login/login.service';
 })
 export class TopBarComponent {
   isLoggedIn: boolean = false;
+  userId: string = '';
   
   items: MenuItem[] = []; // Menu items for the top bar
   isDarkMode: boolean; // Initialize dark mode state
@@ -38,6 +39,10 @@ export class TopBarComponent {
     this.loginService.isLoggedIn.subscribe(loggedIn => {
       this.isLoggedIn = loggedIn;
       if (this.isLoggedIn) {
+        // Get the user ID from localStorage
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        this.userId = user.id || '';
+        
         this.items = [
           {
             label: 'Home',

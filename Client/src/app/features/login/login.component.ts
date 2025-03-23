@@ -100,7 +100,10 @@ export class LoginComponent implements OnInit {
     this.authService.login(loginRequest).subscribe({
       next: (response) => {
         this.loginError = false;
-        this.loginService.login(response.token, formValues.rememberMe);
+        // Extract userId from the response and pass it to the login service
+        // Assuming response contains a userId property; adjust as needed based on actual API response
+        const userId = response.userId || 'user-1';
+        this.loginService.login(response.token, formValues.rememberMe, userId);
         this.router.navigate(['/home']);
       },
       error: (error) => {
