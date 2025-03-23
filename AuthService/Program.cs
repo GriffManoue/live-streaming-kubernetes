@@ -91,13 +91,13 @@ builder.Services.AddAuthentication(options =>
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
+    options.AddPolicy("AllowSpecificOrigin",
         builder =>
         {
-            builder
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader();
+            builder.WithOrigins("http://localhost") // Replace with your client's actual origin
+                   .AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .AllowCredentials();
         });
 });
 
@@ -120,11 +120,7 @@ if (app.Environment.IsDevelopment())
 
 // IMPORTANT: Place UseCors before Authentication/Authorization
 // Replace the existing UseCors call with a more specific configuration.
-app.UseCors(builder => builder
-    .WithOrigins("http://localhost") // Replace with your client's actual origin
-    .AllowAnyMethod()
-    .AllowAnyHeader()
-    .AllowCredentials());
+app.UseCors("AllowSpecificOrigin");
 
 app.UseAuthentication();
 app.UseAuthorization();
