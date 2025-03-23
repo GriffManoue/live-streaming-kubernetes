@@ -28,6 +28,9 @@ public class AuthService : IAuthService
 
     public async Task<AuthResult> RegisterAsync(RegisterRequest request)
     {
+
+        Console.WriteLine($"Registering user: {request.Username}");
+
         // Check if user with the same username or email already exists
         var users = await _userRepository.GetAllAsync();
         if (users.Any(u => u.Username.Equals(request.Username, StringComparison.OrdinalIgnoreCase)))
