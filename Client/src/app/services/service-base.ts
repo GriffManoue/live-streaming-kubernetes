@@ -2,10 +2,12 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export abstract class ServiceBase {
-  protected apiUrl: string; // Base URL for the API
+  protected apiUrl: string = 'http://localhost/api'; // Base URL for the API
 
-  constructor(protected http: HttpClient, apiUrl: string) {
-    this.apiUrl = apiUrl;
+  constructor(protected http: HttpClient, apiUrl?: string) {
+    if (apiUrl) {
+      this.apiUrl = apiUrl;
+    }
   }
 
   protected get<T>(url: string): Observable<T> {

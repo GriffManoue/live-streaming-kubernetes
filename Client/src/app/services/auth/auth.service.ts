@@ -15,7 +15,7 @@ import { StreamTokenRequest } from '../../models/auth/stream-token-request.model
 export class AuthService extends ServiceBase {
 
   constructor(http: HttpClient) {
-    super(http, 'http://localhost/api');
+    super(http);
   }
 
   register(request: RegisterRequest): Observable<AuthResult> {
