@@ -132,6 +132,31 @@ public class AuthController : ControllerBase
             });
         }
     }
+
+    [HttpPost("validate-stream-token")]
+    [Authorize]
+    public async Task<ActionResult<AuthResult>> ValidateStreamToken([FromBody] ValidateTokenRequest request)
+    {
+        try
+        {
+            var result = await _authService.ValidateStreamTokenAsync(request.Token);
+            
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+            
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new AuthResult
+            {
+                Success = false,
+                Error = $"Internal server error: {ex.Message}"
+            });
+        }
+    }
 }
 
 public class ValidateTokenRequest

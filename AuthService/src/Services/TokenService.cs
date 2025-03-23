@@ -96,6 +96,22 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    public bool ValidateStreamToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var validationParameters = GetValidationParameters();
+
+        try
+        {
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
+            return principal.HasClaim(c => c.Type == "stream_id");
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     private TokenValidationParameters GetValidationParameters()
     {
         return new TokenValidationParameters

@@ -224,4 +224,59 @@ public class AuthService : IAuthService
         var users = await _userRepository.GetAllAsync();
         return users.FirstOrDefault(u => u.Id == userId);
     }
+
+
+    public async Task<AuthResult> ValidateStreamTokenAsync(string token)
+    {
+        if (string.IsNullOrEmpty(token))
+            return new AuthResult
+            {
+                Success = false,
+                Error = "Token is required"
+            };
+
+        // Check if token is in the blacklist
+        var blacklistKey = $"revoked_token:{token}";
+        var isRevoked = await _cacheService.GetAsync<bool>(blacklistKey);
+        if (isRevoked)
+            return new AuthResult
+            {
+                Success = false,
+                Error = "Token has been revoked"
+            };
+
+        if (!_tokenService.ValidateStreamToken(token))
+            return new AuthResult
+            {
+                Success = false,
+                Error = "Invalid or expired token"
+            };
+
+        var principal = _tokenService.GetPrincipalFromToken(token);
+        var userIdClaim = principal.FindFirst("sub")?.Value;
+
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            return new AuthResult
+            {
+                Success = false,
+                Error = "Invalid token"
+            };
+
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
+            return new AuthResult
+            {
+                Success = false,
+                Error = "User not found"
+            };
+
+
+
+        return new AuthResult
+        {
+            Success = true,
+            Token = token,
+            UserId = userId
+        };
+    }
 }
