@@ -19,13 +19,7 @@ public class LiveStream
     
     public Guid UserId { get; set; }
     
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    
-    public DateTime? EndedAt { get; set; }
-    
     public bool IsActive { get; set; } = true;
-    
-    public int ViewerCount { get; set; }
     
     // Navigation properties
     public virtual User User { get; set; } = null!;

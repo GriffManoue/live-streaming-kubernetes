@@ -11,13 +11,7 @@ public class StreamMetadata
     
     public string? ThumbnailUrl { get; set; }
     
-    public int TotalViews { get; set; }
-    
-    public int LikeCount { get; set; }
-    
-    public int DislikeCount { get; set; }
-    
-    public List<string> Tags { get; set; } = new();
+    public int Views { get; set; }
     
     // Navigation property
     public virtual LiveStream Stream { get; set; } = null!;

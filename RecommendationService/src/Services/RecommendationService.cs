@@ -62,15 +62,12 @@ public class RecommendationService : IRecommendationService
                 StreamCategory = stream.StreamCategory,
                 UserId = stream.UserId,
                 Username = stream.User.Username,
-                ViewerCount = stream.ViewerCount,
                 IsActive = stream.IsActive,
-                CreatedAt = stream.CreatedAt
             });
 
         // Then add other popular streams (limited to 10 total recommendations)
         foreach (var stream in activeStreams
                      .Where(s => !followedUserIds.Contains(s.UserId))
-                     .OrderByDescending(s => s.ViewerCount)
                      .Take(10 - recommendations.Count))
             recommendations.Add(new StreamDto
             {
@@ -80,9 +77,7 @@ public class RecommendationService : IRecommendationService
                 StreamCategory = stream.StreamCategory,
                 UserId = stream.UserId,
                 Username = stream.User.Username,
-                ViewerCount = stream.ViewerCount,
                 IsActive = stream.IsActive,
-                CreatedAt = stream.CreatedAt
             });
 
         // Cache the result
@@ -119,7 +114,7 @@ public class RecommendationService : IRecommendationService
 
         // Get popular streamers
         var allUsers = await _userRepository.GetAllAsync();
-        var popularStreamers = allUsers.Where(u => u.Streams.Any(s => s.IsActive && s.ViewerCount > 100)).ToList();
+        var popularStreamers = allUsers.Where(u => u.Streams.Any(s => s.IsActive)).ToList();
 
         var recommendations = new List<UserDto>();
 

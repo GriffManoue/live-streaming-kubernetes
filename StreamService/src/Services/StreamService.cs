@@ -118,9 +118,7 @@ public class StreamService : IStreamService
             StreamDescription = request.StreamDescription,
             StreamCategory = request.StreamCategory,
             UserId = userId,
-            CreatedAt = DateTime.UtcNow,
             IsActive = true,
-            ViewerCount = 0
         };
         
         await _streamRepository.AddAsync(stream);
@@ -130,10 +128,6 @@ public class StreamService : IStreamService
         {
             Id = Guid.NewGuid(),
             StreamId = stream.Id,
-            TotalViews = 0,
-            LikeCount = 0,
-            DislikeCount = 0,
-            Tags = new List<string>()
         };
         
         await _metadataRepository.AddAsync(metadata);
@@ -224,7 +218,6 @@ public class StreamService : IStreamService
         
         // End the stream
         stream.IsActive = false;
-        stream.EndedAt = DateTime.UtcNow;
         
         await _streamRepository.UpdateAsync(stream);
         
@@ -242,10 +235,7 @@ public class StreamService : IStreamService
             StreamCategory = stream.StreamCategory,
             UserId = stream.UserId,
             Username = user?.Username,
-            CreatedAt = stream.CreatedAt,
-            EndedAt = stream.EndedAt,
             IsActive = stream.IsActive,
-            ViewerCount = stream.ViewerCount
         };
     }
 }
