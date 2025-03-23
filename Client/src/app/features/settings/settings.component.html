@@ -64,12 +64,47 @@
           </small>
         </div>
 
-        <!-- Active Switch -->
-        <div class="field-checkbox mb-4">
-          <div class="flex align-items-center">
-            <p-inputSwitch id="isActive" formControlName="isActive"></p-inputSwitch>
-            <label for="isActive" class="ml-2">Stream Active</label>
+        <!-- Stream Token field -->
+        <div class="field mb-4">
+          <div class="flex align-items-center mb-1">
+            <label for="streamToken" class="ml-2">Stream Token</label>
+            <i class="pi pi-key ml-2"></i>
           </div>
+          <div class="p-inputgroup">
+            <input 
+              id="streamToken" 
+              type="text" 
+              pInputText 
+              formControlName="streamToken" 
+              class="w-full"
+              placeholder="Your stream token" 
+              [readonly]="true"
+            />
+            <button 
+              pButton 
+              type="button" 
+              icon="pi pi-copy" 
+              (click)="copyToken()" 
+              pTooltip="Copy to clipboard"
+              tooltipPosition="top"
+            ></button>
+          </div>
+          <small class="block mt-1 text-sm">Use this token in your streaming software (OBS, Streamlabs, etc.)</small>
+        </div>
+
+        <!-- Generate new token button -->
+        <div class="field mb-4">
+          <p-button 
+            type="button" 
+            label="Generate New Token" 
+            icon="pi pi-refresh" 
+            styleClass="p-button-secondary w-full"
+            (click)="generateNewToken()"
+          ></p-button>
+          <small class="block mt-1 text-sm text-yellow-500">
+            <i class="pi pi-exclamation-triangle mr-1"></i>
+            Warning: Generating a new token will invalidate your current token
+          </small>
         </div>
 
         <!-- Save button -->
