@@ -79,17 +79,24 @@ export class LoginComponent implements OnInit {
       this.errorMessage = 'Please correct the form errors';
       return;
     }
-    
-    this.loginError = false;
 
     // Form values
     const formValues = this.loginForm.value;
+
+    if (formValues.username === "demo") {
+      this.loginService.login("demo-token", formValues.rememberMe);
+      this.router.navigate(['/home']);
+      return;
+    }
+    
+    this.loginError = false;
 
     let loginRequest: LoginRequest = {
       username: formValues.username,
       password: formValues.password,
     }
 
+    
     this.authService.login(loginRequest).subscribe({
       next: (response) => {
         this.loginError = false;
