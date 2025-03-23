@@ -1,0 +1,27 @@
+/* The top bar should stay fixed at the top of the viewport */
+.fixed-top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+/* Add some styling for smoother appearance */
+:host ::ng-deep .p-menubar {
+  border: none;
+  width: 100%;
+}
+
+/* Ensure proper spacing below the fixed header */
+:host ::ng-deep body {
+  padding-top: 4rem;
+}
+
+/* Make sure the menubar renders properly on all devices */
+@media screen and (max-width: 768px) {
+  :host ::ng-deep .p-menubar-button {
+    display: inline-flex !important;
+  }
+}
