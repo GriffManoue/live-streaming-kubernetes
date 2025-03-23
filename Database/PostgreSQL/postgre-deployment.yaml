@@ -38,7 +38,8 @@ spec:
           failureThreshold: 5
       volumes:
         - name: postgres-data
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: postgres-pvc
 
 
 

@@ -28,14 +28,15 @@ public class AnalyticsDbContext : BaseDbContext
             .WithMany(u => u.Streams)
             .HasForeignKey(s => s.UserId);
             
-        // Exclude navigation properties that are not needed for analytics service
+        // Explicitly ignore all user relationship properties that aren't needed for analytics
         modelBuilder.Entity<User>()
-            .Metadata.FindNavigation(nameof(User.FollowingRelationships))?.SetPropertyAccessMode(PropertyAccessMode.Field);
+            .Ignore(u => u.FollowingRelationships);
         
         modelBuilder.Entity<User>()
             .Ignore(u => u.FollowedByRelationships);
 
+        // Ignore stream metadata for analytics service
         modelBuilder.Entity<LiveStream>()
-            .Metadata.FindNavigation(nameof(LiveStream.Metadata))?.SetPropertyAccessMode(PropertyAccessMode.Field);
+            .Ignore(s => s.Metadata);
     }
 }
