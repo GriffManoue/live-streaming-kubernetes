@@ -12,6 +12,8 @@ public class StreamMetadata
     public string? ThumbnailUrl { get; set; }
     
     public int Views { get; set; }
+
+    public bool IsLive { get; set; } = false;
     
     // Navigation property
     public virtual LiveStream Stream { get; set; } = null!;
