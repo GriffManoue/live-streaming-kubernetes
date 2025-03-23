@@ -11,6 +11,7 @@ using Shared.Data;
 using Shared.Interfaces;
 using Shared.Services;
 using StackExchange.Redis;
+using StreamService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +63,11 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     configOptions.ConnectRetry = 5;
     configOptions.ReconnectRetryPolicy = new ExponentialRetry(5000);
     return ConnectionMultiplexer.Connect(configOptions);
+});
+
+builder.Services.AddHttpClient<IStreamServiceClient, StreamServiceClient>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
 });
 
 builder.Services.AddSingleton<ICacheService, RedisCacheService>();

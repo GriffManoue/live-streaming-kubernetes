@@ -1,6 +1,7 @@
 using Shared.Interfaces;
 using Shared.Models.Auth;
 using Shared.Models.Domain;
+using StreamService.Services;
 
 namespace AuthService.Services;
 
@@ -12,17 +13,21 @@ public class AuthService : IAuthService
     private readonly ITokenService _tokenService;
     private readonly IRepository<User> _userRepository;
 
+    private readonly IStreamServiceClient _streamServiceClient;
+
     public AuthService(
         IRepository<User> userRepository,
         ITokenService tokenService,
         IPasswordHasher passwordHasher,
         IHttpContextAccessor httpContextAccessor,
+        IStreamServiceClient streamServiceClient,
         ICacheService cacheService)
     {
         _userRepository = userRepository;
         _tokenService = tokenService;
         _passwordHasher = passwordHasher;
         _httpContextAccessor = httpContextAccessor;
+        _streamServiceClient = streamServiceClient;
         _cacheService = cacheService;
     }
 
@@ -262,7 +267,7 @@ public class AuthService : IAuthService
                 Error = "Invalid token"
             };
 
-        var user = await _userRepository.GetByIdAsync(userId);
+       var user = await _userRepository.GetByIdAsync(userId);
         if (user == null)
             return new AuthResult
             {
@@ -270,7 +275,23 @@ public class AuthService : IAuthService
                 Error = "User not found"
             };
 
+        // Get stream id from token
+        var streamIdClaim = principal.FindFirst("stream_id")?.Value;
+        if (string.IsNullOrEmpty(streamIdClaim) || !Guid.TryParse(streamIdClaim, out var streamId))
+            return new AuthResult
+            {
+                Success = false,
+                Error = "Invalid stream id"
+            };
 
+        // Check if stream exists
+        var stream = await _streamServiceClient.GetStreamByIdAsync(streamId);
+        if (stream == null)
+            return new AuthResult
+            {
+                Success = false,
+                Error = "Stream not found"
+            };
 
         return new AuthResult
         {
