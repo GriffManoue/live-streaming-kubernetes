@@ -77,6 +77,8 @@ public class AuthService : IAuthService
 
     public async Task<AuthResult> LoginAsync(LoginRequest request)
     {
+        Console.WriteLine($"Logging in user: {request.Username}");
+
         // Find user by username
         var users = await _userRepository.GetAllAsync();
         var user = users.FirstOrDefault(u =>
