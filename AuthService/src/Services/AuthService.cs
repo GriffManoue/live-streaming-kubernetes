@@ -209,6 +209,11 @@ public class AuthService : IAuthService
         // Generate a new stream-specific token
         var token = _tokenService.GenerateStreamToken(currentUser, streamId);
 
+        //Store token in cache with expiration
+        var expirationTime = DateTime.UtcNow.AddHours(1);
+        var cacheKey = $"stream_token:{currentUser.Id}:{streamId}";
+        await _cacheService.SetAsync(cacheKey, token, expirationTime - DateTime.UtcNow);
+
         return new AuthResult
         {
             Success = true,

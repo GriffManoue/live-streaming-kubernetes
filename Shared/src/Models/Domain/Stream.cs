@@ -7,22 +7,23 @@ namespace Shared.Models.Domain;
 public class LiveStream
 {
     public Guid Id { get; set; }
-    
-    [Required] 
-    public required string StreamName { get; set; }
-    
-    [Required] 
-    public required string StreamDescription { get; set; }
-    
-    [Required] 
-    public required StreamCategory StreamCategory { get; set; }
-    
-    public Guid UserId { get; set; }
-    
-    public bool IsActive { get; set; } = true;
-    
-    // Navigation properties
+
+    [Required]
     public virtual User User { get; set; } = null!;
-    
-    public virtual StreamMetadata? Metadata { get; set; }
+
+    [Required]
+    public required string StreamName { get; set; }
+
+    [Required]
+    public required string StreamDescription { get; set; }
+
+    [Required]
+    public required StreamCategory StreamCategory { get; set; }
+
+    public string? ThumbnailUrl { get; set; }
+
+    public string? StreamUrl { get; set; }
+
+    public int Views { get; set; }
+
 }
