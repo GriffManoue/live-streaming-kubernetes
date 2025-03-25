@@ -9,4 +9,8 @@ public class UpdateStreamRequest
     public string? StreamDescription { get; set; }
     
     public StreamCategory? StreamCategory { get; set; }
+
+    public string? ThumbnailUrl { get; set; }
+    public string? StreamUrl { get; set; }
+    public int? Views { get; set; }
 }

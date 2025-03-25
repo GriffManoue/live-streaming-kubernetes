@@ -1,6 +1,7 @@
 
 
 using Shared.Interfaces;
+using Shared.models.Enums;
 using Shared.Models.Domain;
 using Shared.Models.Stream;
 using Shared.Models.User;
@@ -81,7 +82,7 @@ public class StreamService : IStreamService
         return userStreams.Select(s => MapToDto(s, user));
     }
     
-    public async Task<StreamDto> CreateStreamAsync(CreateStreamRequest request)
+    public async Task CreateStreamAsync()
     {
         // Validate the user's token
         if (!await _userContext.ValidateCurrentTokenAsync())
@@ -113,25 +114,22 @@ public class StreamService : IStreamService
         var stream = new LiveStream
         {
             Id = Guid.NewGuid(),
-            StreamName = request.StreamName,
-            StreamDescription = request.StreamDescription,
-            StreamCategory = request.StreamCategory,
+            StreamName = "New Stream",
+            StreamDescription = "Stream Description",
+            
+            StreamCategory = StreamCategory.Gaming,
+            ThumbnailUrl = "",
+            StreamUrl = "",
             User = new User
             {
                 Id = user.Id,
                 Username = user.Username,
                 Email = user.Email,
-                Password ="not_needed",
+                Password = "notneeded" ,
             },
         };
         
         await _streamRepository.AddAsync(stream);
-    
-        
-        // Invalidate cache
-        await _cacheService.RemoveAsync("active_streams");
-        
-        return MapToDto(stream, user);
     }
     
     public async Task<StreamDto> UpdateStreamAsync(Guid id, UpdateStreamRequest request)
@@ -175,6 +173,22 @@ public class StreamService : IStreamService
         {
             stream.StreamCategory = request.StreamCategory.Value;
         }
+
+        if (!string.IsNullOrEmpty(request.ThumbnailUrl))
+        {
+            stream.ThumbnailUrl = request.ThumbnailUrl;
+        }
+
+        if (!string.IsNullOrEmpty(request.StreamUrl))
+        {
+            stream.StreamUrl = request.StreamUrl;
+        }
+
+        if (request.Views != null)
+        {
+            stream.Views = request.Views.Value;
+        }
+       
         
         await _streamRepository.UpdateAsync(stream);
         
@@ -188,28 +202,10 @@ public class StreamService : IStreamService
     
     public async Task EndStreamAsync(Guid id)
     {
-        // Validate the user's token
-        if (!await _userContext.ValidateCurrentTokenAsync())
-        {
-            throw new UnauthorizedAccessException("Invalid or expired authentication token");
-        }
-
         var stream = await _streamRepository.GetByIdAsync(id);
         if (stream == null)
         {
             throw new KeyNotFoundException($"Stream with ID {id} not found");
-        }
-        
-        // Check if the current user is the owner of the stream
-        var currentUserId = _userContext.GetCurrentUserId();
-        if (currentUserId == Guid.Empty)
-        {
-            throw new UnauthorizedAccessException("User is not authenticated");
-        }
-        
-        if (stream.User.Id != currentUserId)
-        {
-            throw new UnauthorizedAccessException("User is not authorized to end this stream");
         }
         
         await _streamRepository.UpdateAsync(stream);
