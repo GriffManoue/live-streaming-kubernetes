@@ -9,9 +9,7 @@ public class UserDto
     public required string Email { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
-    public string? Phone { get; set; }
     public DateTime CreatedAt { get; set; }
-    public bool IsActive { get; set; }
     public int FollowersCount { get; set; }
     public int FollowingCount { get; set; }
 }

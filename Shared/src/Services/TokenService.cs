@@ -1,9 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Shared.Interfaces;
 using Shared.Models.Domain;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace AuthService.Services;
 
@@ -70,47 +71,6 @@ public class TokenService : ITokenService
         return tokenHandler.ValidateToken(token, validationParameters, out _);
     }
 
-    public string GenerateStreamToken(User user, Guid streamId)
-    {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
-        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-        var claims = new[]
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.Name, user.Username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("stream_id", streamId.ToString()),
-            new Claim("token_type", "stream")
-        };
-
-        var token = new JwtSecurityToken(
-            _issuer,
-            _audience,
-            claims,
-            expires: DateTime.UtcNow.AddHours(60),
-            signingCredentials: credentials
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-
-    public bool ValidateStreamToken(string token)
-    {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var validationParameters = GetValidationParameters();
-
-        try
-        {
-            var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
-            return principal.HasClaim(c => c.Type == "stream_id");
-        }
-        catch
-        {
-            return false;
-        }
-    }
 
     private TokenValidationParameters GetValidationParameters()
     {
@@ -125,4 +85,5 @@ public class TokenService : ITokenService
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey))
         };
     }
+
 }

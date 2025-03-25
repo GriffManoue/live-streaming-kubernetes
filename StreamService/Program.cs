@@ -1,4 +1,5 @@
 using System.Text;
+using AuthService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -67,7 +68,7 @@ builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<S
 
 // Register repositories for Stream-specific entities
 builder.Services.AddScoped<IRepository<LiveStream>, Repository<LiveStream>>();
-builder.Services.AddScoped<IRepository<StreamMetadata>, Repository<StreamMetadata>>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 // Add HttpClient for the UserService
 builder.Services.AddHttpClient<IUserServiceClient, UserServiceClient>(client =>

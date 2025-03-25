@@ -10,23 +10,23 @@ namespace StreamService.Services;
 public class StreamService : IStreamService
 {
     private readonly IRepository<LiveStream> _streamRepository;
-    private readonly IRepository<StreamMetadata> _metadataRepository;
     private readonly ICacheService _cacheService;
     private readonly IUserServiceClient _userServiceClient;
     private readonly IUserContext _userContext;
+    private readonly ITokenService _tokenService;
 
     public StreamService(
         IRepository<LiveStream> streamRepository,
-        IRepository<StreamMetadata> metadataRepository,
         ICacheService cacheService,
         IUserServiceClient userServiceClient,
-        IUserContext userContext)
+        IUserContext userContext,
+        ITokenService tokenService)
     {
         _streamRepository = streamRepository;
-        _metadataRepository = metadataRepository;
         _cacheService = cacheService;
         _userServiceClient = userServiceClient;
         _userContext = userContext;
+        _tokenService = tokenService;
     }
     
     public async Task<StreamDto> GetStreamByIdAsync(Guid id)
@@ -37,7 +37,7 @@ public class StreamService : IStreamService
             throw new KeyNotFoundException($"Stream with ID {id} not found");
         }
         
-        var user = await _userServiceClient.GetUserByIdAsync(stream.UserId);
+        var user = await _userServiceClient.GetUserByIdAsync(stream.User.Id);
         
         return MapToDto(stream, user);
     }
@@ -53,12 +53,11 @@ public class StreamService : IStreamService
         
         // If not in cache, get from database
         var streams = await _streamRepository.GetAllAsync();
-        var activeStreams = streams.Where(s => s.IsActive).ToList();
         
         var result = new List<StreamDto>();
-        foreach (var stream in activeStreams)
+        foreach (var stream in streams)
         {
-            var user = await _userServiceClient.GetUserByIdAsync(stream.UserId);
+            var user = await _userServiceClient.GetUserByIdAsync(stream.User.Id);
             result.Add(MapToDto(stream, user));
         }
         
@@ -77,7 +76,7 @@ public class StreamService : IStreamService
         }
         
         var streams = await _streamRepository.GetAllAsync();
-        var userStreams = streams.Where(s => s.UserId == userId).ToList();
+        var userStreams = streams.Where(s => s.User.Id == userId).ToList();
         
         return userStreams.Select(s => MapToDto(s, user));
     }
@@ -103,9 +102,9 @@ public class StreamService : IStreamService
             throw new KeyNotFoundException($"User with ID {userId} not found");
         }
         
-        // Check if user already has an active stream
+        // Check if user already has a stream
         var streams = await _streamRepository.GetAllAsync();
-        if (streams.Any(s => s.UserId == userId && s.IsActive))
+        if (streams.Any(s => s.User.Id == userId))
         {
             throw new InvalidOperationException("User already has an active stream");
         }
@@ -117,20 +116,17 @@ public class StreamService : IStreamService
             StreamName = request.StreamName,
             StreamDescription = request.StreamDescription,
             StreamCategory = request.StreamCategory,
-            UserId = userId,
-            IsActive = true,
+            User = new User
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                Password ="not_needed",
+            },
         };
         
         await _streamRepository.AddAsync(stream);
-        
-        // Create metadata
-        var metadata = new StreamMetadata
-        {
-            Id = Guid.NewGuid(),
-            StreamId = stream.Id,
-        };
-        
-        await _metadataRepository.AddAsync(metadata);
+    
         
         // Invalidate cache
         await _cacheService.RemoveAsync("active_streams");
@@ -159,7 +155,7 @@ public class StreamService : IStreamService
             throw new UnauthorizedAccessException("User is not authenticated");
         }
         
-        if (stream.UserId != currentUserId)
+        if (stream.User.Id != currentUserId)
         {
             throw new UnauthorizedAccessException("User is not authorized to update this stream");
         }
@@ -185,7 +181,7 @@ public class StreamService : IStreamService
         // Invalidate cache
         await _cacheService.RemoveAsync("active_streams");
         
-        var user = await _userServiceClient.GetUserByIdAsync(stream.UserId);
+        var user = await _userServiceClient.GetUserByIdAsync(stream.User.Id);
         
         return MapToDto(stream, user);
     }
@@ -211,13 +207,10 @@ public class StreamService : IStreamService
             throw new UnauthorizedAccessException("User is not authenticated");
         }
         
-        if (stream.UserId != currentUserId)
+        if (stream.User.Id != currentUserId)
         {
             throw new UnauthorizedAccessException("User is not authorized to end this stream");
         }
-        
-        // End the stream
-        stream.IsActive = false;
         
         await _streamRepository.UpdateAsync(stream);
         
@@ -233,9 +226,7 @@ public class StreamService : IStreamService
             StreamName = stream.StreamName,
             StreamDescription = stream.StreamDescription,
             StreamCategory = stream.StreamCategory,
-            UserId = stream.UserId,
             Username = user?.Username,
-            IsActive = stream.IsActive,
         };
     }
 }

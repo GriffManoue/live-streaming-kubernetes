@@ -15,55 +15,32 @@ public class MasterDbContext : BaseDbContext
     }
     
     // User related entities
-    public DbSet<User> Users { get; set; } = null!;
-    public DbSet<UserRelationship> UserRelationships { get; set; } = null!;
-    
+    public DbSet<User> Users { get; set; } = null!;   
     // Stream related entities
     public DbSet<LiveStream> LiveStreams { get; set; } = null!;
-    public DbSet<StreamMetadata> StreamMetadata { get; set; } = null!;
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         
-        // Configure User entity
-        modelBuilder.Entity<User>()
-            .HasIndex(u => u.Username)
-            .IsUnique();
+         modelBuilder.Entity<LiveStream>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.StreamName).IsRequired();
+            entity.Property(e => e.StreamDescription).IsRequired();
+            entity.Property(e => e.StreamCategory).IsRequired();
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.User.Id)
+                .IsRequired();
+        });
         
-        modelBuilder.Entity<User>()
-            .HasIndex(u => u.Email)
-            .IsUnique();
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Username).IsRequired();
+            entity.Property(e => e.Email).IsRequired();
+        });
         
-        // Configure UserRelationship entity
-        modelBuilder.Entity<UserRelationship>()
-            .HasOne(ur => ur.Follower)
-            .WithMany(u => u.FollowingRelationships)
-            .HasForeignKey(ur => ur.FollowerId)
-            .OnDelete(DeleteBehavior.Restrict);
-        
-        modelBuilder.Entity<UserRelationship>()
-            .HasOne(ur => ur.Following)
-            .WithMany(u => u.FollowedByRelationships)
-            .HasForeignKey(ur => ur.FollowingId)
-            .OnDelete(DeleteBehavior.Restrict);
-        
-        modelBuilder.Entity<UserRelationship>()
-            .HasIndex(ur => new { ur.FollowerId, ur.FollowingId })
-            .IsUnique();
-            
-        // Configure LiveStream entity
-        modelBuilder.Entity<LiveStream>()
-            .HasOne(ls => ls.User)
-            .WithMany(u => u.Streams)
-            .HasForeignKey(ls => ls.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-            
-        // Configure StreamMetadata entity
-        modelBuilder.Entity<StreamMetadata>()
-            .HasOne(sm => sm.Stream)
-            .WithOne(ls => ls.Metadata)
-            .HasForeignKey<StreamMetadata>(sm => sm.StreamId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 } 

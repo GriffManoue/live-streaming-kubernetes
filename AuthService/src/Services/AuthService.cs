@@ -1,4 +1,5 @@
 using Shared.Interfaces;
+using Shared.models.Enums;
 using Shared.Models.Auth;
 using Shared.Models.Domain;
 using StreamService.Services;
@@ -33,9 +34,6 @@ public class AuthService : IAuthService
 
     public async Task<AuthResult> RegisterAsync(RegisterRequest request)
     {
-
-        Console.WriteLine($"Registering user: {request.Username}");
-
         // Check if user with the same username or email already exists
         var users = await _userRepository.GetAllAsync();
         if (users.Any(u => u.Username.Equals(request.Username, StringComparison.OrdinalIgnoreCase)))
@@ -61,9 +59,20 @@ public class AuthService : IAuthService
             Password = _passwordHasher.HashPassword(request.Password),
             FirstName = request.FirstName,
             LastName = request.LastName,
-            Phone = request.Phone,
+            IsLive = false,
+            Followers = new List<User>(),
+            Following = new List<User>(),
+            Stream = new LiveStream
+            {
+                Id = Guid.NewGuid(),
+                StreamName = "Default Stream",
+                StreamDescription = "Default Description",
+                ThumbnailUrl = "https://example.com/default-thumbnail.jpg",
+                StreamUrl = "",
+                StreamCategory = StreamCategory.Gaming,
+                Views = 0,
+            },
             CreatedAt = DateTime.UtcNow,
-            IsActive = true
         };
 
         await _userRepository.AddAsync(user);
@@ -82,8 +91,6 @@ public class AuthService : IAuthService
 
     public async Task<AuthResult> LoginAsync(LoginRequest request)
     {
-        Console.WriteLine($"Logging in user: {request.Username}");
-
         // Find user by username
         var users = await _userRepository.GetAllAsync();
         var user = users.FirstOrDefault(u =>
@@ -195,34 +202,6 @@ public class AuthService : IAuthService
         await _cacheService.SetAsync(blacklistKey, true, timeUntilExpiration);
     }
 
-    public async Task<AuthResult> GenerateStreamTokenAsync(Guid streamId)
-    {
-        // Get the current user's claims
-        var currentUser = await GetCurrentUserAsync();
-        if (currentUser == null)
-            return new AuthResult
-            {
-                Success = false,
-                Error = "User not found"
-            };
-
-        // Generate a new stream-specific token
-        var token = _tokenService.GenerateStreamToken(currentUser, streamId);
-
-        //Store token in cache with expiration
-        var expirationTime = DateTime.UtcNow.AddHours(1);
-        var cacheKey = $"stream_token:{currentUser.Id}:{streamId}";
-        await _cacheService.SetAsync(cacheKey, token, expirationTime - DateTime.UtcNow);
-
-        return new AuthResult
-        {
-            Success = true,
-            Token = token,
-            ExpiresAt = DateTime.UtcNow.AddHours(24),
-            UserId = currentUser.Id
-        };
-    }
-
     private async Task<User?> GetCurrentUserAsync()
     {
         var httpContext = _httpContextAccessor.HttpContext;
@@ -235,74 +214,4 @@ public class AuthService : IAuthService
         return users.FirstOrDefault(u => u.Id == userId);
     }
 
-
-    public async Task<AuthResult> ValidateStreamTokenAsync(string token)
-    {
-        if (string.IsNullOrEmpty(token))
-            return new AuthResult
-            {
-                Success = false,
-                Error = "Token is required"
-            };
-
-        // Check if token is in the blacklist
-        var blacklistKey = $"revoked_token:{token}";
-        var isRevoked = await _cacheService.GetAsync<bool>(blacklistKey);
-        if (isRevoked)
-            return new AuthResult
-            {
-                Success = false,
-                Error = "Token has been revoked"
-            };
-
-        if (!_tokenService.ValidateStreamToken(token))
-            return new AuthResult
-            {
-                Success = false,
-                Error = "Invalid or expired token"
-            };
-
-        var principal = _tokenService.GetPrincipalFromToken(token);
-        var userIdClaim = principal.FindFirst("sub")?.Value;
-
-        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
-            return new AuthResult
-            {
-                Success = false,
-                Error = "Invalid token"
-            };
-
-       var user = await _userRepository.GetByIdAsync(userId);
-        if (user == null)
-            return new AuthResult
-            {
-                Success = false,
-                Error = "User not found"
-            };
-
-        // Get stream id from token
-        var streamIdClaim = principal.FindFirst("stream_id")?.Value;
-        if (string.IsNullOrEmpty(streamIdClaim) || !Guid.TryParse(streamIdClaim, out var streamId))
-            return new AuthResult
-            {
-                Success = false,
-                Error = "Invalid stream id"
-            };
-
-        // Check if stream exists
-        var stream = await _streamServiceClient.GetStreamByIdAsync(streamId);
-        if (stream == null)
-            return new AuthResult
-            {
-                Success = false,
-                Error = "Stream not found"
-            };
-
-        return new AuthResult
-        {
-            Success = true,
-            Token = token,
-            UserId = userId
-        };
-    }
 }

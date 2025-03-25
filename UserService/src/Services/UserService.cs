@@ -9,12 +9,10 @@ namespace UserService.Services;
 public class UserService : IUserService
 {
     private readonly IRepository<User> _userRepository;
-    private readonly IRepository<UserRelationship> _relationshipRepository;
     
-    public UserService(IRepository<User> userRepository, IRepository<UserRelationship> relationshipRepository)
+    public UserService(IRepository<User> userRepository)
     {
         _userRepository = userRepository;
-        _relationshipRepository = relationshipRepository;
     }
     
     public async Task<UserDto> GetUserByIdAsync(Guid id)
@@ -65,11 +63,6 @@ public class UserService : IUserService
             user.LastName = request.LastName;
         }
         
-        if (!string.IsNullOrEmpty(request.Phone))
-        {
-            user.Phone = request.Phone;
-        }
-        
         if (!string.IsNullOrEmpty(request.Password))
         {
             user.Password =BCrypt.Net.BCrypt.HashPassword(request.Password);
@@ -82,37 +75,48 @@ public class UserService : IUserService
     
     public async Task<IEnumerable<UserDto>> GetFollowersAsync(Guid userId)
     {
-        var relationships = await _relationshipRepository.GetAllAsync();
-        var followerRelationships = relationships.Where(r => r.FollowingId == userId).ToList();
-        
-        var followers = new List<UserDto>();
-        foreach (var relationship in followerRelationships)
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
         {
-            var follower = await _userRepository.GetByIdAsync(relationship.FollowerId);
-            if (follower != null)
-            {
-                followers.Add(MapToDto(follower));
-            }
+            throw new KeyNotFoundException($"User with ID {userId} not found");
         }
-        return followers;
+
+        return user.Followers
+            .Select(f => new UserDto
+            {
+                Id = f.Id,
+                Username = f.Username,
+                Email = f.Email,
+                FirstName = f.FirstName,
+                LastName = f.LastName,
+                CreatedAt = f.CreatedAt,
+                FollowersCount = f.Followers.Count,
+                FollowingCount = f.Following.Count
+            })
+            .ToList();
     }
     
     public async Task<IEnumerable<UserDto>> GetFollowingAsync(Guid userId)
     {
-        var relationships = await _relationshipRepository.GetAllAsync();
-        var followingRelationships = relationships.Where(r => r.FollowerId == userId).ToList();
-        
-        var following = new List<UserDto>();
-        foreach (var relationship in followingRelationships)
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
         {
-            var followedUser = await _userRepository.GetByIdAsync(relationship.FollowingId);
-            if (followedUser != null)
-            {
-                following.Add(MapToDto(followedUser));
-            }
+            throw new KeyNotFoundException($"User with ID {userId} not found");
         }
-        
-        return following;
+
+        return user.Following
+            .Select(f => new UserDto
+            {
+                Id = f.Id,
+                Username = f.Username,
+                Email = f.Email,
+                FirstName = f.FirstName,
+                LastName = f.LastName,
+                CreatedAt = f.CreatedAt,
+                FollowersCount = f.Followers.Count,
+                FollowingCount = f.Following.Count
+            })
+            .ToList();
     }
     
     public async Task FollowUserAsync(Guid followerId, Guid followingId)
@@ -132,43 +136,44 @@ public class UserService : IUserService
         }
         
         // Check if relationship already exists
-        var relationships = await _relationshipRepository.GetAllAsync();
-        var existingRelationship = relationships.FirstOrDefault(r => 
-            r.FollowerId == followerId && r.FollowingId == followingId);
-        
-        if (existingRelationship != null)
+        if (follower.Following.Any(u => u.Id == followingId))
         {
-            // Already following
+            // Already following, nothing to do
             return;
         }
         
         // Create new relationship
-        var relationship = new UserRelationship
-        {
-            Id = Guid.NewGuid(),
-            FollowerId = followerId,
-            FollowingId = followingId,
-            CreatedAt = DateTime.UtcNow
-        };
+        follower.Following.Add(following);
+        following.Followers.Add(follower);
         
-        await _relationshipRepository.AddAsync(relationship);
     }
     
     public async Task UnfollowUserAsync(Guid followerId, Guid followingId)
     {
-        // Find the relationship
-        var relationships = await _relationshipRepository.GetAllAsync();
-        var relationship = relationships.FirstOrDefault(r => 
-            r.FollowerId == followerId && r.FollowingId == followingId);
+        // Check if users exist
+        var follower = await _userRepository.GetByIdAsync(followerId);
+        var following = await _userRepository.GetByIdAsync(followingId);
         
-        if (relationship == null)
+        if (follower == null)
+        {
+            throw new KeyNotFoundException($"Follower with ID {followerId} not found");
+        }
+        
+        if (following == null)
+        {
+            throw new KeyNotFoundException($"User to unfollow with ID {followingId} not found");
+        }
+        
+        // Check if relationship exists
+        if (!follower.Following.Any(u => u.Id == followingId))
         {
             // Not following, nothing to do
             return;
         }
         
-        // Delete the relationship
-        await _relationshipRepository.DeleteAsync(relationship.Id);
+        // Remove relationship
+        follower.Following.Remove(following);
+        following.Followers.Remove(follower);
     }
     
     private UserDto MapToDto(User user)
@@ -180,11 +185,9 @@ public class UserService : IUserService
             Email = user.Email,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            Phone = user.Phone,
             CreatedAt = user.CreatedAt,
-            IsActive = user.IsActive,
-            FollowersCount = user.FollowedByRelationships.Count,
-            FollowingCount = user.FollowingRelationships.Count
+            FollowersCount = user.Followers.Count,
+            FollowingCount = user.Following.Count
         };
     }
 }

@@ -8,6 +8,4 @@ public interface IAuthService
     Task<AuthResult> LoginAsync(LoginRequest request);
     Task<AuthResult> ValidateTokenAsync(string token);
     Task RevokeTokenAsync(string token);
-    Task<AuthResult> GenerateStreamTokenAsync(Guid streamId);
-    Task<AuthResult> ValidateStreamTokenAsync(string token);
 }

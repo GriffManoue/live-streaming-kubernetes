@@ -30,7 +30,7 @@ public partial class User
 
     public bool IsLive { get; set; } = false;
 
-    public ICollection<User> FollowedByRelationships { get; set; } = new List<User>();
+    public ICollection<User> Followers{ get; set; } = new List<User>();
 
-    public ICollection<User> FollowingRelationships { get; set; } = new List<User>();
+    public ICollection<User> Following { get; set; } = new List<User>();
 }
