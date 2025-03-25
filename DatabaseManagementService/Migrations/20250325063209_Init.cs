@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -40,10 +39,7 @@ namespace DatabaseManagementService.Migrations
                     StreamDescription = table.Column<string>(type: "text", nullable: false),
                     StreamCategory = table.Column<int>(type: "integer", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    ViewerCount = table.Column<int>(type: "integer", nullable: false)
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -89,10 +85,8 @@ namespace DatabaseManagementService.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     StreamId = table.Column<Guid>(type: "uuid", nullable: false),
                     ThumbnailUrl = table.Column<string>(type: "text", nullable: true),
-                    TotalViews = table.Column<int>(type: "integer", nullable: false),
-                    LikeCount = table.Column<int>(type: "integer", nullable: false),
-                    DislikeCount = table.Column<int>(type: "integer", nullable: false),
-                    Tags = table.Column<List<string>>(type: "text[]", nullable: false)
+                    Views = table.Column<int>(type: "integer", nullable: false),
+                    IsLive = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
