@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Interfaces;
-using Shared.Models.User;
 
 namespace UserService.Controllers;
 
@@ -19,7 +18,7 @@ public class UserController : ControllerBase
     }
     
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<UserDto>> GetUserById(Guid id)
+    public async Task<ActionResult<UserDTO>> GetUserById(Guid id)
     {
         try
         {
@@ -37,7 +36,7 @@ public class UserController : ControllerBase
     }
     
     [HttpGet("username/{username}")]
-    public async Task<ActionResult<UserDto>> GetUserByUsername(string username)
+    public async Task<ActionResult<UserDTO>> GetUserByUsername(string username)
     {
         try
         {
@@ -55,12 +54,18 @@ public class UserController : ControllerBase
     }
     
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<UserDto>> UpdateUser(Guid id, [FromBody] UpdateUserRequest request)
+    public async Task<ActionResult<UserDTO>> UpdateUser(Guid id, [FromBody] UserDTO userDto)
     {
         try
         {
-            var user = await _userService.UpdateUserAsync(id, request);
-            return Ok(user);
+            // Ensure the ID in the route matches the ID in the DTO
+            if (id != userDto.Id)
+            {
+                return BadRequest("User ID in the URL does not match the ID in the request body");
+            }
+            
+            var updatedUser = await _userService.UpdateUserAsync(userDto);
+            return Ok(updatedUser);
         }
         catch (KeyNotFoundException ex)
         {
@@ -73,7 +78,7 @@ public class UserController : ControllerBase
     }
     
     [HttpGet("{id:guid}/followers")]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetFollowers(Guid id)
+    public async Task<ActionResult<IEnumerable<UserDTO>>> GetFollowers(Guid id)
     {
         try
         {
@@ -87,7 +92,7 @@ public class UserController : ControllerBase
     }
     
     [HttpGet("{id:guid}/following")]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetFollowing(Guid id)
+    public async Task<ActionResult<IEnumerable<UserDTO>>> GetFollowing(Guid id)
     {
         try
         {
