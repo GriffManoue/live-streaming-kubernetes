@@ -187,7 +187,9 @@ public class UserService : IUserService
             LastName = user.LastName,
             CreatedAt = user.CreatedAt,
             FollowersCount = user.Followers.Count,
-            FollowingCount = user.Following.Count
+            FollowingCount = user.Following.Count,
+            Stream = user.Stream,
+            IsLive = user.IsLive
         };
     }
 }

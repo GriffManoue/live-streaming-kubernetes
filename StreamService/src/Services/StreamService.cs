@@ -227,6 +227,9 @@ public class StreamService : IStreamService
             StreamDescription = stream.StreamDescription,
             StreamCategory = stream.StreamCategory,
             Username = user?.Username,
+            ThumbnailUrl = stream.ThumbnailUrl,
+            StreamUrl = stream.StreamUrl,
+            Views = stream.Views
         };
     }
 }

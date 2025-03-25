@@ -25,18 +25,13 @@ public class AnalyticsDbContext : BaseDbContext
         // Configure Stream entity with user relationship
         modelBuilder.Entity<LiveStream>()
             .HasOne(s => s.User)
-            .WithMany(u => u.Streams)
-            .HasForeignKey(s => s.UserId);
+            .WithOne(u => u.Stream);
             
         // Explicitly ignore all user relationship properties that aren't needed for analytics
         modelBuilder.Entity<User>()
-            .Ignore(u => u.FollowingRelationships);
+            .Ignore(u => u.Followers);
         
         modelBuilder.Entity<User>()
-            .Ignore(u => u.FollowedByRelationships);
-
-        // Ignore stream metadata for analytics service
-        modelBuilder.Entity<LiveStream>()
-            .Ignore(s => s.Metadata);
+            .Ignore(u => u.Following);
     }
 }

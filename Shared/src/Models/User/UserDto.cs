@@ -1,4 +1,5 @@
 using System;
+using Shared.Models.Domain;
 
 namespace Shared.Models.User;
 
@@ -12,4 +13,6 @@ public class UserDto
     public DateTime CreatedAt { get; set; }
     public int FollowersCount { get; set; }
     public int FollowingCount { get; set; }
+    public LiveStream? Stream { get; set; }
+    public bool IsLive { get; set; }
 }

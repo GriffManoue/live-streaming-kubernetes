@@ -11,7 +11,6 @@ public class UserDbContext : BaseDbContext
     }
     
     public DbSet<User> Users { get; set; } = null!;
-    public DbSet<UserRelationship> UserRelationships { get; set; } = null!;
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,25 +25,11 @@ public class UserDbContext : BaseDbContext
             .HasIndex(u => u.Email)
             .IsUnique();
         
-        // Configure UserRelationship entity
-        modelBuilder.Entity<UserRelationship>()
-            .HasOne(ur => ur.Follower)
-            .WithMany(u => u.FollowingRelationships)
-            .HasForeignKey(ur => ur.FollowerId)
-            .OnDelete(DeleteBehavior.Restrict);
-        
-        modelBuilder.Entity<UserRelationship>()
-            .HasOne(ur => ur.Following)
-            .WithMany(u => u.FollowedByRelationships)
-            .HasForeignKey(ur => ur.FollowingId)
-            .OnDelete(DeleteBehavior.Restrict);
-        
-        modelBuilder.Entity<UserRelationship>()
-            .HasIndex(ur => new { ur.FollowerId, ur.FollowingId })
-            .IsUnique();
-            
-        // Exclude navigation properties that are not needed for this service
+        // Configure User entity relationships
         modelBuilder.Entity<User>()
-            .Metadata.FindNavigation(nameof(User.Streams))?.SetPropertyAccessMode(PropertyAccessMode.Field);
+            .HasMany(u => u.Followers)
+            .WithMany(u => u.Following)
+            .UsingEntity(j => j.ToTable("UserFollowers"));
+
     }
 }
