@@ -10,7 +10,7 @@ public interface IStreamService
     Task<StreamDto> GetStreamByIdAsync(Guid id);
     Task<IEnumerable<StreamDto>> GetActiveStreamsAsync();
     Task<IEnumerable<StreamDto>> GetStreamsByUserIdAsync(Guid userId);
-    Task CreateStreamAsync();
-    Task<StreamDto> UpdateStreamAsync(Guid id, UpdateStreamRequest request);
+    Task<StreamDto> CreateStreamAsync();
+    Task<StreamDto> UpdateStreamAsync(Guid id, StreamDto streamDto);
     Task EndStreamAsync(Guid id);
 }

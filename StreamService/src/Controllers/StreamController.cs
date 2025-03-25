@@ -74,11 +74,11 @@ public class StreamController : ControllerBase
     
     [HttpPost]
     [Authorize]
-    public async Task<ActionResult<StreamDto>> CreateStream([FromBody] CreateStreamRequest request)
+    public async Task<ActionResult<StreamDto>> CreateStream()
     {
         try
         {
-            var stream = await _streamService.CreateStreamAsync(request);
+            var stream = await _streamService.CreateStreamAsync();
             return CreatedAtAction(nameof(GetStreamById), new { id = stream.Id }, stream);
         }
         catch (KeyNotFoundException ex)
@@ -89,6 +89,10 @@ public class StreamController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(ex.Message);
+        }
         catch (Exception ex)
         {
             return StatusCode(500, $"Internal server error: {ex.Message}");
@@ -97,16 +101,26 @@ public class StreamController : ControllerBase
     
     [HttpPut("{id:guid}")]
     [Authorize]
-    public async Task<ActionResult<StreamDto>> UpdateStream(Guid id, [FromBody] UpdateStreamRequest request)
+    public async Task<ActionResult<StreamDto>> UpdateStream(Guid id, [FromBody] StreamDto streamDto)
     {
         try
         {
-            var stream = await _streamService.UpdateStreamAsync(id, request);
+            // Ensure the ID in the route matches the ID in the DTO
+            if (id != streamDto.Id)
+            {
+                return BadRequest("Stream ID in the URL does not match the ID in the request body");
+            }
+            
+            var stream = await _streamService.UpdateStreamAsync(id, streamDto);
             return Ok(stream);
         }
         catch (KeyNotFoundException ex)
         {
             return NotFound(ex.Message);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Unauthorized(ex.Message);
         }
         catch (Exception ex)
         {

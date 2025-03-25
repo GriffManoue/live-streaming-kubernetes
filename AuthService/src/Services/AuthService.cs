@@ -3,6 +3,7 @@ using Shared.models.Enums;
 using Shared.Models.Auth;
 using Shared.Models.Domain;
 using StreamService.Services;
+using System.Linq;
 
 namespace AuthService.Services;
 
@@ -13,7 +14,6 @@ public class AuthService : IAuthService
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
     private readonly IRepository<User> _userRepository;
-
     private readonly IStreamServiceClient _streamServiceClient;
 
     public AuthService(
@@ -34,16 +34,22 @@ public class AuthService : IAuthService
 
     public async Task<AuthResult> RegisterAsync(RegisterRequest request)
     {
-        // Check if user with the same username or email already exists
-        var users = await _userRepository.GetAllAsync();
-        if (users.Any(u => u.Username.Equals(request.Username, StringComparison.OrdinalIgnoreCase)))
+        // Check if user with the same username exists using the repository
+        var userWithSameUsername = await _userRepository.FirstOrDefaultAsync(
+            u => u.Username.Equals(request.Username, StringComparison.OrdinalIgnoreCase));
+            
+        if (userWithSameUsername != null)
             return new AuthResult
             {
                 Success = false,
                 Error = "Username already exists"
             };
 
-        if (users.Any(u => u.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase)))
+        // Check if user with the same email exists
+        var userWithSameEmail = await _userRepository.FirstOrDefaultAsync(
+            u => u.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase));
+            
+        if (userWithSameEmail != null)
             return new AuthResult
             {
                 Success = false,
@@ -51,9 +57,10 @@ public class AuthService : IAuthService
             };
 
         // Create new user
+        var userId = Guid.NewGuid();
         var user = new User
         {
-            Id = Guid.NewGuid(),
+            Id = userId,
             Username = request.Username,
             Email = request.Email,
             Password = _passwordHasher.HashPassword(request.Password),
@@ -62,20 +69,35 @@ public class AuthService : IAuthService
             IsLive = false,
             Followers = new List<User>(),
             Following = new List<User>(),
-            Stream = new LiveStream
-            {
-                Id = Guid.NewGuid(),
-                StreamName = "Default Stream",
-                StreamDescription = "Default Description",
-                ThumbnailUrl = "https://example.com/default-thumbnail.jpg",
-                StreamUrl = "",
-                StreamCategory = StreamCategory.Gaming,
-                Views = 0,
-            },
             CreatedAt = DateTime.UtcNow,
         };
 
+        // Save the user first
         await _userRepository.AddAsync(user);
+        
+        try
+        {
+            // Create the stream in StreamService
+            var stream = await _streamServiceClient.CreateStreamAsync(userId);
+            user.Stream = new LiveStream
+            {
+                Id = stream.Id,
+                StreamName = stream.StreamName,
+                StreamDescription = stream.StreamDescription,
+                ThumbnailUrl = stream.ThumbnailUrl,
+                StreamUrl = stream.StreamUrl,
+                StreamCategory = stream.StreamCategory,
+                Views = stream.Views
+            };
+            
+            // Update user with stream info
+            await _userRepository.UpdateAsync(user);
+        }
+        catch (Exception ex)
+        {
+            // Log the error but continue - stream can be created later
+            Console.WriteLine($"Failed to create stream for user {userId}: {ex.Message}");
+        }
 
         // Generate token
         var token = _tokenService.GenerateToken(user);
@@ -91,10 +113,9 @@ public class AuthService : IAuthService
 
     public async Task<AuthResult> LoginAsync(LoginRequest request)
     {
-        // Find user by username
-        var users = await _userRepository.GetAllAsync();
-        var user = users.FirstOrDefault(u =>
-            u.Username.Equals(request.Username, StringComparison.OrdinalIgnoreCase));
+        // Find user by username using the enhanced repository
+        var user = await _userRepository.FirstOrDefaultAsync(
+            u => u.Username.Equals(request.Username, StringComparison.OrdinalIgnoreCase));
 
         if (user == null)
             return new AuthResult
@@ -210,8 +231,7 @@ public class AuthService : IAuthService
         var userIdClaim = httpContext.User.FindFirst("sub")?.Value;
         if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId)) return null;
 
-        var users = await _userRepository.GetAllAsync();
-        return users.FirstOrDefault(u => u.Id == userId);
+        // Use the enhanced repository to get the user by ID directly
+        return await _userRepository.GetByIdAsync(userId);
     }
-
 }

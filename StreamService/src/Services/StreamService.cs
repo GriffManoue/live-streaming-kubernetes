@@ -1,10 +1,11 @@
-
-
 using Shared.Interfaces;
 using Shared.models.Enums;
 using Shared.Models.Domain;
 using Shared.Models.Stream;
-using Shared.Models.User;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace StreamService.Services;
 
@@ -81,8 +82,8 @@ public class StreamService : IStreamService
         
         return userStreams.Select(s => MapToDto(s, user));
     }
-    
-    public async Task CreateStreamAsync()
+     
+    public async Task<StreamDto> CreateStreamAsync()
     {
         // Validate the user's token
         if (!await _userContext.ValidateCurrentTokenAsync())
@@ -116,7 +117,6 @@ public class StreamService : IStreamService
             Id = Guid.NewGuid(),
             StreamName = "New Stream",
             StreamDescription = "Stream Description",
-            
             StreamCategory = StreamCategory.Gaming,
             ThumbnailUrl = "",
             StreamUrl = "",
@@ -125,14 +125,15 @@ public class StreamService : IStreamService
                 Id = user.Id,
                 Username = user.Username,
                 Email = user.Email,
-                Password = "notneeded" ,
+                Password = "notneeded",
             },
         };
         
         await _streamRepository.AddAsync(stream);
+        return MapToDto(stream, user);
     }
     
-    public async Task<StreamDto> UpdateStreamAsync(Guid id, UpdateStreamRequest request)
+    public async Task<StreamDto> UpdateStreamAsync(Guid id, StreamDto streamDto)
     {
         // Validate the user's token
         if (!await _userContext.ValidateCurrentTokenAsync())
@@ -159,36 +160,29 @@ public class StreamService : IStreamService
         }
         
         // Update stream properties
-        if (!string.IsNullOrEmpty(request.StreamName))
+        if (!string.IsNullOrEmpty(streamDto.StreamName))
         {
-            stream.StreamName = request.StreamName;
+            stream.StreamName = streamDto.StreamName;
         }
         
-        if (!string.IsNullOrEmpty(request.StreamDescription))
+        if (!string.IsNullOrEmpty(streamDto.StreamDescription))
         {
-            stream.StreamDescription = request.StreamDescription;
+            stream.StreamDescription = streamDto.StreamDescription;
         }
         
-        if (request.StreamCategory != null)
+        stream.StreamCategory = streamDto.StreamCategory;
+
+        if (!string.IsNullOrEmpty(streamDto.ThumbnailUrl))
         {
-            stream.StreamCategory = request.StreamCategory.Value;
+            stream.ThumbnailUrl = streamDto.ThumbnailUrl;
         }
 
-        if (!string.IsNullOrEmpty(request.ThumbnailUrl))
+        if (!string.IsNullOrEmpty(streamDto.StreamUrl))
         {
-            stream.ThumbnailUrl = request.ThumbnailUrl;
+            stream.StreamUrl = streamDto.StreamUrl;
         }
 
-        if (!string.IsNullOrEmpty(request.StreamUrl))
-        {
-            stream.StreamUrl = request.StreamUrl;
-        }
-
-        if (request.Views != null)
-        {
-            stream.Views = request.Views.Value;
-        }
-       
+        stream.Views = streamDto.Views;
         
         await _streamRepository.UpdateAsync(stream);
         
@@ -214,7 +208,7 @@ public class StreamService : IStreamService
         await _cacheService.RemoveAsync("active_streams");
     }
     
-    private StreamDto MapToDto(LiveStream stream, UserDto? user)
+    private StreamDto MapToDto(LiveStream stream, UserDTO? user)
     {
         return new StreamDto
         {
