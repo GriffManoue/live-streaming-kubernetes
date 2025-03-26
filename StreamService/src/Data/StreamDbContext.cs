@@ -16,9 +16,11 @@ public class StreamDbContext : BaseDbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configure Stream entity
+        // Configure Stream entity with explicit foreign key
         modelBuilder.Entity<LiveStream>()
             .HasOne(s => s.User)
-            .WithOne(u => u.Stream);
+            .WithOne(u => u.Stream)
+            .HasForeignKey<LiveStream>(s => s.UserId)
+            .IsRequired();
     }
 }

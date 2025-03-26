@@ -31,5 +31,10 @@ public class UserDbContext : BaseDbContext
             .WithMany(u => u.Following)
             .UsingEntity(j => j.ToTable("UserFollowers"));
 
+        // Configure the User side of one-to-one relationship with LiveStream
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.Stream)
+            .WithOne(s => s.User)
+            .HasForeignKey<LiveStream>(s => s.UserId);
     }
 }

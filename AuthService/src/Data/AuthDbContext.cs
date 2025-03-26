@@ -25,6 +25,10 @@ public class AuthDbContext : BaseDbContext
             .HasIndex(u => u.Email)
             .IsUnique();
             
-         // Exclude navigation properties that are not needed for this service
+        // Configure the User side of one-to-one relationship with LiveStream
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.Stream)
+            .WithOne(s => s.User)
+            .HasForeignKey<LiveStream>(s => s.UserId);
     }
 }
