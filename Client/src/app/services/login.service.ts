@@ -10,6 +10,7 @@ export class LoginService {
   get isLoggedIn() {
     return this.loggedIn.asObservable();
   }
+  
 
   hasToken(): boolean {
     return !!localStorage.getItem('auth_token') || !!sessionStorage.getItem('auth_token');

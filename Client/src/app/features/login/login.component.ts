@@ -12,7 +12,8 @@ import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
 import { LoginService } from '../../services/login.service';
 import { AuthService } from '../../services/auth.service';
-import { LoginRequest } from '../../models/auth/login-request.model';
+import { LoginRequest } from '../../models/auth/login-request';
+import { AuthResult } from '../../models/auth/auth-result';
 
 @Component({
   selector: 'app-login',
@@ -98,12 +99,11 @@ export class LoginComponent implements OnInit {
 
     
     this.authService.login(loginRequest).subscribe({
-      next: (response) => {
+      next: (response: AuthResult) => {
         this.loginError = false;
-        // Extract userId from the response and pass it to the login service
         // Assuming response contains a userId property; adjust as needed based on actual API response
         const userId = response.userId || 'user-1';
-        this.loginService.login(response.token, formValues.rememberMe, userId);
+        this.loginService.login(response.token ?? '', formValues.rememberMe, userId);
         this.router.navigate(['/home']);
       },
       error: (error) => {
