@@ -22,25 +22,23 @@ public class MasterDbContext : BaseDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
-         modelBuilder.Entity<LiveStream>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.StreamName).IsRequired();
-            entity.Property(e => e.StreamDescription).IsRequired();
-            entity.Property(e => e.StreamCategory).IsRequired();
-            entity.HasOne(e => e.User)
-                .WithMany()
-                .HasForeignKey(e => e.User.Id)
-                .IsRequired();
-        });
-        
+
+        // Configure User entity
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Username).IsRequired();
-            entity.Property(e => e.Email).IsRequired();
+            entity.HasKey(u => u.Id);
+            entity.HasMany(u => u.Followers)
+                  .WithMany(u => u.Following)
+                  .UsingEntity(j => j.ToTable("UserFollowers"));
         });
-        
+
+        // Configure LiveStream entity
+        modelBuilder.Entity<LiveStream>(entity =>
+        {
+            entity.HasKey(ls => ls.Id);
+            entity.HasOne(ls => ls.User)
+                  .WithOne(u => u.Stream)
+                  .HasForeignKey<LiveStream>(ls => ls.UserId);
+        });
     }
-} 
+}

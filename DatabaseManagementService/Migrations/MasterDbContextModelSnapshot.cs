@@ -28,9 +28,6 @@ namespace DatabaseManagementService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
                     b.Property<int>("StreamCategory")
                         .HasColumnType("integer");
 
@@ -42,40 +39,24 @@ namespace DatabaseManagementService.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("LiveStreams");
-                });
-
-            modelBuilder.Entity("Shared.Models.Domain.StreamMetadata", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsLive")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("StreamId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("StreamUrl")
+                        .HasColumnType("text");
 
                     b.Property<string>("ThumbnailUrl")
                         .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Views")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StreamId")
+                    b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("StreamMetadata");
+                    b.ToTable("LiveStreams");
                 });
 
             modelBuilder.Entity("Shared.Models.Domain.User", b =>
@@ -94,7 +75,7 @@ namespace DatabaseManagementService.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<bool>("IsLive")
                         .HasColumnType("boolean");
 
                     b.Property<string>("LastName")
@@ -104,102 +85,60 @@ namespace DatabaseManagementService.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Phone")
-                        .HasColumnType("text");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.HasIndex("Username")
-                        .IsUnique();
-
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Shared.Models.Domain.UserRelationship", b =>
+            modelBuilder.Entity("UserUser", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("FollowerId")
+                    b.Property<Guid>("FollowersId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("FollowingId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("Id");
+                    b.HasKey("FollowersId", "FollowingId");
 
                     b.HasIndex("FollowingId");
 
-                    b.HasIndex("FollowerId", "FollowingId")
-                        .IsUnique();
-
-                    b.ToTable("UserRelationships");
+                    b.ToTable("UserFollowers", (string)null);
                 });
 
             modelBuilder.Entity("Shared.Models.Domain.LiveStream", b =>
                 {
                     b.HasOne("Shared.Models.Domain.User", "User")
-                        .WithMany("Streams")
-                        .HasForeignKey("UserId")
+                        .WithOne("Stream")
+                        .HasForeignKey("Shared.Models.Domain.LiveStream", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Shared.Models.Domain.StreamMetadata", b =>
+            modelBuilder.Entity("UserUser", b =>
                 {
-                    b.HasOne("Shared.Models.Domain.LiveStream", "Stream")
-                        .WithOne("Metadata")
-                        .HasForeignKey("Shared.Models.Domain.StreamMetadata", "StreamId")
+                    b.HasOne("Shared.Models.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("FollowersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Stream");
-                });
-
-            modelBuilder.Entity("Shared.Models.Domain.UserRelationship", b =>
-                {
-                    b.HasOne("Shared.Models.Domain.User", "Follower")
-                        .WithMany("FollowingRelationships")
-                        .HasForeignKey("FollowerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Shared.Models.Domain.User", "Following")
-                        .WithMany("FollowedByRelationships")
+                    b.HasOne("Shared.Models.Domain.User", null)
+                        .WithMany()
                         .HasForeignKey("FollowingId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Follower");
-
-                    b.Navigation("Following");
-                });
-
-            modelBuilder.Entity("Shared.Models.Domain.LiveStream", b =>
-                {
-                    b.Navigation("Metadata");
                 });
 
             modelBuilder.Entity("Shared.Models.Domain.User", b =>
                 {
-                    b.Navigation("FollowedByRelationships");
-
-                    b.Navigation("FollowingRelationships");
-
-                    b.Navigation("Streams");
+                    b.Navigation("Stream")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
