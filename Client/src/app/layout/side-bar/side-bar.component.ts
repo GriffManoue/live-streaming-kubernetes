@@ -4,7 +4,7 @@ import { PanelModule } from 'primeng/panel';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
-import { LoginService } from '../../services/login/login.service';
+import { LoginService } from '../../services/login.service';
 
 
 @Component({

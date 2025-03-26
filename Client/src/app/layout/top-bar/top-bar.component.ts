@@ -9,7 +9,7 @@ import { MenuItem } from 'primeng/api';
 import { StreamCategories } from '../../models/enums/stream-categories';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
-import { LoginService } from '../../services/login/login.service';
+import { LoginService } from '../../services/login.service';
 
 @Component({
   selector: 'app-top-bar',

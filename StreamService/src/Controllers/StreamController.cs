@@ -127,5 +127,62 @@ public class StreamController : ControllerBase
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
+
+    [HttpPost("{id:guid}/generateStreamKey")]
+    [Authorize]
+    public async Task<ActionResult<string>> GenerateStreamKey(Guid id)
+    {
+        try
+        {
+            var streamKey = await _streamService.GenerateStreamKeyAsync(id);
+            return Ok(streamKey);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+    [HttpPost("start/{streamKey}")]
+    [AllowAnonymous]
+    public async Task<ActionResult> StartStream(string streamKey)
+    {
+        try
+        {
+            await _streamService.StartStreamAsync(streamKey);
+            return Ok();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+    [HttpPost("end/{streamKey}")]
+    [Authorize]
+    public async Task<ActionResult> EndStream(string streamKey)
+    {
+        try
+        {
+            await _streamService.EndStreamAsync(streamKey);
+            return Ok();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
     
 }

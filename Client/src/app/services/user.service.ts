@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ServiceBase } from '../service-base';
-import { FollowRequest } from '../../models/user/follow-request';
+import { ServiceBase } from './service-base';
+import { FollowRequest } from '../models/user/follow-request';
 
 @Injectable({
   providedIn: 'root'
