@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { LiveStream } from '../../models/stream/stream';
 import { StreamCategories, StreamCategoryKey } from '../../models/enums/stream-categories';
 import { ActivatedRoute } from '@angular/router';
+import { StreamService } from '../../services/stream.service';
 
 @Component({
   selector: 'app-settings',
@@ -29,18 +30,19 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class SettingsComponent implements OnInit {
   streamForm!: FormGroup;
-  stream: LiveStream = new LiveStream("1", "My Stream", "A description of my stream", "Gaming", "123");
+  stream!: LiveStream;
   categories = Object.keys(StreamCategories);
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute) { }
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private streamService: StreamService) { }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       const id = params['id'];
-      // Use the id as needed
-      console.log(id);
+      this.streamService.getStreamById(id).subscribe(stream => {
+        this.stream = stream;
+        this.initForm();
+      }); // Assuming this method exists in your service
     });
-    this.initForm();
   }
 
   initForm() {
