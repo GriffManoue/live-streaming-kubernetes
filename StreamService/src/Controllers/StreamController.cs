@@ -128,22 +128,4 @@ public class StreamController : ControllerBase
         }
     }
     
-    [HttpPost("{id:guid}/end")]
-    [Authorize]
-    public async Task<ActionResult> EndStream(Guid id)
-    {
-        try
-        {
-            await _streamService.EndStreamAsync(id);
-            return Ok();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
-        }
-    }
 }

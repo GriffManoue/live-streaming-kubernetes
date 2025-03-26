@@ -12,5 +12,7 @@ public interface IStreamService
     Task<IEnumerable<StreamDto>> GetStreamsByUserIdAsync(Guid userId);
     Task<StreamDto> CreateStreamAsync();
     Task<StreamDto> UpdateStreamAsync(Guid id, StreamDto streamDto);
-    Task EndStreamAsync(Guid id);
+    Task<string> GenerateStreamKeyAsync(Guid id);
+    Task StartStreamAsync(string streamKey);
+    Task EndStreamAsync(string streamKey);
 }

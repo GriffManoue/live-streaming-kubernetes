@@ -25,11 +25,8 @@ public class RtmpEventController : ControllerBase
         try
         {
             _logger.LogInformation($"Stream publish event received: {{{@event.StreamKey}, {@event.StreamName}}}");
-            
-            // In a real implementation, you would:
-            // 1. Validate the stream key against the user's stream key
-            // 2. Create or update the stream in the database
-            // 3. Notify subscribers that the stream has started
+
+            await _streamService.StartStreamAsync(@event.StreamKey);
             
             return Ok();
         }
@@ -47,11 +44,7 @@ public class RtmpEventController : ControllerBase
         {
             _logger.LogInformation($"Stream publish done event received: {{{@event.StreamKey}, {@event.StreamName}}}");
             
-            // In a real implementation, you would:
-            // 1. Find the stream by stream key
-            // 2. Mark the stream as inactive
-            // 3. Update the stream end time
-            // 4. Notify subscribers that the stream has ended
+            await _streamService.EndStreamAsync(@event.StreamKey);
             
             return Ok();
         }

@@ -28,7 +28,7 @@ public class StreamService : IStreamService
         _userServiceClient = userServiceClient;
         _userContext = userContext;
     }
-    
+
     public async Task<StreamDto> GetStreamByIdAsync(Guid id)
     {
         var stream = await _streamRepository.GetByIdAsync(id);
@@ -36,12 +36,12 @@ public class StreamService : IStreamService
         {
             throw new KeyNotFoundException($"Stream with ID {id} not found");
         }
-        
+
         var user = await _userServiceClient.GetUserByIdAsync(stream.User.Id);
-        
+
         return MapToDto(stream, user);
     }
-    
+
     public async Task<IEnumerable<StreamDto>> GetActiveStreamsAsync()
     {
         // Try to get from cache first
@@ -50,23 +50,23 @@ public class StreamService : IStreamService
         {
             return cachedStreams;
         }
-        
+
         // If not in cache, get from database
         var streams = await _streamRepository.GetAllAsync();
-        
+
         var result = new List<StreamDto>();
         foreach (var stream in streams)
         {
             var user = await _userServiceClient.GetUserByIdAsync(stream.User.Id);
             result.Add(MapToDto(stream, user));
         }
-        
+
         // Cache the result
         await _cacheService.SetAsync("active_streams", result, TimeSpan.FromMinutes(1));
-        
+
         return result;
     }
-    
+
     public async Task<IEnumerable<StreamDto>> GetStreamsByUserIdAsync(Guid userId)
     {
         var user = await _userServiceClient.GetUserByIdAsync(userId);
@@ -74,13 +74,13 @@ public class StreamService : IStreamService
         {
             throw new KeyNotFoundException($"User with ID {userId} not found");
         }
-        
+
         var streams = await _streamRepository.GetAllAsync();
         var userStreams = streams.Where(s => s.User.Id == userId).ToList();
-        
+
         return userStreams.Select(s => MapToDto(s, user));
     }
-     
+
     public async Task<StreamDto> CreateStreamAsync()
     {
         // Validate the user's token
@@ -95,20 +95,20 @@ public class StreamService : IStreamService
         {
             throw new UnauthorizedAccessException("User is not authenticated");
         }
-        
+
         var user = await _userServiceClient.GetUserByIdAsync(userId);
         if (user == null)
         {
             throw new KeyNotFoundException($"User with ID {userId} not found");
         }
-        
+
         // Check if user already has a stream
         var streams = await _streamRepository.GetAllAsync();
         if (streams.Any(s => s.User.Id == userId))
         {
             throw new InvalidOperationException("User already has an active stream");
         }
-        
+
         // Create new stream
         var stream = new LiveStream
         {
@@ -126,11 +126,11 @@ public class StreamService : IStreamService
                 Password = "notneeded",
             },
         };
-        
+
         await _streamRepository.AddAsync(stream);
         return MapToDto(stream, user);
     }
-    
+
     public async Task<StreamDto> UpdateStreamAsync(Guid id, StreamDto streamDto)
     {
         // Validate the user's token
@@ -144,30 +144,30 @@ public class StreamService : IStreamService
         {
             throw new KeyNotFoundException($"Stream with ID {id} not found");
         }
-        
+
         // Check if the current user is the owner of the stream
         var currentUserId = _userContext.GetCurrentUserId();
         if (currentUserId == Guid.Empty)
         {
             throw new UnauthorizedAccessException("User is not authenticated");
         }
-        
+
         if (stream.User.Id != currentUserId)
         {
             throw new UnauthorizedAccessException("User is not authorized to update this stream");
         }
-        
+
         // Update stream properties
         if (!string.IsNullOrEmpty(streamDto.StreamName))
         {
             stream.StreamName = streamDto.StreamName;
         }
-        
+
         if (!string.IsNullOrEmpty(streamDto.StreamDescription))
         {
             stream.StreamDescription = streamDto.StreamDescription;
         }
-        
+
         stream.StreamCategory = streamDto.StreamCategory;
 
         if (!string.IsNullOrEmpty(streamDto.ThumbnailUrl))
@@ -181,29 +181,15 @@ public class StreamService : IStreamService
         }
 
         stream.Views = streamDto.Views;
-        
+
         await _streamRepository.UpdateAsync(stream);
-        
+
         // Invalidate cache
         await _cacheService.RemoveAsync("active_streams");
-        
+
         var user = await _userServiceClient.GetUserByIdAsync(stream.User.Id);
-        
+
         return MapToDto(stream, user);
-    }
-    
-    public async Task EndStreamAsync(Guid id)
-    {
-        var stream = await _streamRepository.GetByIdAsync(id);
-        if (stream == null)
-        {
-            throw new KeyNotFoundException($"Stream with ID {id} not found");
-        }
-        
-        await _streamRepository.UpdateAsync(stream);
-        
-        // Invalidate cache
-        await _cacheService.RemoveAsync("active_streams");
     }
 
     public async Task<string> GenerateStremKeyAsync(Guid id)
@@ -213,18 +199,73 @@ public class StreamService : IStreamService
         {
             throw new KeyNotFoundException($"Stream with ID {id} not found");
         }
-        
+
         // Generate a new stream key
         var streamKey = Guid.NewGuid().ToString();
-        
+
         // Update the stream with the new key
         stream.StreamUrl = streamKey;
-        
+
         await _streamRepository.UpdateAsync(stream);
-        
+
         return streamKey;
     }
-    
+
+    public async Task<string> GenerateStreamKeyAsync(Guid id)
+    {
+        var stream = await _streamRepository.GetByIdAsync(id);
+        if (stream == null)
+        {
+            throw new KeyNotFoundException($"Stream with ID {id} not found");
+        }
+
+        // Generate a new stream key
+        var streamKey = Guid.NewGuid().ToString();
+
+        // Update the stream with the new key
+        stream.StreamUrl = "http://localhost:8080/hls/" + streamKey + ".m3u8";
+
+        await _streamRepository.UpdateAsync(stream);
+
+        return streamKey;
+    }
+
+    public async Task StartStreamAsync(string streamKey)
+    {
+        // Validate the stream key
+        var streams = await _streamRepository.GetAllAsync();
+
+        //find the stream with the given key
+        var stream = streams.FirstOrDefault(s => s.StreamUrl == streamKey);
+
+        if (stream == null)
+        {
+            throw new KeyNotFoundException($"Stream with key {streamKey} not found");
+        }     
+
+        await _cacheService.RemoveAsync("active_streams");
+    }
+    public async Task EndStreamAsync(string streamKey)
+    {
+        // Validate the stream key
+        var streams = _streamRepository.GetAllAsync().Result;
+
+        //find the stream with the given key
+        var stream = streams.FirstOrDefault(s => s.StreamUrl == streamKey);
+
+        if (stream == null)
+        {
+            throw new KeyNotFoundException($"Stream with key {streamKey} not found");
+        }
+
+        stream.StreamUrl = null;
+        stream.Views = 0; // Reset views or any other properties as needed
+
+        await _streamRepository.UpdateAsync(stream);
+
+        await _cacheService.RemoveAsync("active_streams");
+    }
+
     private StreamDto MapToDto(LiveStream stream, UserDTO? user)
     {
         return new StreamDto
