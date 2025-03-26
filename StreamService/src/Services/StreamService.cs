@@ -15,7 +15,6 @@ public class StreamService : IStreamService
     private readonly ICacheService _cacheService;
     private readonly IUserServiceClient _userServiceClient;
     private readonly IUserContext _userContext;
-    private readonly ITokenService _tokenService;
 
     public StreamService(
         IRepository<LiveStream> streamRepository,
@@ -28,7 +27,6 @@ public class StreamService : IStreamService
         _cacheService = cacheService;
         _userServiceClient = userServiceClient;
         _userContext = userContext;
-        _tokenService = tokenService;
     }
     
     public async Task<StreamDto> GetStreamByIdAsync(Guid id)
@@ -206,6 +204,25 @@ public class StreamService : IStreamService
         
         // Invalidate cache
         await _cacheService.RemoveAsync("active_streams");
+    }
+
+    public async Task<string> GenerateStremKeyAsync(Guid id)
+    {
+        var stream = await _streamRepository.GetByIdAsync(id);
+        if (stream == null)
+        {
+            throw new KeyNotFoundException($"Stream with ID {id} not found");
+        }
+        
+        // Generate a new stream key
+        var streamKey = Guid.NewGuid().ToString();
+        
+        // Update the stream with the new key
+        stream.StreamUrl = streamKey;
+        
+        await _streamRepository.UpdateAsync(stream);
+        
+        return streamKey;
     }
     
     private StreamDto MapToDto(LiveStream stream, UserDTO? user)

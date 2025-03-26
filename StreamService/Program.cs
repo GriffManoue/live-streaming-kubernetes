@@ -68,8 +68,6 @@ builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<S
 
 // Register repositories for Stream-specific entities
 builder.Services.AddScoped<IRepository<LiveStream>, Repository<LiveStream>>();
-builder.Services.AddScoped<ITokenService, TokenService>();
-
 // Add HttpClient for the UserService
 builder.Services.AddHttpClient<IUserServiceClient, UserServiceClient>(client =>
 {
