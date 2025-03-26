@@ -32,7 +32,7 @@
           </div>
 
           <!-- Email field -->
-          <div class="col-6 field mb-3">
+          <div class="col-12 field mb-3">
             <div class="flex align-items-center mb-1">
               <label for="email" class="ml-2">Email</label>
               <i class="pi pi-envelope ml-2"></i>
@@ -45,23 +45,6 @@
             </small>
             <small class="p-error block mt-1" *ngIf="f['email'].touched && f['email'].errors?.['email']">
               Please enter a valid email address
-            </small>
-          </div>
-
-          <!-- Phone field -->
-          <div class="col-6 field mb-3">
-            <div class="flex align-items-center mb-1">
-              <label for="phone" class="ml-2">Phone</label>
-              <i class="pi pi-phone ml-2"></i>
-            </div>
-            <input id="phone" type="text" pInputText formControlName="phone" class="w-full"
-              placeholder="Enter your phone number" 
-              [ngClass]="{'ng-invalid ng-dirty': f['phone'].touched && f['phone'].invalid}" />
-            <small class="p-error block mt-1" *ngIf="f['phone'].touched && f['phone'].errors?.['required']">
-              Phone number is required
-            </small>
-            <small class="p-error block mt-1" *ngIf="f['phone'].touched && f['phone'].errors?.['pattern']">
-              Please enter a valid phone number
             </small>
           </div>
 

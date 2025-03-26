@@ -16,18 +16,18 @@ export class AuthService extends ServiceBase {
   }
 
   register(request: RegisterRequest): Observable<AuthResult> {
-    return this.http.post<AuthResult>(`${this.apiUrl}/api/auth/register`, request);
+    return this.http.post<AuthResult>(`${this.apiUrl}/auth/register`, request);
   }
 
   login(request: LoginRequest): Observable<AuthResult> {
-    return this.http.post<AuthResult>(`${this.apiUrl}/api/auth/login`, request);
+    return this.http.post<AuthResult>(`${this.apiUrl}/auth/login`, request);
   }
 
   validateToken(token: string): Observable<AuthResult> {
-    return this.http.post<AuthResult>(`${this.apiUrl}/api/auth/validate`, { token });
+    return this.http.post<AuthResult>(`${this.apiUrl}/auth/validate`, { token });
   }
 
   revokeToken(token: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/api/auth/revoke`, { token });
+    return this.http.post(`${this.apiUrl}/auth/revoke`, { token });
   }
 }

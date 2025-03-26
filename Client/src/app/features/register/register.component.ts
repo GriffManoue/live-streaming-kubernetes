@@ -12,6 +12,7 @@ import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
 import { LoginService } from '../../services/login.service';
 import { AuthService } from '../../services/auth.service';
+import { RegisterRequest } from '../../models/auth/register-request';
 
 @Component({
   selector: 'app-register',
@@ -55,7 +56,6 @@ export class RegisterComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
-      phone: ['', [Validators.required, Validators.pattern(/^\+?[0-9\s\-\(\)]{7,15}$/)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]],
       rememberMe: [false]
@@ -98,12 +98,11 @@ export class RegisterComponent implements OnInit {
     // Form values
     const formValues = this.registerForm.value;
 
-    let registerRequest = {
+    let registerRequest: RegisterRequest = {
       username: formValues.username,
       email: formValues.email,
       firstName: formValues.firstName,
       lastName: formValues.lastName,
-      phone: formValues.phone,
       password: formValues.password,
     }
 
