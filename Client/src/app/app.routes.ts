@@ -15,5 +15,5 @@ export const routes: Routes = [
   { path: 'settings/:id', component: SettingsComponent}, // Lazy load settings component
   { path: '**', redirectTo: ''} // Redirect to home if no other route matches
   //todo : add 404 page
-  //todo: lazy load other components
+  //todo: lazy load other components add modules and change maxbundlesize in angular.json
 ];
