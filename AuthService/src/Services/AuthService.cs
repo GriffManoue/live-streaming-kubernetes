@@ -4,6 +4,7 @@ using Shared.Models.Auth;
 using Shared.Models.Domain;
 using StreamService.Services;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace AuthService.Services;
 
@@ -15,6 +16,7 @@ public class AuthService : IAuthService
     private readonly ITokenService _tokenService;
     private readonly IRepository<User> _userRepository;
     private readonly IStreamServiceClient _streamServiceClient;
+    private readonly ILogger<AuthService> _logger;
 
     public AuthService(
         IRepository<User> userRepository,
@@ -22,7 +24,8 @@ public class AuthService : IAuthService
         IPasswordHasher passwordHasher,
         IHttpContextAccessor httpContextAccessor,
         IStreamServiceClient streamServiceClient,
-        ICacheService cacheService)
+        ICacheService cacheService,
+        ILogger<AuthService> logger)
     {
         _userRepository = userRepository;
         _tokenService = tokenService;
@@ -30,13 +33,15 @@ public class AuthService : IAuthService
         _httpContextAccessor = httpContextAccessor;
         _streamServiceClient = streamServiceClient;
         _cacheService = cacheService;
+        _logger = logger;
     }
 
     public async Task<AuthResult> RegisterAsync(RegisterRequest request)
     {
+        
         // Check if user with the same username exists using the repository
         var userWithSameUsername = await _userRepository.FirstOrDefaultAsync(
-            u => u.Username.Equals(request.Username, StringComparison.OrdinalIgnoreCase));
+            u => u.Username.ToLower() == request.Username.ToLower());
             
         if (userWithSameUsername != null)
             return new AuthResult
@@ -47,7 +52,7 @@ public class AuthService : IAuthService
 
         // Check if user with the same email exists
         var userWithSameEmail = await _userRepository.FirstOrDefaultAsync(
-            u => u.Email.Equals(request.Email, StringComparison.OrdinalIgnoreCase));
+            u => u.Email.ToLower() == request.Email.ToLower());
             
         if (userWithSameEmail != null)
             return new AuthResult
@@ -115,7 +120,7 @@ public class AuthService : IAuthService
     {
         // Find user by username using the enhanced repository
         var user = await _userRepository.FirstOrDefaultAsync(
-            u => u.Username.Equals(request.Username, StringComparison.OrdinalIgnoreCase));
+            u => u.Username.ToLower() == request.Username.ToLower());
 
         if (user == null)
             return new AuthResult
