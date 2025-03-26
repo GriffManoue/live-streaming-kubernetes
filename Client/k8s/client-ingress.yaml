@@ -43,21 +43,4 @@ spec:
                 name: stream-service
                 port:
                   number: 80
-          
-          # Route to Analytics Service
-          - path: /api/analytics
-            pathType: Prefix
-            backend:
-              service:
-                name: analytics-service
-                port:
-                  number: 80
-
-          # Route to Recommendation Service
-          - path: /api/recommendation
-            pathType: Prefix
-            backend:
-              service:
-                name: recommendation-service
-                port:
-                  number: 80
+        
