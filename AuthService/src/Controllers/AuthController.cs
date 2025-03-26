@@ -67,11 +67,11 @@ public class AuthController : ControllerBase
     }
     
     [HttpPost("validate")]
-    public async Task<ActionResult<AuthResult>> ValidateToken([FromBody] ValidateTokenRequest request)
+    public async Task<ActionResult<AuthResult>> ValidateToken([FromBody] string token)
     {
         try
         {
-            var result = await _authService.ValidateTokenAsync(request.Token);
+            var result = await _authService.ValidateTokenAsync(token);
             
             if (!result.Success)
             {
@@ -91,11 +91,11 @@ public class AuthController : ControllerBase
     }
     
     [HttpPost("revoke")]
-    public async Task<ActionResult> RevokeToken([FromBody] RevokeTokenRequest request)
+    public async Task<ActionResult> RevokeToken([FromBody] string token)
     {
         try
         {
-            await _authService.RevokeTokenAsync(request.Token);
+            await _authService.RevokeTokenAsync(token);
             return Ok();
         }
         catch (Exception ex)
@@ -108,68 +108,9 @@ public class AuthController : ControllerBase
         }
     }
 
-    [HttpPost("stream-token")]
-    [Authorize] 
-    public async Task<ActionResult<AuthResult>> GenerateStreamToken([FromBody] StreamTokenRequest request)
-    {
-        try
-        {
-            var result = await _authService.GenerateStreamTokenAsync(request.StreamId);
-            
-            if (!result.Success)
-            {
-                return BadRequest(result);
-            }
-            
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new AuthResult
-            {
-                Success = false,
-                Error = $"Internal server error: {ex.Message}"
-            });
-        }
-    }
+   
 
-    [HttpPost("validate-stream-token")]
-    [Authorize]
-    public async Task<ActionResult<AuthResult>> ValidateStreamToken([FromBody] ValidateTokenRequest request)
-    {
-        try
-        {
-            var result = await _authService.ValidateStreamTokenAsync(request.Token);
-            
-            if (!result.Success)
-            {
-                return BadRequest(result);
-            }
-            
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new AuthResult
-            {
-                Success = false,
-                Error = $"Internal server error: {ex.Message}"
-            });
-        }
-    }
 }
 
-public class ValidateTokenRequest
-{
-    public string Token { get; set; } = string.Empty;
-}
 
-public class RevokeTokenRequest
-{
-    public string Token { get; set; } = string.Empty;
-}
 
-public class StreamTokenRequest
-{
-    public Guid StreamId { get; set; }
-}

@@ -26,13 +26,5 @@ public class AuthDbContext : BaseDbContext
             .IsUnique();
             
          // Exclude navigation properties that are not needed for this service
-    modelBuilder.Entity<User>()
-        .Ignore(u => u.Streams);
-        
-    modelBuilder.Entity<User>()
-        .Ignore(u => u.FollowingRelationships);
-    
-    modelBuilder.Entity<User>()
-        .Ignore(u => u.FollowedByRelationships);
     }
 }

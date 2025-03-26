@@ -20,8 +20,7 @@ public class StreamService : IStreamService
         IRepository<LiveStream> streamRepository,
         ICacheService cacheService,
         IUserServiceClient userServiceClient,
-        IUserContext userContext,
-        ITokenService tokenService)
+        IUserContext userContext)
     {
         _streamRepository = streamRepository;
         _cacheService = cacheService;
