@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { UserDto } from '../../models/user/user-dto';
 import { ServiceBase } from '../service-base';
+import { FollowRequest } from '../../models/user/follow-request';
 
 @Injectable({
   providedIn: 'root'
@@ -10,34 +10,35 @@ import { ServiceBase } from '../service-base';
 export class UserService extends ServiceBase {
 
   constructor(http: HttpClient) {
-    super(http, 'http://user-service.default.svc.cluster.local/api' );
+    super(http );
   }
 
-  getUserById(id: string): Observable<UserDto> {
-    return this.get<UserDto>(`user/${id}`);
+  getUserById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/api/user/${id}`);
   }
 
-  getUserByUsername(username: string): Observable<UserDto> {
-    return this.get<UserDto>(`user/username/${username}`);
+  getUserByUsername(username: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/api/user/username/${username}`);
   }
 
-  updateUser(id: string, user: UserDto): Observable<UserDto> {
-    return this.put<UserDto>(`user/${id}`, user);
+  updateUser(id: string, user: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/api/user/${id}`, user);
   }
 
-  getFollowers(id: string): Observable<UserDto[]> {
-    return this.get<UserDto[]>(`user/${id}/followers`);
+  getFollowers(id: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/api/user/${id}/followers`);
   }
 
-  getFollowing(id: string): Observable<UserDto[]> {
-    return this.get<UserDto[]>(`user/${id}/following`);
+  getFollowing(id: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/api/user/${id}/following`);
   }
 
-  followUser(followerId: string, followingId: string): Observable<void> {
-    return this.post<void>('user/follow', { followerId, followingId });
+  followUser(request: FollowRequest): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/api/user/follow`, request);
   }
 
-  unfollowUser(followerId: string, followingId: string): Observable<void> {
-    return this.post<void>('user/unfollow', { followerId, followingId });
+  unfollowUser(request: FollowRequest): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/api/user/unfollow`, request);
   }
+
 }
