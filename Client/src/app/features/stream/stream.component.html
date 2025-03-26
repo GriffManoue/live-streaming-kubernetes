@@ -13,13 +13,13 @@
   </div>
 
   <!-- Stream content -->
-  <div *ngIf="!loading && !error" class="grid grid-cols-1 gap-6">
+  <div *ngIf="!loading && !error && streamData" class="grid grid-cols-1 gap-6">
     <div class="col-span-1">
       <!-- Video player -->
       <div class="rounded-lg overflow-hidden shadow-lg">
-        <video #videoPlayer 
-               class="w-full aspect-video" 
-               controls 
+        <video #videoPlayer
+               class="w-full aspect-video"
+               controls
                autoplay></video>
       </div>
 
@@ -29,34 +29,34 @@
           <div>
             <h1 class="text-2xl font-bold mb-2">{{ streamData.streamName }}</h1>
             <p class="mb-3">{{ streamData.streamDescription }}</p>
-            
+
             <div class="flex items-center gap-3 mb-3">
               <div class="flex items-center">
-                <p-avatar [label]="streamData.username.charAt(0).toUpperCase()" 
-                          styleClass="mr-2" 
+                <p-avatar [label]="streamData.userId.charAt(0).toUpperCase()"
+                          styleClass="mr-2"
                           shape="circle"></p-avatar>
-                <span class="font-semibold">{{ streamData.username }}</span>
+                <span class="font-semibold">{{ streamData.userId }}</span>
               </div>
-              
-              <p-tag [value]="streamData.streamCategory" 
+
+              <p-tag [value]="streamData.streamCategory"
                      [severity]="getCategorySeverity(streamData.streamCategory)"></p-tag>
-              
+
               <div class="flex items-center">
                 <i class="pi pi-users mr-1"></i>
-                <span>{{ streamData.viewerCount | number }} viewers</span>
+                <span>{{ streamData.views | number }} viewers</span>
               </div>
             </div>
           </div>
-          
+
           <div class="mt-3 md:mt-0">
             <p-button label="Follow" icon="pi pi-user-plus" styleClass="p-button-outlined mr-2"></p-button>
             <p-button label="Share" icon="pi pi-share-alt"></p-button>
           </div>
         </div>
-        
+
         <div class="mt-4">
           <p class="text-sm text-gray-500">
-            Started streaming {{ streamData.createdAt | date:'medium' }}
+            Started streaming
           </p>
         </div>
       </p-card>

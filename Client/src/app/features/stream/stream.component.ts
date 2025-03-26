@@ -6,8 +6,12 @@ import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TagModule } from 'primeng/tag';
 import { AvatarModule } from 'primeng/avatar';
+import { StreamService } from '../../services/stream.service';
+import { LiveStream } from '../../models/stream/stream';
+import { StreamCategoryKey } from '../../models/enums/stream-categories';
 
 declare let shaka: any;
+
 @Component({
   selector: 'app-stream',
   standalone: true,
@@ -25,45 +29,37 @@ declare let shaka: any;
 })
 export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('videoPlayer') videoElement!: ElementRef;
-  
+
   streamId: string | null = null;
-  streamData: any = {
-    id: '123e4567-e89b-12d3-a456-426614174000',
-    streamName: 'Live Coding Session',
-    streamDescription: 'Building a live streaming platform with .NET and Angular',
-    streamCategory: 'Technology',
-    username: 'coder789',
-    createdAt: new Date(),
-    viewerCount: 512,
-    isActive: true
-  };
-  
+  streamData: LiveStream | null = null;
+
   loading: boolean = true;
   error: string | null = null;
-  player:any = null;
+  player: any = null;
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private streamService: StreamService
+  ) { }
 
   ngOnInit(): void {
     this.streamId = this.route.snapshot.paramMap.get('streamId');
-    
-    // In a real implementation, you would fetch the stream data from your API
-    // Example:
-    // this.streamService.getStream(this.streamId).subscribe({
-    //   next: (data) => {
-    //     this.streamData = data;
-    //     this.loading = false;
-    //   },
-    //   error: (err) => {
-    //     this.error = 'Could not load stream';
-    //     this.loading = false;
-    //   }
-    // });
-    
-    // For demo purposes, simulate API call with timeout
-    setTimeout(() => {
+
+    if (this.streamId) {
+      this.streamService.getStreamById(this.streamId).subscribe({
+        next: (data) => {
+          this.streamData = data;
+          this.loading = false;
+        },
+        error: (err) => {
+          this.error = 'Could not load stream';
+          this.loading = false;
+        }
+      });
+    } else {
+      this.error = 'Stream ID not provided';
       this.loading = false;
-    }, 1000);
+    }
   }
 
   ngAfterViewInit(): void {
@@ -80,51 +76,55 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // Method to assign PrimeNG severity based on stream category
-  getCategorySeverity(category: string): "success" | "info" | "warn" | "danger" | "secondary" | "contrast" | undefined {
-    const categoryMap: { [key: string]: "success" | "info" | "warn" | "danger" | "secondary" | "contrast" } = {
-      'Gaming': 'info',
-      'Music': 'success',
-      'Sports': 'warn',
-      'Art': 'info',
-      'Cooking': 'success',
-      'Education': 'info',
-      'Travel': 'warn',
-      'TalkShows': 'info',
-      'News': 'danger',
-      'Technology': 'secondary',
-      'Science': 'secondary',
-      'HealthAndFitness': 'success'
+  getCategorySeverity(category: StreamCategoryKey): "success" | "info" | "warn" | "danger" | "secondary" | "contrast" | undefined {
+    const categoryMap: { [key in StreamCategoryKey]: "success" | "info" | "warn" | "danger" | "secondary" | "contrast" } = {
+      Gaming: 'info',
+      Music: 'success',
+      Sports: 'warn',
+      Art: 'info',
+      Cooking: 'success',
+      Education: 'info',
+      Travel: 'warn',
+      TalkShows: 'info',
+      News: 'danger',
+      Technology: 'secondary',
+      Science: 'secondary',
+      HealthAndFitness: 'success',
+      FashionAndBeauty: 'info',
+      FoodAndDrink: 'success',
+      PetsAndAnimals: 'warn',
+      DiyAndCrafts: 'info'
     };
-    
+
     return categoryMap[category] || 'info';
   }
 
   private async initPlayer(): Promise<void> {
     // Install polyfills
     shaka.polyfill.installAll();
-    
+
     // Check browser support
     if (!shaka.Player.isBrowserSupported()) {
       this.error = 'Browser not supported for video playback!';
       return;
     }
-    
+
     // Wait for DOM to be ready
     setTimeout(async () => {
       try {
         const video = this.videoElement.nativeElement;
         this.player = new shaka.Player(video);
-        
+
         // Listen for errors
         this.player.addEventListener('error', this.onPlayerError.bind(this));
-        
+
         // In a real implementation, you would use the actual stream URL
         // const streamUrl = `https://your-streaming-server.com/hls/${this.streamId}/index.m3u8`;
-        
+
         // For demo, using a sample HLS stream
-        const streamUrl = 'http://localhost:8080/hls/testkey.m3u8';
+        const streamUrl = this.streamData?.streamUrl;
+        //const streamUrl = 'http://localhost:8080/hls/testkey.m3u8';
         //const streamUrl = 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/hls.m3u8';
-        //const streamUrl = 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8';
         // Load the stream
         await this.player.load(streamUrl);
         console.log('Stream loaded successfully');
