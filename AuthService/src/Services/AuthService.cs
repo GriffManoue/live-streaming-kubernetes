@@ -82,8 +82,8 @@ public class AuthService : IAuthService
         
         try
         {
-            // Create the stream in StreamService
-            var stream = await _streamServiceClient.CreateStreamAsync();
+            // Create the stream in StreamService - pass the user object so the StreamService can use its ID
+            var stream = await _streamServiceClient.CreateStreamAsync(user);
             user.Stream = new LiveStream
             {
                 Id = stream.Id,
@@ -101,6 +101,7 @@ public class AuthService : IAuthService
         catch (Exception ex)
         {
             // Log the error but continue - stream can be created later
+            _logger.LogError(ex, "Failed to create stream for user {UserId}: {Message}", userId, ex.Message);
             Console.WriteLine($"Failed to create stream for user {userId}: {ex.Message}");
         }
 

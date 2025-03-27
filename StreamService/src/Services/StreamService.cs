@@ -85,7 +85,7 @@ public class StreamService : IStreamService
         Guid userId;
         UserDTO? user;
 
-        // If a user ID is specified (for service-to-service), use that
+        // If a user ID is specified (for service-to-service), use that directly without authentication
         if (specifiedUserId.HasValue && specifiedUserId != Guid.Empty)
         {
             userId = specifiedUserId.Value;
@@ -97,7 +97,7 @@ public class StreamService : IStreamService
         }
         else
         {
-            // Validate the user's token for normal user access
+            // For normal web users, validate authentication
             if (!await _userContext.ValidateCurrentTokenAsync())
             {
                 throw new UnauthorizedAccessException("Invalid or expired authentication token");
@@ -117,11 +117,14 @@ public class StreamService : IStreamService
             }
         }
 
-        // Check if user already has a stream
-        var streams = await _streamRepository.GetAllAsync();
-        if (streams.Any(s => s.User.Id == userId))
+        // Check if user already has a stream (skip this for service-to-service calls)
+        if (specifiedUserId == null)
         {
-            throw new InvalidOperationException("User already has an active stream");
+            var streams = await _streamRepository.GetAllAsync();
+            if (streams.Any(s => s.User.Id == userId))
+            {
+                throw new InvalidOperationException("User already has an active stream");
+            }
         }
 
         // Create new stream
