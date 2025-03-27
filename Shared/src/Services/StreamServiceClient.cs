@@ -12,7 +12,7 @@ public class StreamServiceClient : IStreamServiceClient
     public StreamServiceClient(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
-        _baseUrl = "http://localhost/api/";
+        _baseUrl = "http://stream-service:8080/api/";
     }
 
     public async Task<StreamDto?> GetStreamByIdAsync(Guid streamId)
