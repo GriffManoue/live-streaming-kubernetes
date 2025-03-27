@@ -16,6 +16,12 @@ public class StreamDbContext : BaseDbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // Configure the table name explicitly to match the database
+        modelBuilder.Entity<LiveStream>().ToTable("Streams");
+        
+        // Configure User entity table name
+        modelBuilder.Entity<User>().ToTable("Users");
+        
         // Configure Stream entity with explicit foreign key
         modelBuilder.Entity<LiveStream>()
             .HasOne(s => s.User)

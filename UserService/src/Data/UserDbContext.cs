@@ -16,6 +16,9 @@ public class UserDbContext : BaseDbContext
     {
         base.OnModelCreating(modelBuilder);
         
+        // Configure table names explicitly to match the database
+        modelBuilder.Entity<LiveStream>().ToTable("Streams");
+        
         // Configure User entity
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Username)
