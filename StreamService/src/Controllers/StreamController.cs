@@ -73,7 +73,7 @@ public class StreamController : ControllerBase
     }
     
     [HttpPost]
-    [Authorize]
+    [AllowAnonymous] 
     public async Task<ActionResult<StreamDto>> CreateStream()
     {
         try
