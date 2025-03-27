@@ -32,7 +32,7 @@ public class StreamServiceClient : IStreamServiceClient
     {
         try
         {
-            var response = await _httpClient.PostAsync($"{_baseUrl}/stream", new StringContent(string.Empty));
+            var response = await _httpClient.PostAsync($"{_baseUrl}stream", new StringContent(string.Empty));
             Console.WriteLine($"Response: {response.StatusCode}");
             response.EnsureSuccessStatusCode();
             var stream = await response.Content.ReadFromJsonAsync<StreamDto>();
