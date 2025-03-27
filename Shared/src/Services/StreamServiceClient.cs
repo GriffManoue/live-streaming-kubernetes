@@ -19,7 +19,7 @@ public class StreamServiceClient : IStreamServiceClient
     {
         try
         {
-            return await _httpClient.GetFromJsonAsync<StreamDto>($"{_baseUrl}/stream/{streamId}");
+            return await _httpClient.GetFromJsonAsync<StreamDto>($"{_baseUrl}stream/{streamId}");
         }
         catch (HttpRequestException)
         {
