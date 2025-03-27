@@ -83,16 +83,34 @@ public class StreamService : IStreamService
     public async Task<StreamDto> CreateStreamAsync(Guid? specifiedUserId = null)
     {
         Guid userId;
-        UserDTO? user;
+        UserDTO? user = null;
 
         // If a user ID is specified (for service-to-service), use that directly without authentication
         if (specifiedUserId.HasValue && specifiedUserId != Guid.Empty)
         {
             userId = specifiedUserId.Value;
-            user = await _userServiceClient.GetUserByIdAsync(userId);
+            try
+            {
+                user = await _userServiceClient.GetUserByIdAsync(userId);
+                // For service-to-service calls, we'll continue even if the user can't be found
+                // We'll just use the ID that was provided
+            }
+            catch (Exception ex)
+            {
+                // Log the error but continue with just the user ID
+                Console.WriteLine($"Warning: Couldn't fetch user details for ID {userId}: {ex.Message}");
+            }
+            
+            // If user is null, create a minimal user object with just the ID
             if (user == null)
             {
-                throw new KeyNotFoundException($"User with ID {userId} not found");
+                user = new UserDTO
+                {
+                    Id = userId,
+                    Username = $"user-{userId.ToString().Substring(0, 8)}",
+                    Email = "pending@example.com",
+                    Password = "notneeded",
+                };
             }
         }
         else
@@ -140,7 +158,7 @@ public class StreamService : IStreamService
             {
                 Id = user.Id,
                 Username = user.Username,
-                Email = user.Email,
+                Email = user.Email ?? "pending@example.com",
                 Password = "notneeded",
             },
         };

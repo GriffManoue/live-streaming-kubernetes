@@ -22,7 +22,7 @@ public class StreamServiceClient : IStreamServiceClient
         _logger = logger;
         
         // Read from configuration with fallback to the default value
-        _baseUrl = configuration["Services:StreamService:BaseUrl"] ?? "http://stream-service:8080/api/";
+        _baseUrl = configuration["Services:StreamService:BaseUrl"] ?? "http://stream-service/api/";
         _logger?.LogInformation("StreamServiceClient initialized with base URL: {BaseUrl}", _baseUrl);
     }
 
