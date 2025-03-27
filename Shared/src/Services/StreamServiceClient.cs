@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Shared.Models.Domain;
 using Shared.Models.Stream;
 
 namespace StreamService.Services;
@@ -45,11 +46,15 @@ public class StreamServiceClient : IStreamServiceClient
         }
     }
 
-    public async Task<StreamDto> CreateStreamAsync()
+    public async Task<StreamDto> CreateStreamAsync(User? user = null)
     {
         try
         {
-            var url = $"{_baseUrl}stream";
+            // Add userId as a query parameter if user is provided
+            string url = user != null 
+                ? $"{_baseUrl}stream?userId={user.Id}" 
+                : $"{_baseUrl}stream";
+            
             _logger?.LogInformation("Creating new stream at {Url}", url);
             
             var response = await _httpClient.PostAsync(url, new StringContent(string.Empty));

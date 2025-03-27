@@ -80,25 +80,41 @@ public class StreamService : IStreamService
         return userStreams.Select(s => MapToDto(s, user));
     }
 
-    public async Task<StreamDto> CreateStreamAsync()
+    public async Task<StreamDto> CreateStreamAsync(Guid? specifiedUserId = null)
     {
-        // Validate the user's token
-        if (!await _userContext.ValidateCurrentTokenAsync())
-        {
-            throw new UnauthorizedAccessException("Invalid or expired authentication token");
-        }
+        Guid userId;
+        UserDTO? user;
 
-        // Get the authenticated user's ID
-        var userId = _userContext.GetCurrentUserId();
-        if (userId == Guid.Empty)
+        // If a user ID is specified (for service-to-service), use that
+        if (specifiedUserId.HasValue && specifiedUserId != Guid.Empty)
         {
-            throw new UnauthorizedAccessException("User is not authenticated");
+            userId = specifiedUserId.Value;
+            user = await _userServiceClient.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User with ID {userId} not found");
+            }
         }
-
-        var user = await _userServiceClient.GetUserByIdAsync(userId);
-        if (user == null)
+        else
         {
-            throw new KeyNotFoundException($"User with ID {userId} not found");
+            // Validate the user's token for normal user access
+            if (!await _userContext.ValidateCurrentTokenAsync())
+            {
+                throw new UnauthorizedAccessException("Invalid or expired authentication token");
+            }
+
+            // Get the authenticated user's ID
+            userId = _userContext.GetCurrentUserId();
+            if (userId == Guid.Empty)
+            {
+                throw new UnauthorizedAccessException("User is not authenticated");
+            }
+
+            user = await _userServiceClient.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User with ID {userId} not found");
+            }
         }
 
         // Check if user already has a stream

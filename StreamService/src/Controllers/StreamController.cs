@@ -73,13 +73,13 @@ public class StreamController : ControllerBase
     }
     
     [HttpPost]
-    [AllowAnonymous] 
-    public async Task<ActionResult<StreamDto>> CreateStream()
+    [AllowAnonymous] // Allow anonymous access for service-to-service communication
+    public async Task<ActionResult<StreamDto>> CreateStream([FromQuery] Guid? userId = null)
     {
         try
         {
             Console.WriteLine("Creating stream...");
-            var stream = await _streamService.CreateStreamAsync();
+            var stream = await _streamService.CreateStreamAsync(userId);
             return CreatedAtAction(nameof(GetStreamById), new { id = stream.Id }, stream);
         }
         catch (KeyNotFoundException ex)
