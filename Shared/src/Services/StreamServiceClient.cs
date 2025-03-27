@@ -12,7 +12,7 @@ public class StreamServiceClient : IStreamServiceClient
     public StreamServiceClient(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
-        _baseUrl = configuration["ServiceUrls:UserService"] ?? "http://localhost/api/";
+        _baseUrl = "http://localhost/api/";
     }
 
     public async Task<StreamDto?> GetStreamByIdAsync(Guid streamId)
@@ -28,11 +28,12 @@ public class StreamServiceClient : IStreamServiceClient
         }
     }
 
-    public async Task<StreamDto> CreateStreamAsync(Guid userId)
+    public async Task<StreamDto> CreateStreamAsync()
     {
         try
         {
-            var response = await _httpClient.PostAsync($"{_baseUrl}/stream", null);
+            var response = await _httpClient.PostAsync($"{_baseUrl}/stream", new StringContent(string.Empty));
+            Console.WriteLine($"Response: {response.StatusCode}");
             response.EnsureSuccessStatusCode();
             var stream = await response.Content.ReadFromJsonAsync<StreamDto>();
             return stream ?? throw new InvalidOperationException("Failed to create stream");

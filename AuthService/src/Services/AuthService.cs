@@ -83,7 +83,7 @@ public class AuthService : IAuthService
         try
         {
             // Create the stream in StreamService
-            var stream = await _streamServiceClient.CreateStreamAsync(userId);
+            var stream = await _streamServiceClient.CreateStreamAsync();
             user.Stream = new LiveStream
             {
                 Id = stream.Id,

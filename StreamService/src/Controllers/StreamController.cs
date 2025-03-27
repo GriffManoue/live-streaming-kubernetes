@@ -78,6 +78,7 @@ public class StreamController : ControllerBase
     {
         try
         {
+            Console.WriteLine("Creating stream...");
             var stream = await _streamService.CreateStreamAsync();
             return CreatedAtAction(nameof(GetStreamById), new { id = stream.Id }, stream);
         }
