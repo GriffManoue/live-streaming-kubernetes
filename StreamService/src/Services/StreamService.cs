@@ -82,89 +82,35 @@ public class StreamService : IStreamService
 
     public async Task<StreamDto> CreateStreamAsync(Guid? specifiedUserId = null)
     {
-        Guid userId;
-        UserDTO? user = null;
-
-        // If a user ID is specified (for service-to-service), use that directly without authentication
-        if (specifiedUserId.HasValue && specifiedUserId != Guid.Empty)
+        if (specifiedUserId != null)
         {
-            userId = specifiedUserId.Value;
-            try
-            {
-                user = await _userServiceClient.GetUserByIdAsync(userId);
-                // For service-to-service calls, we'll continue even if the user can't be found
-                // We'll just use the ID that was provided
-            }
-            catch (Exception ex)
-            {
-                // Log the error but continue with just the user ID
-                Console.WriteLine($"Warning: Couldn't fetch user details for ID {userId}: {ex.Message}");
-            }
-            
-            // If user is null, create a minimal user object with just the ID
+            var user = await _userServiceClient.GetUserByIdAsync(specifiedUserId.Value);
             if (user == null)
             {
-                user = new UserDTO
-                {
-                    Id = userId,
-                    Username = $"user-{userId.ToString().Substring(0, 8)}",
-                    Email = "pending@example.com",
-                    Password = "notneeded",
-                };
-            }
-        }
-        else
-        {
-            // For normal web users, validate authentication
-            if (!await _userContext.ValidateCurrentTokenAsync())
-            {
-                throw new UnauthorizedAccessException("Invalid or expired authentication token");
+                throw new KeyNotFoundException($"User with ID {specifiedUserId} not found");
             }
 
-            // Get the authenticated user's ID
-            userId = _userContext.GetCurrentUserId();
-            if (userId == Guid.Empty)
-            {
-                throw new UnauthorizedAccessException("User is not authenticated");
-            }
-
-            user = await _userServiceClient.GetUserByIdAsync(userId);
-            if (user == null)
-            {
-                throw new KeyNotFoundException($"User with ID {userId} not found");
-            }
-        }
-
-        // Check if user already has a stream (skip this for service-to-service calls)
-        if (specifiedUserId == null)
-        {
             var streams = await _streamRepository.GetAllAsync();
-            if (streams.Any(s => s.User.Id == userId))
+            if (streams.Any(s => s.User.Id == specifiedUserId))
             {
                 throw new InvalidOperationException("User already has an active stream");
             }
+
+            var stream = new LiveStream
+            {
+                Id = Guid.NewGuid(),
+                StreamName = "New Stream",
+                StreamDescription = "Stream Description",
+                StreamCategory = StreamCategory.Gaming,
+                ThumbnailUrl = "",
+                StreamUrl = "",
+            };
+
+            await _streamRepository.AddAsync(stream);
+            return MapToDto(stream, user);
         }
 
-        // Create new stream
-        var stream = new LiveStream
-        {
-            Id = Guid.NewGuid(),
-            StreamName = "New Stream",
-            StreamDescription = "Stream Description",
-            StreamCategory = StreamCategory.Gaming,
-            ThumbnailUrl = "",
-            StreamUrl = "",
-            User = new User
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email ?? "pending@example.com",
-                Password = "notneeded",
-            },
-        };
-
-        await _streamRepository.AddAsync(stream);
-        return MapToDto(stream, user);
+        throw new InvalidOperationException("User ID is required to create a stream");
     }
 
     public async Task<StreamDto> UpdateStreamAsync(Guid id, StreamDto streamDto)
@@ -277,7 +223,7 @@ public class StreamService : IStreamService
         if (stream == null)
         {
             throw new KeyNotFoundException($"Stream with key {streamKey} not found");
-        }     
+        }
 
         await _cacheService.RemoveAsync("active_streams");
     }
