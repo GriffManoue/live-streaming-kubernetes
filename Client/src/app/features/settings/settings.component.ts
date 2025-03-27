@@ -36,6 +36,7 @@ export class SettingsComponent implements OnInit {
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private streamService: StreamService) { }
 
   ngOnInit() {
+    //todo, fix params
     this.route.params.subscribe(params => {
       const id = params['id'];
       this.streamService.getStreamById(id).subscribe(stream => {

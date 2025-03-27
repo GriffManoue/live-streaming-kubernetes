@@ -2,8 +2,6 @@
 kubectl port-forward service/user-service 8081:80 &
 kubectl port-forward service/auth-service 8082:80 &
 kubectl port-forward service/stream-service 8083:80 &
-kubectl port-forward service/analytics-service 8084:80 &
-kubectl port-forward service/recommendation-service 8085:80 &
 kubectl port-forward service/db-management 8086:80 &
 kubectl port-forward service/postgres 5432:5432 &
 
