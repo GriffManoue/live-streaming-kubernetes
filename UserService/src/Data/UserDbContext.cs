@@ -3,7 +3,7 @@ using Shared.Models.Domain;
 
 namespace UserService.Data;
 
-public class UserDbContext : IDbContext
+public class UserDbContext : BaseDbContext
 {
     public UserDbContext(DbContextOptions<UserDbContext> options)
         : base(options)
