@@ -125,12 +125,7 @@ public class StreamService : IStreamService
 
     public async Task<StreamDto> UpdateStreamAsync(Guid id, StreamDto streamDto)
     {
-        // Validate the user's token
-        if (!await _userContext.ValidateCurrentTokenAsync())
-        {
-            throw new UnauthorizedAccessException("Invalid or expired authentication token");
-        }
-
+    
         var stream = await _streamRepository.GetByIdAsync(id);
         if (stream == null)
         {
