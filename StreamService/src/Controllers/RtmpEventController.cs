@@ -20,13 +20,19 @@ public class RtmpEventController : ControllerBase
     }
     
     [HttpPost("publish")]
-    public async Task<ActionResult> OnPublish([FromBody] RtmpPublishEvent @event)
+    public async Task<ActionResult> OnPublish()
     {
         try
         {
-            _logger.LogInformation($"Stream publish event received: {{{@event.StreamKey}, {@event.StreamName}}}");
+            // Read stream key from form data (NGINX RTMP sends as form data, not JSON)
+            var name = Request.Form["name"].ToString(); // This is your stream key
+            var app = Request.Form["app"].ToString();   // This is usually "live"
+            var clientId = Request.Form["addr"].ToString() ?? string.Empty;
+            var clientIp = Request.Form["clientid"].ToString() ?? string.Empty;
+            
+            _logger.LogInformation($"Stream publish event received: {{Stream Key: {name}, App: {app}}}");
 
-            await _streamService.StartStreamAsync(@event.StreamKey);
+            await _streamService.StartStreamAsync(name);
             
             return Ok();
         }
@@ -38,13 +44,19 @@ public class RtmpEventController : ControllerBase
     }
     
     [HttpPost("publish_done")]
-    public async Task<ActionResult> OnPublishDone([FromBody] RtmpPublishDoneEvent @event)
+    public async Task<ActionResult> OnPublishDone()
     {
         try
         {
-            _logger.LogInformation($"Stream publish done event received: {{{@event.StreamKey}, {@event.StreamName}}}");
+            // Read stream key from form data (NGINX RTMP sends as form data, not JSON)
+            var name = Request.Form["name"].ToString(); // This is your stream key
+            var app = Request.Form["app"].ToString();   // This is usually "live"
+            var clientId = Request.Form["addr"].ToString() ?? string.Empty;
+            var clientIp = Request.Form["clientid"].ToString() ?? string.Empty;
             
-            await _streamService.EndStreamAsync(@event.StreamKey);
+            _logger.LogInformation($"Stream publish done event received: {{Stream Key: {name}, App: {app}}}");
+            
+            await _streamService.EndStreamAsync(name);
             
             return Ok();
         }
@@ -54,21 +66,4 @@ public class RtmpEventController : ControllerBase
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
-}
-
-public class RtmpPublishEvent
-{
-    public string StreamKey { get; set; } = string.Empty;
-    public string StreamName { get; set; } = string.Empty;
-    public string ClientId { get; set; } = string.Empty;
-    public string ClientIp { get; set; } = string.Empty;
-}
-
-public class RtmpPublishDoneEvent
-{
-    public string StreamKey { get; set; } = string.Empty;
-    public string StreamName { get; set; } = string.Empty;
-    public string ClientId { get; set; } = string.Empty;
-    public string ClientIp { get; set; } = string.Empty;
-    public int Duration { get; set; }
 }
