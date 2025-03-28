@@ -50,6 +50,14 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
         next: (data) => {
           this.streamData = data;
           this.loading = false;
+          
+          // Initialize player after data is loaded
+          // We need to check if AfterViewInit has already run
+          setTimeout(() => {
+            if (this.videoElement) {
+              this.initPlayer();
+            }
+          }, 0);
         },
         error: (err) => {
           this.error = 'Could not load stream';
@@ -63,8 +71,10 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Initialize Shaka Player
-    this.initPlayer();
+    // Only initialize the player when we have both the video element and stream data
+    if (this.streamData?.streamUrl) {
+      this.initPlayer();
+    }
   }
 
   ngOnDestroy(): void {
@@ -100,6 +110,12 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private async initPlayer(): Promise<void> {
+    // Check if shaka is available
+    if (typeof shaka === 'undefined') {
+      this.error = 'Video player library not loaded!';
+      return;
+    }
+
     // Install polyfills
     shaka.polyfill.installAll();
 
@@ -109,23 +125,39 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
 
-    // Wait for DOM to be ready
+    // Wait for DOM to be ready and ensure video element exists
     setTimeout(async () => {
       try {
+        if (!this.videoElement) {
+          this.error = 'Video player element not found';
+          return;
+        }
+
         const video = this.videoElement.nativeElement;
+        if (!video) {
+          this.error = 'Video element reference is invalid';
+          return;
+        }
+
         this.player = new shaka.Player(video);
 
         // Listen for errors
         this.player.addEventListener('error', this.onPlayerError.bind(this));
      
+        // Ensure we have a stream URL before attempting to load
+        if (!this.streamData?.streamUrl) {
+          this.error = 'Stream URL not available';
+          return;
+        }
+
         // Load the stream
-        await this.player.load(this.streamData?.streamUrl);
+        await this.player.load(this.streamData.streamUrl);
         console.log('Stream loaded successfully');
       } catch (error) {
         console.error('Error loading the stream:', error);
-        this.error = 'Error loading the stream';
+        this.error = 'Error loading the stream: ' + (error instanceof Error ? error.message : String(error));
       }
-    }, 1500);
+    }, 1000);
   }
 
   private onPlayerError(event: any): void {
