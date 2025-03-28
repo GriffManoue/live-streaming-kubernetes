@@ -53,7 +53,7 @@ public class UserService : IUserService
 
     public async Task<UserDTO> GetUserByIdAsync(Guid id)
     {
-        var user = await _userRepository.GetByIdWithIncludesAsync(id, u => u.Followers, u => u.Following, u => u.Stream)
+        var user = await _userRepository.GetByIdWithIncludesAsync(id, u => u.Followers, u => u.Following)
             ?? throw new KeyNotFoundException($"User with ID {id} not found");
 
         return MapToUserDTO(user);
@@ -64,8 +64,7 @@ public class UserService : IUserService
         var user = await _userRepository.FirstOrDefaultAsync(
                 u => u.Username == username, 
                 u => u.Followers, 
-                u => u.Following, 
-                u => u.Stream)
+                u => u.Following)
             ?? throw new KeyNotFoundException($"User with username {username} not found");
 
         return MapToUserDTO(user);
@@ -111,8 +110,7 @@ public class UserService : IUserService
         var updatedUser = await _userRepository.GetByIdWithIncludesAsync(
             user.Id, 
             u => u.Followers, 
-            u => u.Following, 
-            u => u.Stream);
+            u => u.Following);
             
         return MapToUserDTO(updatedUser!);
     }
@@ -126,7 +124,7 @@ public class UserService : IUserService
             Username = user.Username,
             Password = user.Password, // Note: In a real application, you might not want to return the password
             Email = user.Email,
-            StreamId = user.Stream.Id,
+            StreamId = user.Stream?.Id ?? Guid.Empty, // Handle null Stream
             FirstName = user.FirstName,
             LastName = user.LastName,
             CreatedAt = user.CreatedAt,

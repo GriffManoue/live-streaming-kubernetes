@@ -9,7 +9,6 @@ public class UserDbContext : BaseDbContext
     public UserDbContext(DbContextOptions<UserDbContext> options)
         : base(options)
     {
-        Database.SetQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery);
     }
 
     public DbSet<User> Users { get; set; }
@@ -17,12 +16,16 @@ public class UserDbContext : BaseDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        //Ignore Stream entity in UserDbContext
+        modelBuilder.Ignore<LiveStream>();
 
-        //modelBuilder.Entity<User>()
-        //    .HasOne(u => u.Stream)
-        //    .WithOne(s => s.User)
-        //    .HasForeignKey<LiveStream>(s => s.UserId)
-        //    .IsRequired()
-        //    .OnDelete(DeleteBehavior.Cascade);
+        // Configure many-to-many relationship between users (followers/following)
+        modelBuilder.Entity<User>()
+            .HasMany(u => u.Followers)
+            .WithMany(u => u.Following)
+            .UsingEntity(j => j
+                .ToTable("UserFollowers") // Use a more descriptive table name
+            );
     }
 }
