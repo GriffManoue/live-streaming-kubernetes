@@ -14,26 +14,26 @@ export class StreamService extends ServiceBase {
   }
 
   getStreamById(id: string): Observable<LiveStream> {
-    return this.http.get<LiveStream>(`${this.apiUrl}/api/stream/${id}`);
+    return this.http.get<LiveStream>(`${this.apiUrl}/stream/${id}`);
   }
 
   getActiveStreams(): Observable<LiveStream[]> {
-    return this.http.get<LiveStream[]>(`${this.apiUrl}/api/stream`);
+    return this.http.get<LiveStream[]>(`${this.apiUrl}/stream`);
   }
 
   getStreamsByUserId(userId: string): Observable<LiveStream[]> {
-    return this.http.get<LiveStream[]>(`${this.apiUrl}/api/stream/user/${userId}`);
+    return this.http.get<LiveStream[]>(`${this.apiUrl}/stream/user/${userId}`);
   }
 
   createStream(): Observable<LiveStream> {
-    return this.http.post<LiveStream>(`${this.apiUrl}/api/stream`, {});
+    return this.http.post<LiveStream>(`${this.apiUrl}/stream`, {});
   }
 
   updateStream(id: string, stream: LiveStream): Observable<LiveStream> {
-    return this.http.put<LiveStream>(`${this.apiUrl}/api/stream/${id}`, stream);
+    return this.http.put<LiveStream>(`${this.apiUrl}/stream/${id}`, stream);
   }
 
   generateStreamKey(id: string): Observable<string> {
-    return this.http.post<string>(`${this.apiUrl}/api/stream/${id}/generateStreamKey`, {});
+    return this.http.post<string>(`${this.apiUrl}/stream/${id}/generateStreamKey`, {});
   }
 }
