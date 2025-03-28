@@ -117,16 +117,9 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
 
         // Listen for errors
         this.player.addEventListener('error', this.onPlayerError.bind(this));
-
-        // In a real implementation, you would use the actual stream URL
-        // const streamUrl = `https://your-streaming-server.com/hls/${this.streamId}/index.m3u8`;
-
-        // For demo, using a sample HLS stream
-        const streamUrl = this.streamData?.streamUrl;
-        //const streamUrl = 'http://localhost:8080/hls/testkey.m3u8';
-        //const streamUrl = 'https://storage.googleapis.com/shaka-demo-assets/angel-one-hls/hls.m3u8';
+     
         // Load the stream
-        await this.player.load(streamUrl);
+        await this.player.load(this.streamData?.streamUrl);
         console.log('Stream loaded successfully');
       } catch (error) {
         console.error('Error loading the stream:', error);
