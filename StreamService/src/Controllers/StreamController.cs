@@ -105,7 +105,6 @@ public class StreamController : ControllerBase
     }
     
     [HttpPut("{id:guid}")]
-    [Authorize]
     public async Task<ActionResult<StreamDto>> UpdateStream(Guid id, [FromBody] StreamDto streamDto)
     {
         try
@@ -134,7 +133,6 @@ public class StreamController : ControllerBase
     }
 
     [HttpPost("{id:guid}/generateStreamKey")]
-    [Authorize]
     public async Task<ActionResult<string>> GenerateStreamKey(Guid id)
     {
         try
@@ -172,7 +170,6 @@ public class StreamController : ControllerBase
     }
 
     [HttpPost("end/{streamKey}")]
-    [Authorize]
     public async Task<ActionResult> EndStream(string streamKey)
     {
         try
