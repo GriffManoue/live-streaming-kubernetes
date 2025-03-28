@@ -21,8 +21,8 @@ export class StreamService extends ServiceBase {
     return this.http.get<LiveStream[]>(`${this.apiUrl}/stream`);
   }
 
-  getStreamsByUserId(userId: string): Observable<LiveStream[]> {
-    return this.http.get<LiveStream[]>(`${this.apiUrl}/stream/user/${userId}`);
+  getStreamByUserId(userId: string): Observable<LiveStream> {
+    return this.http.get<LiveStream>(`${this.apiUrl}/stream/user/${userId}`);
   }
 
   createStream(): Observable<LiveStream> {

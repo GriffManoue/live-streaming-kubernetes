@@ -55,12 +55,12 @@ public class StreamController : ControllerBase
     
     [HttpGet("user/{userId:guid}")]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<StreamDto>>> GetStreamsByUserId(Guid userId)
+    public async Task<ActionResult<StreamDto>> GetStreamByUserId(Guid userId)
     {
         try
         {
-            var streams = await _streamService.GetStreamsByUserIdAsync(userId);
-            return Ok(streams);
+            var stream = await _streamService.GetStreamByUserIdAsync(userId);
+            return Ok(stream);
         }
         catch (KeyNotFoundException ex)
         {

@@ -66,7 +66,7 @@ public class StreamService : IStreamService
         return result;
     }
 
-    public async Task<IEnumerable<StreamDto>> GetStreamsByUserIdAsync(Guid userId)
+    public async Task<StreamDto> GetStreamByUserIdAsync(Guid userId)
     {
         var user = await _userServiceClient.GetUserByIdAsync(userId);
         if (user == null)
@@ -74,10 +74,14 @@ public class StreamService : IStreamService
             throw new KeyNotFoundException($"User with ID {userId} not found");
         }
 
-        var streams = await _streamRepository.GetAllAsync();
-        var userStreams = streams.Where(s => s.User.Id == userId).ToList();
+        var stream = (await _streamRepository.GetAllAsync()).FirstOrDefault(s => s.User.Id == userId);
 
-        return userStreams.Select(s => MapToDto(s, user));
+        if (stream == null)
+        {
+            return null;
+        }
+
+        return MapToDto(stream, user);
     }
 
     public async Task<StreamDto> CreateStreamAsync(Guid? specifiedUserId = null)

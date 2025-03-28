@@ -39,15 +39,17 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit() {
-    //todo, fix params
     this.route.params.subscribe(params => {
-      const id = params['id'];
-      this.streamService.getStreamById(id).subscribe(stream => {
+      const userId = params['id'];
+      // Get stream by user ID instead of stream ID
+      this.streamService.getStreamByUserId(userId).subscribe(stream => {
         this.stream = stream;
         this.updateFormWithStreamData();
-      }); // Assuming this method exists in your service
+
+      });
     });
   }
+
 
   private initializeForm() {
     // Initialize with empty values first
@@ -80,7 +82,7 @@ export class SettingsComponent implements OnInit {
         streamDescription: this.streamForm.get('streamDescription')?.value,
         streamCategory: this.streamForm.get('streamCategory')?.value
       };
-      
+
       // Call the API to update the stream
       this.streamService.updateStream(this.stream.id, updatedStream).subscribe({
         next: (result) => {
