@@ -84,19 +84,6 @@ public class AuthService : IAuthService
         {
             // Create the stream in StreamService - pass the user object so the StreamService can use its ID
             var stream = await _streamServiceClient.CreateStreamAsync(user);
-            user.Stream = new LiveStream
-            {
-                Id = stream.Id,
-                StreamName = stream.StreamName,
-                StreamDescription = stream.StreamDescription,
-                ThumbnailUrl = stream.ThumbnailUrl,
-                StreamUrl = stream.StreamUrl,
-                StreamCategory = stream.StreamCategory,
-                Views = stream.Views
-            };
-            
-            // Update user with stream info
-            await _userRepository.UpdateAsync(user);
         }
         catch (Exception ex)
         {
