@@ -15,6 +15,9 @@ public class AuthDbContext : BaseDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+                // Configure the table name explicitly to match the database
+        modelBuilder.Entity<LiveStream>().ToTable("LiveStreams");
         
         // Configure User entity - Only include what's needed for authentication
         modelBuilder.Entity<User>()
