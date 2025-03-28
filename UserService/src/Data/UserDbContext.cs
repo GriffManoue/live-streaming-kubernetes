@@ -9,6 +9,7 @@ public class UserDbContext : BaseDbContext
     public UserDbContext(DbContextOptions<UserDbContext> options)
         : base(options)
     {
+        Database.SetQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery);
     }
 
     public DbSet<User> Users { get; set; }
@@ -17,11 +18,11 @@ public class UserDbContext : BaseDbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<User>()
-            .HasOne(u => u.Stream)
-            .WithOne(s => s.User)
-            .HasForeignKey<LiveStream>(s => s.UserId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+        //modelBuilder.Entity<User>()
+        //    .HasOne(u => u.Stream)
+        //    .WithOne(s => s.User)
+        //    .HasForeignKey<LiveStream>(s => s.UserId)
+        //    .IsRequired()
+        //    .OnDelete(DeleteBehavior.Cascade);
     }
 }
