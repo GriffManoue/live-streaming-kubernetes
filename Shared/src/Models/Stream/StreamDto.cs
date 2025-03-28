@@ -11,5 +11,6 @@ public class StreamDto
     public string? Username { get; set; }
     public string? ThumbnailUrl { get; set; }
     public string? StreamUrl { get; set; }
+    public string? StreamKey { get; set; }
     public int Views { get; set; }
 }

@@ -43,4 +43,15 @@ spec:
                 name: stream-service
                 port:
                   number: 80
+          
+          # Route to RTMPController Service
+          - path: /api/rtmp
+            pathType: Prefix
+            backend:
+              service:
+                name: stream-service
+                port:
+                  number: 80
+
+            
         

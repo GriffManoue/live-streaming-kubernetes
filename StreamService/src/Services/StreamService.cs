@@ -199,7 +199,11 @@ public class StreamService : IStreamService
         // Generate a new stream key
         var streamKey = Guid.NewGuid().ToString();
 
-        // Update the stream with the new key
+        // Store the raw stream key directly
+        // We'll use this exact key for RTMP streaming
+        stream.StreamKey = streamKey;
+        
+        // Update the stream URL for HLS playback
         stream.StreamUrl = "http://localhost:8080/hls/" + streamKey + ".m3u8";
 
         await _streamRepository.UpdateAsync(stream);
@@ -212,34 +216,38 @@ public class StreamService : IStreamService
         // Validate the stream key
         var streams = await _streamRepository.GetAllAsync();
 
-        //find the stream with the given key
-        var stream = streams.FirstOrDefault(s => s.StreamUrl == streamKey);
+        // Find the stream with the given key by matching against StreamKey property
+        var stream = streams.FirstOrDefault(s => s.StreamKey == streamKey);
 
         if (stream == null)
         {
             throw new KeyNotFoundException($"Stream with key {streamKey} not found");
         }
+
+        // Mark the stream as active
+        // You might want to update additional properties to indicate the stream is live
 
         await _cacheService.RemoveAsync("active_streams");
     }
+
     public async Task EndStreamAsync(string streamKey)
     {
         // Validate the stream key
-        var streams = _streamRepository.GetAllAsync().Result;
+        var streams = await _streamRepository.GetAllAsync();
 
-        //find the stream with the given key
-        var stream = streams.FirstOrDefault(s => s.StreamUrl == streamKey);
+        // Find the stream with the given key by matching against StreamKey property
+        var stream = streams.FirstOrDefault(s => s.StreamKey == streamKey);
 
         if (stream == null)
         {
             throw new KeyNotFoundException($"Stream with key {streamKey} not found");
         }
 
-        stream.StreamUrl = null;
+        // Stream has ended, update properties if needed
+        // We don't need to remove the StreamUrl or StreamKey, just mark the stream as inactive
         stream.Views = 0; // Reset views or any other properties as needed
 
         await _streamRepository.UpdateAsync(stream);
-
         await _cacheService.RemoveAsync("active_streams");
     }
 
@@ -254,6 +262,7 @@ public class StreamService : IStreamService
             Username = user?.Username,
             ThumbnailUrl = stream.ThumbnailUrl,
             StreamUrl = stream.StreamUrl,
+            StreamKey = stream.StreamKey,
             Views = stream.Views
         };
     }

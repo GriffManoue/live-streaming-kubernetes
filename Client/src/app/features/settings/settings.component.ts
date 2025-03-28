@@ -77,7 +77,7 @@ export class SettingsComponent implements OnInit {
       streamName: ['', Validators.required],
       streamDescription: [''],
       streamCategory: ['', Validators.required],
-      streamToken: [{ value: this.generateNewToken, disabled: true }]
+      streamToken: [{ value: '', disabled: true }]
     });
   }
 
@@ -87,8 +87,8 @@ export class SettingsComponent implements OnInit {
         streamName: this.stream.streamName,
         streamDescription: this.stream.streamDescription,
         streamCategory: this.stream.streamCategory,
-        // Keep the existing token or generate a new one if needed
-        streamToken: this.generateNewToken()
+        // Use existing stream key if available, otherwise the token field will be empty
+        streamToken: this.stream.streamKey || ''
       });
     }
   }
@@ -141,11 +141,21 @@ export class SettingsComponent implements OnInit {
     if (this.stream && this.stream.id) {
       this.streamService.generateStreamKey(this.stream.id).subscribe({
         next: (newToken) => {
+          // Update the form value
           this.streamForm.get('streamToken')?.setValue(newToken);
+          
+          // Also update the stream object to keep everything in sync
+          this.stream.streamKey = newToken;
+          
+          // Update the stream URL to reflect the new key (matching backend format)
+          this.stream.streamUrl = `http://localhost:8080/hls/${newToken}.m3u8`;
+          
           console.log('Generated new token:', newToken);
+          // TODO: Add success notification
         },
         error: (err) => {
           console.error('Error generating new token:', err);
+          // TODO: Add error notification
         }
       });
     } else {

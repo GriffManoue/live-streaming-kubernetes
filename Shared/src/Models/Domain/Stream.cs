@@ -28,6 +28,9 @@ public class LiveStream
     public string? ThumbnailUrl { get; set; }
 
     public string? StreamUrl { get; set; }
+    
+    // Add a dedicated property for stream key
+    public string? StreamKey { get; set; }
 
     public int Views { get; set; }
 

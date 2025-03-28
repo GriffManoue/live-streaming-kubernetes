@@ -8,5 +8,6 @@ export interface LiveStream {
     userId: string;
     thumbnailUrl?: string;
     streamUrl?: string;
+    streamKey?: string;
     views: number;
 }
