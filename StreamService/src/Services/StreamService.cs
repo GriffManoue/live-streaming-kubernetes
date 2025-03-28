@@ -36,7 +36,7 @@ public class StreamService : IStreamService
             throw new KeyNotFoundException($"Stream with ID {id} not found");
         }
 
-        var user = await _userServiceClient.GetUserByIdAsync(stream.User.Id);
+        var user = await _userServiceClient.GetUserByIdAsync(stream.UserId);
 
         return MapToDto(stream, user);
     }
@@ -56,8 +56,11 @@ public class StreamService : IStreamService
         var result = new List<StreamDto>();
         foreach (var stream in streams)
         {
-            var user = await _userServiceClient.GetUserByIdAsync(stream.User.Id);
-            result.Add(MapToDto(stream, user));
+            if (stream.UserId != Guid.Empty)
+            {
+                var user = await _userServiceClient.GetUserByIdAsync(stream.UserId);
+                result.Add(MapToDto(stream, user));
+            }
         }
 
         // Cache the result
@@ -99,7 +102,7 @@ public class StreamService : IStreamService
             }
 
             var streams = await _streamRepository.GetAllAsync();
-            if (streams.Any(s => s.User.Id == specifiedUserId))
+            if (streams.Any(s => s.UserId == specifiedUserId))
             {
                 throw new InvalidOperationException("User already has an active stream");
             }
@@ -125,23 +128,10 @@ public class StreamService : IStreamService
 
     public async Task<StreamDto> UpdateStreamAsync(Guid id, StreamDto streamDto)
     {
-    
         var stream = await _streamRepository.GetByIdAsync(id);
         if (stream == null)
         {
             throw new KeyNotFoundException($"Stream with ID {id} not found");
-        }
-
-        // Check if the current user is the owner of the stream
-        var currentUserId = _userContext.GetCurrentUserId();
-        if (currentUserId == Guid.Empty)
-        {
-            throw new UnauthorizedAccessException("User is not authenticated");
-        }
-
-        if (stream.User.Id != currentUserId)
-        {
-            throw new UnauthorizedAccessException("User is not authorized to update this stream");
         }
 
         // Update stream properties
@@ -174,7 +164,7 @@ public class StreamService : IStreamService
         // Invalidate cache
         await _cacheService.RemoveAsync("active_streams");
 
-        var user = await _userServiceClient.GetUserByIdAsync(stream.User.Id);
+        var user = await _userServiceClient.GetUserByIdAsync(stream.UserId);
 
         return MapToDto(stream, user);
     }

@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { ServiceBase } from './service-base';
 import { HttpClient } from '@angular/common/http';
 import { LiveStream } from '../models/stream/stream';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +35,9 @@ export class StreamService extends ServiceBase {
   }
 
   generateStreamKey(id: string): Observable<string> {
-    return this.http.post<string>(`${this.apiUrl}/stream/${id}/generateStreamKey`, {});
+    return this.http.post<{ streamKey: string }>(`${this.apiUrl}/stream/${id}/generateStreamKey`, {})
+      .pipe(
+        map(response => response.streamKey)
+      );
   }
 }
