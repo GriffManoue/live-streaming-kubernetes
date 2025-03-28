@@ -53,6 +53,10 @@ public class UserService : IUserService
 
     public async Task<UserDTO> GetUserByIdAsync(Guid id)
     {
+        Console.WriteLine($"Fetching user with ID: {id}");
+        if(id == Guid.Empty)
+            throw new ArgumentException("User ID cannot be empty", nameof(id));
+        
         var user = await _userRepository.GetByIdWithIncludesAsync(id, u => u.Followers, u => u.Following)
             ?? throw new KeyNotFoundException($"User with ID {id} not found");
 
