@@ -74,10 +74,14 @@ public class StreamService : IStreamService
             throw new KeyNotFoundException($"User with ID {userId} not found");
         }
 
-        var stream = (await _streamRepository.GetAllAsync()).FirstOrDefault(s => s.User.Id == userId);
+        var streams = await _streamRepository.GetAllAsync();
+        
+        // Find stream where the UserId property matches instead of accessing User.Id which might be null
+        var stream = streams.FirstOrDefault(s => s.UserId == userId);
 
         if (stream == null)
         {
+            // Return null instead of throwing an exception for not finding a stream
             return null;
         }
 

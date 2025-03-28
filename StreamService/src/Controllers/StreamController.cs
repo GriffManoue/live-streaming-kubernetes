@@ -60,6 +60,10 @@ public class StreamController : ControllerBase
         try
         {
             var stream = await _streamService.GetStreamByUserIdAsync(userId);
+            if (stream == null)
+            {
+                return NotFound($"No stream found for user with ID {userId}");
+            }
             return Ok(stream);
         }
         catch (KeyNotFoundException ex)

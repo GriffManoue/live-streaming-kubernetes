@@ -41,15 +41,35 @@ export class SettingsComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       const userId = params['id'];
-      // Get stream by user ID instead of stream ID
-      this.streamService.getStreamByUserId(userId).subscribe(stream => {
-        this.stream = stream;
-        this.updateFormWithStreamData();
-
+      // Get stream by user ID
+      this.streamService.getStreamByUserId(userId).subscribe({
+        next: (stream) => {
+          this.stream = stream;
+          this.updateFormWithStreamData();
+        },
+        error: (error) => {
+          console.error('Error fetching stream:', error);
+          // Create a new stream if none exists (404 Not Found)
+          if (error.status === 404) {
+            this.createNewStream(userId);
+          }
+        }
       });
     });
   }
 
+  private createNewStream(userId: string) {
+    this.streamService.createStream().subscribe({
+      next: (newStream) => {
+        this.stream = newStream;
+        this.updateFormWithStreamData();
+        console.log('Created new stream:', newStream);
+      },
+      error: (error) => {
+        console.error('Error creating new stream:', error);
+      }
+    });
+  }
 
   private initializeForm() {
     // Initialize with empty values first
