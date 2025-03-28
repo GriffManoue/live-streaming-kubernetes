@@ -99,11 +99,13 @@ public class StreamService : IStreamService
             var stream = new LiveStream
             {
                 Id = Guid.NewGuid(),
+                UserId = specifiedUserId.Value, // Set the required UserId property
                 StreamName = "New Stream",
                 StreamDescription = "Stream Description",
                 StreamCategory = StreamCategory.Gaming,
                 ThumbnailUrl = "",
                 StreamUrl = "",
+                Views = 0
             };
 
             await _streamRepository.AddAsync(stream);
