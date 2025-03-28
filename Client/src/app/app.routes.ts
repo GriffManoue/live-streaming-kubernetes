@@ -11,8 +11,8 @@ export const routes: Routes = [
   { path: 'home', component: RecommendationComponent, canActivate: [AuthGuard] },
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'stream/:streamId', component: StreamComponent }, //canActivate: [AuthGuard]
-  { path: 'settings/:id', component: SettingsComponent}, // Lazy load settings component
+  { path: 'stream/:streamId', component: StreamComponent, canActivate: [AuthGuard] }, //canActivate: [AuthGuard]
+  { path: 'settings/:id', component: SettingsComponent, canActivate: [AuthGuard]}, // Lazy load settings component
   { path: '**', redirectTo: ''} // Redirect to home if no other route matches
   //todo : add 404 page
   //todo: lazy load other components add modules and change maxbundlesize in angular.json
