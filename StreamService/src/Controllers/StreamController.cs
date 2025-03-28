@@ -138,7 +138,7 @@ public class StreamController : ControllerBase
         try
         {
             var streamKey = await _streamService.GenerateStreamKeyAsync(id);
-            return Ok(streamKey);
+            return Ok(new { streamKey });  // Return as JSON object with property name
         }
         catch (KeyNotFoundException ex)
         {
