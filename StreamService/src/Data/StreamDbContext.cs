@@ -17,7 +17,7 @@ public class StreamDbContext : BaseDbContext
         base.OnModelCreating(modelBuilder);
 
         // Configure the table name explicitly to match the database
-        modelBuilder.Entity<LiveStream>().ToTable("Streams");
+        modelBuilder.Entity<LiveStream>().ToTable("LiveStreams");
         
         // Configure User entity table name
         modelBuilder.Entity<User>().ToTable("Users");

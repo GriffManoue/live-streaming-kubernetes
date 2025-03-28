@@ -16,9 +16,6 @@ public class UserDbContext : BaseDbContext
     {
         base.OnModelCreating(modelBuilder);
         
-        // Configure table names explicitly to match the database
-        modelBuilder.Entity<LiveStream>().ToTable("Streams");
-        
         // Configure User entity
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Username)
@@ -33,11 +30,5 @@ public class UserDbContext : BaseDbContext
             .HasMany(u => u.Followers)
             .WithMany(u => u.Following)
             .UsingEntity(j => j.ToTable("UserFollowers"));
-
-        // Configure the User side of one-to-one relationship with LiveStream
-        modelBuilder.Entity<User>()
-            .HasOne(u => u.Stream)
-            .WithOne(s => s.User)
-            .HasForeignKey<LiveStream>(s => s.UserId);
     }
 }
