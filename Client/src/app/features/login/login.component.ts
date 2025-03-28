@@ -83,13 +83,6 @@ export class LoginComponent implements OnInit {
 
     // Form values
     const formValues = this.loginForm.value;
-
-    if (formValues.username === "demo") {
-      this.loginService.login("demo-token", formValues.rememberMe);
-      this.router.navigate(['/home']);
-      return;
-    }
-    
     this.loginError = false;
 
     let loginRequest: LoginRequest = {
@@ -97,14 +90,17 @@ export class LoginComponent implements OnInit {
       password: formValues.password,
     }
 
-    
     this.authService.login(loginRequest).subscribe({
       next: (response: AuthResult) => {
         this.loginError = false;
-        // Assuming response contains a userId property; adjust as needed based on actual API response
-        const userId = response.userId || 'user-1';
-        this.loginService.login(response.token ?? '', formValues.rememberMe, userId);
+        const userId = response.userId;
+        if(response.token){
+        this.loginService.login(response.token, formValues.rememberMe, userId);
         this.router.navigate(['/home']);
+        }else{
+          this.loginError = true;
+          this.errorMessage = 'Invalid username or password';
+        }
       },
       error: (error) => {
         this.loginError = true;
