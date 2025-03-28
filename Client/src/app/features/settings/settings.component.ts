@@ -33,7 +33,10 @@ export class SettingsComponent implements OnInit {
   stream!: LiveStream;
   categories = Object.keys(StreamCategories);
 
-  constructor(private fb: FormBuilder, private route: ActivatedRoute, private streamService: StreamService) { }
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private streamService: StreamService) {
+    // Initialize form with default values
+    this.initializeForm();
+  }
 
   ngOnInit() {
     //todo, fix params
@@ -41,23 +44,61 @@ export class SettingsComponent implements OnInit {
       const id = params['id'];
       this.streamService.getStreamById(id).subscribe(stream => {
         this.stream = stream;
-        this.initForm();
+        this.updateFormWithStreamData();
       }); // Assuming this method exists in your service
     });
   }
 
-  initForm() {
+  private initializeForm() {
+    // Initialize with empty values first
     this.streamForm = this.fb.group({
-      streamName: [this.stream.streamName, Validators.required],
-      streamDescription: [this.stream.streamDescription],
-      streamCategory: [this.stream.streamCategory, Validators.required],
-      streamToken: [{ value: this.generateTokenIfEmpty(), disabled: true }]
+      streamName: ['', Validators.required],
+      streamDescription: [''],
+      streamCategory: ['', Validators.required],
+      streamToken: [{ value: this.generateNewToken, disabled: true }]
     });
   }
 
+  private updateFormWithStreamData() {
+    if (this.stream) {
+      this.streamForm.patchValue({
+        streamName: this.stream.streamName,
+        streamDescription: this.stream.streamDescription,
+        streamCategory: this.stream.streamCategory,
+        // Keep the existing token or generate a new one if needed
+        streamToken: this.generateNewToken()
+      });
+    }
+  }
+
   onSubmit() {
-    console.log(this.streamForm.value);
-    // TODO: Send to API
+    if (this.streamForm.valid && this.stream && this.stream.id) {
+      // Get form values
+      const updatedStream: LiveStream = {
+        ...this.stream,
+        streamName: this.streamForm.get('streamName')?.value,
+        streamDescription: this.streamForm.get('streamDescription')?.value,
+        streamCategory: this.streamForm.get('streamCategory')?.value
+      };
+      
+      // Call the API to update the stream
+      this.streamService.updateStream(this.stream.id, updatedStream).subscribe({
+        next: (result) => {
+          console.log('Stream updated successfully', result);
+          // TODO: Add success notification
+        },
+        error: (error) => {
+          console.error('Error updating stream', error);
+          // TODO: Add error notification
+        }
+      });
+    } else {
+      // Mark all fields as touched to trigger validation
+      Object.keys(this.streamForm.controls).forEach(key => {
+        const control = this.streamForm.get(key);
+        control?.markAsTouched();
+      });
+    }
   }
 
   copyToken() {
@@ -75,19 +116,18 @@ export class SettingsComponent implements OnInit {
   }
 
   generateNewToken() {
-    // In a real app, this would call an API to generate a secure token
-    const newToken = 'stream_' + Math.random().toString(36).substring(2, 15);
-    this.streamForm.get('streamToken')?.setValue(newToken);
-    // TODO: Save the new token to the backend
-    console.log('Generated new token:', newToken);
-  }
-
-  private generateTokenIfEmpty(): string {
-    // Check if the stream already has a token
-    //todo
-    
-    // Generate a placeholder token for demo purposes
-    // In production, this should come from the backend
-    return 'stream_' + Math.random().toString(36).substring(2, 15);
+    if (this.stream && this.stream.id) {
+      this.streamService.generateStreamKey(this.stream.id).subscribe({
+        next: (newToken) => {
+          this.streamForm.get('streamToken')?.setValue(newToken);
+          console.log('Generated new token:', newToken);
+        },
+        error: (err) => {
+          console.error('Error generating new token:', err);
+        }
+      });
+    } else {
+      console.error('Cannot generate token: Stream ID is missing');
+    }
   }
 }
