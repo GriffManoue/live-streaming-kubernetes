@@ -47,7 +47,7 @@ export class TopBarComponent {
           {
             label: 'Home',
             icon: 'pi pi-video',
-            routerLink: '/',
+            routerLink: '/home',
             routerLinkActiveOptions: { exact: true }
           },
           {
