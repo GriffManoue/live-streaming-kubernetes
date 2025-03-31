@@ -7,6 +7,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TagModule } from 'primeng/tag';
 import { AvatarModule } from 'primeng/avatar';
 import { StreamService } from '../../services/stream.service';
+import { UserService } from '../../services/user.service';
 import { LiveStream } from '../../models/stream/stream';
 import { StreamCategoryKey } from '../../models/enums/stream-categories';
 
@@ -32,6 +33,8 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
 
   streamId: string | null = null;
   streamData: LiveStream | null = null;
+  username: string = 'Unknown user';
+  userInitial: string = 'U';
 
   loading: boolean = true;
   error: string | null = null;
@@ -39,7 +42,8 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private route: ActivatedRoute,
-    private streamService: StreamService
+    private streamService: StreamService,
+    private userService: UserService
   ) { }
 
   ngOnInit(): void {
@@ -51,8 +55,21 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
           this.streamData = data;
           this.loading = false;
           
+          // Fetch username from UserService using the stream's userId
+          if (this.streamData.userId) {
+            this.userService.getUserById(this.streamData.userId).subscribe({
+              next: (user) => {
+                this.username = user.username || 'Unknown user';
+                this.userInitial = this.username.charAt(0).toUpperCase();
+              },
+              error: (err) => {
+                console.error('Error fetching user:', err);
+                // Keep default values for username and userInitial
+              }
+            });
+          }
+          
           // Initialize player after data is loaded
-          // We need to check if AfterViewInit has already run
           setTimeout(() => {
             if (this.videoElement) {
               this.initPlayer();
@@ -151,7 +168,9 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
         }
 
         // Load the stream
-        await this.player.load(this.streamData.streamUrl);
+        const streamUrl = "https://localhost:8080/hls/d935b49a-af65-4e1d-bb7a-00ecb0565371.m3u8"; // Replace with actual stream URL
+        //const streamUrl = "https://nginx-rtmp-service/hls/d935b49a-af65-4e1d-bb7a-00ecb0565371.m3u8";
+        await this.player.load(streamUrl);
         console.log('Stream loaded successfully');
       } catch (error) {
         console.error('Error loading the stream:', error);
