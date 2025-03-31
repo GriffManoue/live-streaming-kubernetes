@@ -168,7 +168,7 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
         }
 
         // Load the stream
-        const streamUrl = "http://nginx-rtmp-service/hls/d935b49a-af65-4e1d-bb7a-00ecb0565371.m3u8";
+        const streamUrl = "http://localhost:8080/hls/d935b49a-af65-4e1d-bb7a-00ecb0565371.m3u8";
         await this.player.load(streamUrl);
         console.log('Stream loaded successfully');
       } catch (error) {
