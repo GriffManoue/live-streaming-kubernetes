@@ -34,7 +34,6 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
 
   streamId: string | null = null;
   streamData: LiveStream | null = null;
-  user : User | null = null;
 
   loading: boolean = true;
   error: string | null = null;
@@ -42,8 +41,7 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private route: ActivatedRoute,
-    private streamService: StreamService,
-    private userService: UserService
+    private streamService: StreamService
   ) { }
 
   ngOnInit(): void {
@@ -55,16 +53,6 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
           this.streamData = data;
           console.log('Stream data:', this.streamData);
           this.loading = false;
-
-          this.userService.getUserById(this.streamData?.userId).subscribe({
-            next: (data) => {
-              this.user = data;
-              console.log('User data:', this.user);
-            },
-            error: (err) => {
-              console.error('Error fetching user:', err);
-            }
-          });
         },
         error: (err) => {
           this.error = 'Could not load stream';
@@ -134,7 +122,6 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
         this.player.addEventListener('error', this.onPlayerError.bind(this));
      
         // Load the stream
-        const streamUrl = "http://localhost:8080/hls/d935b49a-af65-4e1d-bb7a-00ecb0565371.m3u8"; // Replace with actual stream URL
         await this.player.load(this.streamData?.streamUrl);
         console.log('Stream loaded successfully');
       } catch (error) {
