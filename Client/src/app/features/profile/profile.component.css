@@ -1,0 +1,117 @@
+.profile-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Align items to the top */
+  min-height: calc(100vh - 4rem); /* Adjust for top bar */
+  background-color: var(--surface-ground);
+  padding: 2rem;
+  /* Account for the top bar height */
+  padding-top: calc(4rem + 2rem); /* Add padding for top bar */
+  margin-left: 280px; /* Account for sidebar */
+}
+
+.profile-card-container {
+  width: 100%;
+  max-width: 700px; /* Adjust width as needed */
+}
+
+.profile-card {
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+  padding: 1.5rem 0;
+  background-color: var(--surface-card);
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+}
+
+:host ::ng-deep .p-card .p-card-content {
+  padding: 1.5rem;
+}
+
+:host ::ng-deep .p-password input {
+  width: 100%;
+}
+
+/* Support for PrimeNG grid layout */
+:host ::ng-deep .grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -0.5rem;
+  margin-left: -0.5rem;
+  margin-top: -0.5rem;
+}
+
+:host ::ng-deep .col-12,
+:host ::ng-deep .md\:col-6 { /* Target md breakpoint specifically */
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .col-12 {
+  width: 100%;
+}
+
+@media (min-width: 768px) { /* Apply 50% width only on medium screens and up */
+  :host ::ng-deep .md\:col-6 {
+    width: 50%;
+  }
+}
+
+
+.text-primary {
+  color: var(--primary-color);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 992px) { /* Adjust breakpoint for sidebar */
+  .profile-container {
+    margin-left: 0; /* Remove margin when sidebar might be hidden or smaller */
+    padding-left: 2rem; /* Restore padding */
+    padding-right: 2rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  :host ::ng-deep .md\:col-6 { /* Stack columns on smaller screens */
+     width: 100%;
+  }
+}
+
+
+@media screen and (max-width: 576px) {
+  .profile-card-container {
+    max-width: 100%;
+  }
+   .profile-container {
+     padding-top: calc(4rem + 1rem); /* Reduce top padding slightly */
+     padding-left: 1rem;
+     padding-right: 1rem;
+   }
+}

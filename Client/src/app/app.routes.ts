@@ -5,6 +5,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { RegisterComponent } from './features/register/register.component';
 import { StreamComponent } from './features/stream/stream.component';
 import { SettingsComponent } from './features/settings/settings.component';
+import { ProfileComponent } from './features/profile/profile.component'; // Import ProfileComponent
 
 export const routes: Routes = [
   { path: '', component: LoginComponent},
@@ -13,6 +14,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'stream/:streamId', component: StreamComponent, canActivate: [AuthGuard] }, //canActivate: [AuthGuard]
   { path: 'settings/:id', component: SettingsComponent, canActivate: [AuthGuard]}, // Lazy load settings component
+  { path: 'profile/:id', component: ProfileComponent}, // canActivate: [AuthGuard]  Add profile route
   { path: '**', redirectTo: ''} // Redirect to home if no other route matches
   //todo : add 404 page
   //todo: lazy load other components add modules and change maxbundlesize in angular.json
