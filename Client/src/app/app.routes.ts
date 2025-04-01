@@ -2,11 +2,6 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './features/login/login.component';
 import { AuthGuard } from './guards/auth.guard';
 import { RegisterComponent } from './features/register/register.component';
-// Remove direct component imports for lazy-loaded routes
-// import { RecommendationComponent } from './features/recommendation/recommendation.component';
-// import { StreamComponent } from './features/stream/stream.component';
-// import { SettingsComponent } from './features/settings/settings.component';
-// import { ProfileComponent } from './features/profile/profile.component';
 
 export const routes: Routes = [
   // Keep non-lazy routes as they are
@@ -33,10 +28,8 @@ export const routes: Routes = [
   {
     path: 'profile/:id',
     loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent),
-    canActivate: [AuthGuard] // Apply AuthGuard here as well
+    canActivate: [AuthGuard]
   },
 
-  // Wildcard route remains the same
-  { path: '**', redirectTo: 'home'} // Redirect to home (or login if preferred) for unknown routes
-  //todo : add 404 page
+  { path: '**', redirectTo: 'home'} // Redirect to home 
 ];
