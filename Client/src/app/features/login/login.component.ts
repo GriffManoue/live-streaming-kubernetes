@@ -14,6 +14,7 @@ import { LoginService } from '../../services/login.service';
 import { AuthService } from '../../services/auth.service';
 import { LoginRequest } from '../../models/auth/login-request';
 import { AuthResult } from '../../models/auth/auth-result';
+import { MessageService } from 'primeng/api'; // Import MessageService
 
 @Component({
   selector: 'app-login',
@@ -41,10 +42,11 @@ export class LoginComponent implements OnInit {
   loading: boolean = false;
 
   constructor(
-    private router: Router, 
+    private router: Router,
     private fb: FormBuilder,
     private authService: AuthService,
-    private loginService: LoginService
+    private loginService: LoginService,
+    private messageService: MessageService // Inject MessageService
   ) {}
 
   ngOnInit() {
@@ -76,14 +78,16 @@ export class LoginComponent implements OnInit {
     });
 
     if (this.loginForm.invalid) {
-      this.loginError = true;
+      this.loginError = true; // Keep inline error if desired
       this.errorMessage = 'Please correct the form errors';
+      this.messageService.add({ severity: 'warn', summary: 'Validation Error', detail: 'Please check the form for errors.' }); // Add toast
       return;
     }
 
     // Form values
     const formValues = this.loginForm.value;
     this.loginError = false;
+    this.loading = true; // Start loading indicator
 
     let loginRequest: LoginRequest = {
       username: formValues.username,
@@ -92,19 +96,26 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(loginRequest).subscribe({
       next: (response: AuthResult) => {
+        this.loading = false; // Stop loading indicator
         this.loginError = false;
         const userId = response.userId;
         if(response.token){
-        this.loginService.login(response.token, formValues.rememberMe, userId);
-        this.router.navigate(['/home']);
+          this.loginService.login(response.token, formValues.rememberMe, userId);
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Login successful!' }); // Success toast
+          // Navigate after a short delay to allow toast visibility
+          setTimeout(() => this.router.navigate(['/home']), 500);
         }else{
           this.loginError = true;
           this.errorMessage = 'Invalid username or password';
+          this.messageService.add({ severity: 'error', summary: 'Login Failed', detail: 'Invalid username or password.' }); // Error toast
         }
       },
       error: (error) => {
+        this.loading = false; // Stop loading indicator
         this.loginError = true;
-        this.errorMessage = 'Invalid username or password';
+        const detail = error?.error?.message || 'Invalid username or password';
+        this.errorMessage = detail;
+        this.messageService.add({ severity: 'error', summary: 'Login Failed', detail: detail }); // Error toast
       }
     });
   }

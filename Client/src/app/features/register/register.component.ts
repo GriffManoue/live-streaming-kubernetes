@@ -13,6 +13,7 @@ import { MessageModule } from 'primeng/message';
 import { LoginService } from '../../services/login.service';
 import { AuthService } from '../../services/auth.service';
 import { RegisterRequest } from '../../models/auth/register-request';
+import { MessageService } from 'primeng/api'; // Import MessageService
 
 @Component({
   selector: 'app-register',
@@ -40,10 +41,11 @@ export class RegisterComponent implements OnInit {
   loading: boolean = false;
 
   constructor(
-    private router: Router, 
-    private loginService: LoginService,
+    private router: Router,
+    private loginService: LoginService, // Keep if needed, otherwise remove
     private authService: AuthService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private messageService: MessageService // Inject MessageService
   ) {}
 
   ngOnInit(): void {
@@ -83,17 +85,19 @@ export class RegisterComponent implements OnInit {
     });
 
     if (this.registerForm.invalid) {
+      this.registerError = true; // Keep inline error if desired
       if (this.registerForm.errors?.['passwordMismatch']) {
-        this.registerError = true;
         this.errorMessage = 'Passwords do not match';
+        this.messageService.add({ severity: 'warn', summary: 'Validation Error', detail: 'Passwords do not match.' }); // Add toast
       } else {
-        this.registerError = true;
         this.errorMessage = 'Please correct the form errors';
+        this.messageService.add({ severity: 'warn', summary: 'Validation Error', detail: 'Please check the form for errors.' }); // Add toast
       }
       return;
     }
 
     this.registerError = false;
+    this.loading = true; // Start loading indicator
 
     // Form values
     const formValues = this.registerForm.value;
@@ -108,14 +112,18 @@ export class RegisterComponent implements OnInit {
 
     this.authService.register(registerRequest).subscribe({
       next: (response) => {
+        this.loading = false; // Stop loading indicator
         this.registerError = false;
-
-        // Handle successful registration
-        this.router.navigate(['/login']);
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Registration successful! Please log in.' }); // Success toast
+        // Navigate after a short delay
+        setTimeout(() => this.router.navigate(['/login']), 1000);
       },
       error: (error) => {
+        this.loading = false; // Stop loading indicator
         this.registerError = true;
-        this.errorMessage = error.error.message || 'Registration failed';
+        const detail = error?.error?.message || 'Registration failed';
+        this.errorMessage = detail;
+        this.messageService.add({ severity: 'error', summary: 'Registration Failed', detail: detail }); // Error toast
       }
     });
 
