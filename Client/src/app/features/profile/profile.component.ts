@@ -11,6 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 import { PasswordModule } from 'primeng/password';
 import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
+import { MessageService } from 'primeng/api'; 
 
 @Component({
   selector: 'app-profile',
@@ -36,8 +37,12 @@ export class ProfileComponent implements OnInit {
   profileError = false;
   errorMessage = '';
 
-  // TODO: Inject UserService when available
-  constructor(private fb: FormBuilder, private route: ActivatedRoute , private userService: UserService ) {
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private userService: UserService,
+    private messageService: MessageService 
+  ) {
     this.initializeForm();
   }
 
@@ -97,7 +102,8 @@ export class ProfileComponent implements OnInit {
       error: (err) => {
         console.error('Error fetching user data:', err);
         this.errorMessage = 'Failed to load user data.';
-        this.profileError = true;
+        this.profileError = true; 
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load user data.' }); // Show toast
         this.loading = false;
       }
     });
@@ -122,32 +128,37 @@ export class ProfileComponent implements OnInit {
       Object.keys(this.profileForm.controls).forEach(key => {
         this.profileForm.get(key)?.markAsTouched();
       });
+      this.messageService.add({ severity: 'warn', summary: 'Validation Error', detail: 'Please check the form for errors.' });
       return;
     }
 
     this.loading = true;
     const updatedUserData = {
-      ...this.user, 
+      ...this.user,
       username: this.f['username'].value,
       email: this.f['email'].value,
       firstName: this.f['firstName'].value,
       lastName: this.f['lastName'].value,
-      password: this.f['password'].value 
+      ...(this.f['password'].value && { password: this.f['password'].value })
     };
 
-    console.log('Submitting updated user data:', updatedUserData); 
+
+    console.log('Submitting updated user data:', updatedUserData);
     this.userService.updateUser(this.userId, updatedUserData).subscribe({
         next: (result) => {
           console.log('Profile updated successfully', result);
           this.loading = false;
-          // TODO: Add success notification
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Profile updated successfully!' }); 
+          this.profileForm.get('password')?.reset('');
+          this.profileForm.get('confirmPassword')?.reset('');
         },
         error: (error) => {
           console.error('Error updating profile', error);
-          this.errorMessage = 'Failed to update profile. Please try again.';
+          const detail = error?.error?.message || 'Failed to update profile. Please try again.'; 
+          this.errorMessage = detail;
           this.profileError = true;
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: detail });
           this.loading = false;
-          // TODO: Add error notification
         }
       });
   }
