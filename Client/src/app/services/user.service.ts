@@ -15,31 +15,31 @@ export class UserService extends ServiceBase {
   }
 
   getUserById(id: string): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/api/user/${id}`);
+    return this.http.get<User>(`${this.apiUrl}/user/${id}`);
   }
 
   getUserByUsername(username: string): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/api/user/username/${username}`);
+    return this.http.get<User>(`${this.apiUrl}/user/username/${username}`);
   }
 
   updateUser(id: string, user: User): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/api/user/${id}`, user);
+    return this.http.put<User>(`${this.apiUrl}/user/${id}`, user);
   }
 
   getFollowers(id: string): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/api/user/${id}/followers`);
+    return this.http.get<User[]>(`${this.apiUrl}/user/${id}/followers`);
   }
 
   getFollowing(id: string): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/api/user/${id}/following`);
+    return this.http.get<User[]>(`${this.apiUrl}/user/${id}/following`);
   }
 
   followUser(request: FollowRequest): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/api/user/follow`, request);
+    return this.http.post<any>(`${this.apiUrl}/user/follow`, request);
   }
 
   unfollowUser(request: FollowRequest): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/api/user/unfollow`, request);
+    return this.http.post<any>(`${this.apiUrl}/user/unfollow`, request);
   }
 
 }
