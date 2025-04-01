@@ -1,16 +1,30 @@
-# Client
+# KubeStream Client (Angular Frontend)
+
+This is the Angular frontend application for the **Live Streaming Kubernetes Application**. It provides the user interface for interacting with the platform.
+
+For details on the overall project architecture, backend services, and setup instructions for the entire application (including backend and infrastructure), please refer to the [main project README](../README.md).
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.3.
 
+## Key Features
+
+-   User Registration and Login
+-   Browsing active live streams
+-   Viewing live streams using HLS (via Shaka Player)
+-   User profile and stream settings management (including generating stream keys)
+-   (Planned: Following users, chat, etc.)
+
 ## Development server
 
-To start a local development server, run:
+Ensure the backend services are running (see main README). Then, to start the local development server for the client:
 
 ```bash
+# Navigate to this directory (Client/) if you aren't already here
+npm install # If you haven't installed dependencies yet
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files. 
 
 ## Code scaffolding
 
