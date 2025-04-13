@@ -139,21 +139,17 @@ export class ProfileComponent implements OnInit {
       email: this.f['email'].value,
       firstName: this.f['firstName'].value,
       lastName: this.f['lastName'].value,
-      ...(this.f['password'].value && { password: this.f['password'].value })
+      password: this.f['password'].value,
     };
 
-
-    console.log('Submitting updated user data:', updatedUserData);
     this.userService.updateUser(this.userId, updatedUserData).subscribe({
         next: (result) => {
-          console.log('Profile updated successfully', result);
           this.loading = false;
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Profile updated successfully!' }); 
           this.profileForm.get('password')?.reset('');
           this.profileForm.get('confirmPassword')?.reset('');
         },
         error: (error) => {
-          console.error('Error updating profile', error);
           const detail = error?.error?.message || 'Failed to update profile. Please try again.'; 
           this.errorMessage = detail;
           this.profileError = true;

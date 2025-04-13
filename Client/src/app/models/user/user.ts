@@ -6,4 +6,5 @@ export interface User {
     lastName?: string;
     createdAt: Date;
     isLive: boolean;
+    password?: string;
 }

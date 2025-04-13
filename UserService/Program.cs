@@ -30,6 +30,7 @@ builder.Services.AddScoped<IRepository<User>, Repository<User>>();
 
 // Add application services
 builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
+builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 
 // Add OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();

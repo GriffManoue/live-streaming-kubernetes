@@ -10,12 +10,14 @@ namespace UserService.Services;
 public class UserService : IUserService
 {
     private readonly IRepository<User> _userRepository;
+    private readonly IPasswordHasher _passwordHasher;
     
-    public UserService(IRepository<User> userRepository)
+    public UserService(IRepository<User> userRepository, IPasswordHasher passwordHasher)
     {
+        _passwordHasher = passwordHasher;
         _userRepository = userRepository;
     }
-
+    
     public async Task FollowUserAsync(Guid followerId, Guid followingId)
     {
         if (followerId == followingId)
@@ -102,7 +104,7 @@ public class UserService : IUserService
         // Update user properties (except relationships)
         user.Username = userDto.Username;
         user.Email = userDto.Email;
-        // Don't update password here - should be done through a separate secured method
+        user.Password = _passwordHasher.HashPassword(userDto.Password);
         user.FirstName = userDto.FirstName;
         user.LastName = userDto.LastName;
         user.IsLive = userDto.IsLive;

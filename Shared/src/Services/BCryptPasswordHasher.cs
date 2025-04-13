@@ -1,6 +1,6 @@
 using Shared.Interfaces;
 
-namespace AuthService.Services;
+namespace Shared.Services;
 
 public class BCryptPasswordHasher : IPasswordHasher
 {
