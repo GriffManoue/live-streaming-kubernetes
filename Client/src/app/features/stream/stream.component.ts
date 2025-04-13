@@ -150,12 +150,12 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
     this.error = 'Error playing the stream: ' + event.detail.code;
   }
 
-  public followUser(userId: string): void {
+  public followUser(): void {
 
     let user: User = JSON.parse(localStorage.getItem('user') || '{}');
     let followRequest: FollowRequest = {
       followerId: user.id,
-      followingId: userId
+      followingId: this.streamData?.userId || ''
     }
 
     this.userService.followUser(followRequest).subscribe({
@@ -168,12 +168,12 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     });
   }
-  public unfollowUser(userId: string): void {
+  public unfollowUser(): void {
     let user : User = JSON.parse(localStorage.getItem('user') || '{}');
 
     let followRequest: FollowRequest = {
       followerId: user.id,
-      followingId: userId
+      followingId: this.streamData?.userId || ''
     }
     this.userService.unfollowUser(followRequest).subscribe({
       next: () => {
