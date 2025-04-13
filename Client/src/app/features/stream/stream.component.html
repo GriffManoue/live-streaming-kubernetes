@@ -32,9 +32,9 @@
 
             <div class="flex items-center gap-3 mb-3">
               <div class="flex items-center">
-                <p-avatar [label]="streamData.username"
-                          styleClass="mr-2"
-                          shape="circle"></p-avatar>
+                <p-avatar [label]="streamData.username.charAt(0)"
+                      styleClass="mr-2"
+                      shape="circle"></p-avatar>
                 <span class="font-semibold">{{ streamData.username }}</span>
               </div>
 

@@ -58,13 +58,13 @@ export class TopBarComponent {
     {
       label: 'Profile',
       icon: 'pi pi-user',
-      routerLink: '/profile/' + this.userId,
+      routerLink: ['/profile', this.userId],
       routerLinkActiveOptions: { exact: true }
     },
     {
       label: 'Settings',
       icon: 'pi pi-cog',
-      routerLink: '/settings' + this.userId,
+      routerLink: ['/settings', this.userId],
       routerLinkActiveOptions: { exact: true }
     },
     {
