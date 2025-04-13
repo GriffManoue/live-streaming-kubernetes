@@ -158,6 +158,7 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
       followingId: this.streamData?.userId || ''
     }
 
+    console.log ('Follow request:', followRequest);
     this.userService.followUser(followRequest).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Successfully followed user!' });
@@ -175,6 +176,8 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
       followerId: user.id,
       followingId: this.streamData?.userId || ''
     }
+
+    console.log ('Unfollow request:', followRequest);
     this.userService.unfollowUser(followRequest).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Successfully unfollowed user!' });
