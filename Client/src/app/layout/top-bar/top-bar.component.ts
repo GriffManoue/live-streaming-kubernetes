@@ -10,6 +10,7 @@ import { StreamCategories } from '../../models/enums/stream-categories';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
 import { LoginService } from '../../services/login.service';
+import { SplitButtonModule } from 'primeng/splitbutton';
 
 @Component({
   selector: 'app-top-bar',
@@ -22,7 +23,8 @@ import { LoginService } from '../../services/login.service';
     InputTextModule,
     AvatarModule,
     ToggleSwitchModule,
-    FormsModule
+    FormsModule,
+    SplitButtonModule
   ],
   templateUrl: './top-bar.component.html',
   styleUrl: './top-bar.component.css'
@@ -31,7 +33,52 @@ export class TopBarComponent {
   isLoggedIn: boolean = false;
   userId: string = '';
   
-  items: MenuItem[] = []; // Menu items for the top bar
+  items: MenuItem[] = [
+    {
+      label: 'Home',
+      icon: 'pi pi-video',
+      routerLink: '/home',
+      routerLinkActiveOptions: { exact: true }
+    },
+    {
+      label: 'Categories',
+      icon: 'pi pi-list',
+      routerLink: '/categories',
+      routerLinkActiveOptions: { exact: true },
+      items: Object.values(StreamCategories).map(category => ({
+        label: category.name,
+        icon: category.icon,
+        routerLink: `/categories/${category.name.toLowerCase()}`,
+        routerLinkActiveOptions: { exact: true }
+      }))
+
+    }
+  ];
+  userMenuItems: MenuItem[] = [
+    {
+      label: 'Profile',
+      icon: 'pi pi-user',
+      routerLink: '/profile',
+      routerLinkActiveOptions: { exact: true }
+    },
+    {
+      label: 'Settings',
+      icon: 'pi pi-cog',
+      routerLink: '/settings',
+      routerLinkActiveOptions: { exact: true }
+    },
+    {
+      label: 'Logout',
+      icon: 'pi pi-sign-out',
+      command: () => {
+        this.loginService.logout();
+        this.isLoggedIn = false;
+        this.userId = '';
+        localStorage.removeItem('user'); // Clear user data from local storage
+      }
+    }
+
+  ];
   isDarkMode: boolean; // Initialize dark mode state
   
   
@@ -42,28 +89,6 @@ export class TopBarComponent {
         // Get the user ID from localStorage
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         this.userId = user.id || '';
-        
-        this.items = [
-          {
-            label: 'Home',
-            icon: 'pi pi-video',
-            routerLink: '/home',
-            routerLinkActiveOptions: { exact: true }
-          },
-          {
-            label: 'Categories',
-            icon: 'pi pi-list',
-            routerLink: '/categories',
-            routerLinkActiveOptions: { exact: true },
-            items: Object.values(StreamCategories).map(category => ({
-              label: category.name,
-              icon: category.icon,
-              routerLink: `/categories/${category.name.toLowerCase()}`,
-              routerLinkActiveOptions: { exact: true }
-            }))
-    
-          }
-        ];
       }
     });
 
