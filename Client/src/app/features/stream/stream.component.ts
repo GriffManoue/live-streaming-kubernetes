@@ -9,8 +9,10 @@ import { AvatarModule } from 'primeng/avatar';
 import { StreamService } from '../../services/stream.service';
 import { LiveStream } from '../../models/stream/stream';
 import { StreamCategoryKey } from '../../models/enums/stream-categories';
-import { User } from '../../models/user/user';
 import { UserService } from '../../services/user.service';
+import { FollowRequest } from '../../models/user/follow-request';
+import { User } from '../../models/user/user';
+import { MessageService } from 'primeng/api';
 
 declare let shaka: any;
 
@@ -38,10 +40,13 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
   loading: boolean = true;
   error: string | null = null;
   player: any = null;
+  isFollowing: boolean = false; 
 
   constructor(
     private route: ActivatedRoute,
-    private streamService: StreamService
+    private streamService: StreamService,
+    private userService: UserService,
+    private messageService: MessageService,
   ) { }
 
   ngOnInit(): void {
@@ -63,6 +68,15 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
       this.error = 'Stream ID not provided';
       this.loading = false;
     }
+
+    // Check if the user is following the streamer
+    let user: User = JSON.parse(localStorage.getItem('user') || '{}');
+    this.userService.getFollowing(user.id).subscribe({
+      next: (following) => {
+        this.isFollowing = following.some((f: User) => f.id === this.streamData?.userId);
+      }
+    });
+      
   }
 
   ngAfterViewInit(): void {
@@ -134,5 +148,42 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
   private onPlayerError(event: any): void {
     console.error('Error code', event.detail.code, 'object', event.detail);
     this.error = 'Error playing the stream: ' + event.detail.code;
+  }
+
+  public followUser(userId: string): void {
+
+    let user: User = JSON.parse(localStorage.getItem('user') || '{}');
+    let followRequest: FollowRequest = {
+      followerId: user.id,
+      followingId: userId
+    }
+
+    this.userService.followUser(followRequest).subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Successfully followed user!' });
+        this.isFollowing = true; // Update the following status
+      },
+      error: (err) => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error following user!' });
+      }
+    });
+  }
+  public unfollowUser(userId: string): void {
+    let user : User = JSON.parse(localStorage.getItem('user') || '{}');
+
+    let followRequest: FollowRequest = {
+      followerId: user.id,
+      followingId: userId
+    }
+    this.userService.unfollowUser(followRequest).subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Successfully unfollowed user!' });
+        this.isFollowing = false; // Update the following status
+      },
+      error: (err) => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error unfollowing user!' });
+      }
+    });
+
   }
 }
