@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
 import { InputTextModule } from 'primeng/inputtext';
@@ -58,7 +58,7 @@ export class TopBarComponent {
   isDarkMode: boolean; // Initialize dark mode state
   
   
-  constructor(private loginService: LoginService) {
+  constructor(private loginService: LoginService, private router: Router) {
     this.loginService.isLoggedIn.subscribe(loggedIn => {
       this.isLoggedIn = loggedIn;
       if (this.isLoggedIn) {
@@ -88,6 +88,7 @@ export class TopBarComponent {
               this.userId = '';
               this.userMenuItems = []; // Clear menu items on logout
               localStorage.removeItem('user'); // Clear user data from local storage
+              router.navigate(['/login']); // Redirect to login page
             }
           }
         ];
