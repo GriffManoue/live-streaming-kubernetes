@@ -54,31 +54,7 @@ export class TopBarComponent {
 
     }
   ];
-  userMenuItems: MenuItem[] = [
-    {
-      label: 'Profile',
-      icon: 'pi pi-user',
-      routerLink: ['/profile', this.userId],
-      routerLinkActiveOptions: { exact: true }
-    },
-    {
-      label: 'Settings',
-      icon: 'pi pi-cog',
-      routerLink: ['/settings', this.userId],
-      routerLinkActiveOptions: { exact: true }
-    },
-    {
-      label: 'Logout',
-      icon: 'pi pi-sign-out',
-      command: () => {
-        this.loginService.logout();
-        this.isLoggedIn = false;
-        this.userId = '';
-        localStorage.removeItem('user'); // Clear user data from local storage
-      }
-    }
-
-  ];
+  userMenuItems: MenuItem[] = []; // Initialize as empty
   isDarkMode: boolean; // Initialize dark mode state
   
   
@@ -89,6 +65,36 @@ export class TopBarComponent {
         // Get the user ID from localStorage
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         this.userId = user.id || '';
+        // Update userMenuItems only when logged in and userId is available
+        this.userMenuItems = [
+          {
+            label: 'Profile',
+            icon: 'pi pi-user',
+            routerLink: ['/profile', this.userId],
+            routerLinkActiveOptions: { exact: true }
+          },
+          {
+            label: 'Settings',
+            icon: 'pi pi-cog',
+            routerLink: ['/settings', this.userId],
+            routerLinkActiveOptions: { exact: true }
+          },
+          {
+            label: 'Logout',
+            icon: 'pi pi-sign-out',
+            command: () => {
+              this.loginService.logout();
+              this.isLoggedIn = false;
+              this.userId = '';
+              this.userMenuItems = []; // Clear menu items on logout
+              localStorage.removeItem('user'); // Clear user data from local storage
+            }
+          }
+        ];
+      } else {
+        // Clear userMenuItems when logged out
+        this.userId = '';
+        this.userMenuItems = [];
       }
     });
 

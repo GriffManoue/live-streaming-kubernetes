@@ -135,8 +135,4 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
     console.error('Error code', event.detail.code, 'object', event.detail);
     this.error = 'Error playing the stream: ' + event.detail.code;
   }
-
-  public getUserIcon( stream: LiveStream): string {
-    return stream.username?.charAt(0).toUpperCase() || 'U';
-  }
 }
