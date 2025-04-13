@@ -1,10 +1,11 @@
-import { StreamCategoryKey } from "../enums/stream-categories";
+import { StreamCategory } from "../enums/stream-categories";
+
 
 export interface LiveStream {
     id: string;
     streamName: string;
     streamDescription: string;
-    streamCategory: StreamCategoryKey;
+    streamCategory: StreamCategory;
     userId: string;
     thumbnailUrl?: string;
     streamUrl?: string;

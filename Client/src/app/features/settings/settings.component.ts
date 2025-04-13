@@ -8,7 +8,7 @@ import { CardModule } from 'primeng/card';
 import { TooltipModule } from 'primeng/tooltip';
 import { CommonModule } from '@angular/common';
 import { LiveStream } from '../../models/stream/stream';
-import { StreamCategories, StreamCategoryKey } from '../../models/enums/stream-categories';
+import { StreamCategory } from '../../models/enums/stream-categories';
 import { ActivatedRoute } from '@angular/router';
 import { StreamService } from '../../services/stream.service';
 import { MessageService } from 'primeng/api'; 
@@ -32,7 +32,7 @@ import { MessageService } from 'primeng/api';
 export class SettingsComponent implements OnInit {
   streamForm!: FormGroup;
   stream!: LiveStream;
-  categories = Object.keys(StreamCategories);
+  categories = Object.keys(StreamCategory).map(key => ({ label: key, value: key }));
 
   constructor(
     private fb: FormBuilder,

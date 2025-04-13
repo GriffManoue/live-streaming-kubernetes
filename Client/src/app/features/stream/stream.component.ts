@@ -8,7 +8,7 @@ import { TagModule } from 'primeng/tag';
 import { AvatarModule } from 'primeng/avatar';
 import { StreamService } from '../../services/stream.service';
 import { LiveStream } from '../../models/stream/stream';
-import { StreamCategoryKey } from '../../models/enums/stream-categories';
+import { StreamCategory } from '../../models/enums/stream-categories';
 import { UserService } from '../../services/user.service';
 import { FollowRequest } from '../../models/user/follow-request';
 import { User } from '../../models/user/user';
@@ -93,8 +93,8 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   // Method to assign PrimeNG severity based on stream category
-  getCategorySeverity(category: StreamCategoryKey): "success" | "info" | "warn" | "danger" | "secondary" | "contrast" | undefined {
-    const categoryMap: { [key in StreamCategoryKey]: "success" | "info" | "warn" | "danger" | "secondary" | "contrast" } = {
+  getCategorySeverity(category: StreamCategory): "success" | "info" | "warn" | "danger" | "secondary" | "contrast" | undefined {
+    const categoryMap: { [key in StreamCategory]: "success" | "info" | "warn" | "danger" | "secondary" | "contrast" } = {
       Gaming: 'info',
       Music: 'success',
       Sports: 'warn',

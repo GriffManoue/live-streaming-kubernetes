@@ -6,7 +6,7 @@ import { MenubarModule } from 'primeng/menubar';
 import { InputTextModule } from 'primeng/inputtext';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuItem } from 'primeng/api';
-import { StreamCategories } from '../../models/enums/stream-categories';
+import { StreamCategory, StreamCategoryIcons } from '../../models/enums/stream-categories';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
 import { LoginService } from '../../services/login.service';
@@ -45,13 +45,12 @@ export class TopBarComponent {
       icon: 'pi pi-list',
       routerLink: '/categories',
       routerLinkActiveOptions: { exact: true },
-      items: Object.values(StreamCategories).map(category => ({
-        label: category.name,
-        icon: category.icon,
-        routerLink: `/categories/${category.name.toLowerCase()}`,
+      items: Object.values(StreamCategory).map(category => ({
+        label: category,
+        icon: StreamCategoryIcons[category as StreamCategory],
+        routerLink: `/categories/${category}`,
         routerLinkActiveOptions: { exact: true }
       }))
-
     }
   ];
   userMenuItems: MenuItem[] = []; // Initialize as empty
