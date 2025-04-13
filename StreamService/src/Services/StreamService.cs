@@ -273,7 +273,8 @@ public class StreamService : IStreamService
             ThumbnailUrl = stream.ThumbnailUrl,
             StreamUrl = stream.StreamUrl,
             StreamKey = stream.StreamKey,
-            Views = stream.Views
+            Views = stream.Views,
+            UserId = stream.UserId 
         };
     }
 }
