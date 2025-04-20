@@ -22,12 +22,14 @@ export class StreamService extends ServiceBase {
     return this.http.get<LiveStream[]>(`${this.apiUrl}/stream`);
   }
 
-  getStreamByUserId(userId: string): Observable<LiveStream> {
+  getStreamByUserId(userId: string): Observable<LiveStream | null> {
     return this.http.get<LiveStream>(`${this.apiUrl}/stream/user/${userId}`);
   }
 
-  createStream(): Observable<LiveStream> {
-    return this.http.post<LiveStream>(`${this.apiUrl}/stream`, {});
+  createStream(userId?: string): Observable<LiveStream> {
+    // If userId is provided, send as query param, else send empty
+    const url = userId ? `${this.apiUrl}/stream?userId=${userId}` : `${this.apiUrl}/stream`;
+    return this.http.post<LiveStream>(url, {});
   }
 
   updateStream(id: string, stream: LiveStream): Observable<LiveStream> {
@@ -42,11 +44,13 @@ export class StreamService extends ServiceBase {
   }
 
   joinViewer(streamId: string, viewerId: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/stream/${streamId}/viewer/join`, {viewerId});
+    // The backend expects viewerId as a query parameter, not in the body
+    return this.http.post<void>(`${this.apiUrl}/stream/${streamId}/viewer/join?viewerId=${viewerId}`, {});
   }
 
   leaveViewer(streamId: string, viewerId: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/stream/${streamId}/viewer/leave`, {viewerId});
+    // The backend expects viewerId as a query parameter, not in the body
+    return this.http.post<void>(`${this.apiUrl}/stream/${streamId}/viewer/leave?viewerId=${viewerId}`, {});
   }
 
   getViewerCount(streamId: string): Observable<number> {
