@@ -51,7 +51,7 @@
           <div class="mt-3 md:mt-0">
             <p-button *ngIf="!isFollowing" label="Follow" icon="pi pi-user-plus" styleClass="p-button-outlined mr-2" (click)="followUser()"></p-button>
             <p-button *ngIf="isFollowing" label="Unfollow" icon="pi pi-user-minus" styleClass="p-button-outlined mr-2" (click)="unfollowUser()"></p-button>
-            <p-button label="Share" icon="pi pi-share-alt" (onclick)= "copyLinkToClipboard()"></p-button>
+            <p-button label="Share" icon="pi pi-share-alt" (click)= "copyLinkToClipboard()"></p-button>
           </div>
         </div>
 
