@@ -261,6 +261,28 @@ public class StreamService : IStreamService
         await _cacheService.RemoveAsync("active_streams");
     }
 
+    // Viewer tracking using Redis set
+    public async Task JoinViewerAsync(Guid streamId)
+    {
+        var key = $"stream:viewers:{streamId}";
+        var viewerId = Guid.NewGuid().ToString(); // For demo, use random. Replace with user/session ID if available.
+        await _cacheService.SetAddAsync(key, viewerId);
+        await _cacheService.ExpireAsync(key, TimeSpan.FromHours(6)); // Optional: expire after inactivity
+    }
+
+    public async Task LeaveViewerAsync(Guid streamId)
+    {
+        var key = $"stream:viewers:{streamId}";
+        var viewerId = Guid.NewGuid().ToString(); // Should match the one used in JoinViewerAsync
+        await _cacheService.SetRemoveAsync(key, viewerId);
+    }
+
+    public async Task<int> GetViewerCountAsync(Guid streamId)
+    {
+        var key = $"stream:viewers:{streamId}";
+        return await _cacheService.SetCountAsync(key);
+    }
+
     private StreamDto MapToDto(LiveStream stream, UserDTO? user)
     {
         return new StreamDto

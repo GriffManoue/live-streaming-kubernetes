@@ -186,5 +186,28 @@ public class StreamController : ControllerBase
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
-    
+
+    [HttpPost("{id:guid}/viewer/join")]
+    [AllowAnonymous]
+    public async Task<IActionResult> JoinViewer(Guid id)
+    {
+        await _streamService.JoinViewerAsync(id);
+        return Ok();
+    }
+
+    [HttpPost("{id:guid}/viewer/leave")]
+    [AllowAnonymous]
+    public async Task<IActionResult> LeaveViewer(Guid id)
+    {
+        await _streamService.LeaveViewerAsync(id);
+        return Ok();
+    }
+
+    [HttpGet("{id:guid}/viewers")]
+    [AllowAnonymous]
+    public async Task<ActionResult<int>> GetViewerCount(Guid id)
+    {
+        var count = await _streamService.GetViewerCountAsync(id);
+        return Ok(count);
+    }
 }

@@ -38,4 +38,25 @@ public class RedisCacheService : ICacheService
     {
         await _db.KeyDeleteAsync(key);
     }
+
+    public async Task SetAddAsync(string key, string value)
+    {
+        await _db.SetAddAsync(key, value);
+    }
+
+    public async Task SetRemoveAsync(string key, string value)
+    {
+        await _db.SetRemoveAsync(key, value);
+    }
+
+    public async Task<int> SetCountAsync(string key)
+    {
+        var count = await _db.SetLengthAsync(key);
+        return (int)count;
+    }
+
+    public async Task ExpireAsync(string key, TimeSpan expiry)
+    {
+        await _db.KeyExpireAsync(key, expiry);
+    }
 }

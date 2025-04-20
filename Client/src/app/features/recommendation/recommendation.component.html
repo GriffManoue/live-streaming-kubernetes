@@ -10,7 +10,7 @@
       <div>
         <h3 class="font-bold text-lg mb-1">{{stream.streamName}}</h3>
         <p class="mb-1">Streamer: {{stream.username}}</p>
-        <p class="mb-2">Viewers: {{stream.views}}</p>
+        <p class="mb-2">Live Viewers: {{stream.currentViewers ?? 0}}</p>
       </div>
       <ng-template pTemplate="footer">
         <p-button label="Watch" icon="pi pi-play" styleClass="w-full" [routerLink]="['/stream', stream.id]"></p-button>

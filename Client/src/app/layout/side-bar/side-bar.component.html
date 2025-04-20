@@ -12,6 +12,7 @@
                     <div>
                         <h3 class="streamer-name m-0">{{streamer.username}}</h3>
                         <span *ngIf="streamer.isLive" class="live-badge">LIVE</span>
+                        <span *ngIf="streamer.isLive" class="ml-2 text-xs text-green-600">{{streamer.currentViewers || 0}} viewers</span>
                     </div>
                 </div>
             </div>

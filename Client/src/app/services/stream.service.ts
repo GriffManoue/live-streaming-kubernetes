@@ -40,4 +40,16 @@ export class StreamService extends ServiceBase {
         map(response => response.streamKey)
       );
   }
+
+  joinViewer(streamId: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/stream/${streamId}/viewer/join`, {});
+  }
+
+  leaveViewer(streamId: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/stream/${streamId}/viewer/leave`, {});
+  }
+
+  getViewerCount(streamId: string): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/stream/${streamId}/viewers`);
+  }
 }

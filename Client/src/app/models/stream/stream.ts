@@ -11,5 +11,5 @@ export interface LiveStream {
     streamUrl?: string;
     streamKey?: string;
     views: number;
-    username?: string;
+    currentViewers?: number;
 }

@@ -41,6 +41,8 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
   error: string | null = null;
   player: any = null;
   isFollowing: boolean = false; 
+  currentViewers: number = 0;
+  private viewerInterval: any;
 
   constructor(
     private route: ActivatedRoute,
@@ -56,8 +58,11 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
       this.streamService.getStreamById(this.streamId).subscribe({
         next: (data) => {
           this.streamData = data;
-          console.log('Stream data:', this.streamData);
           this.loading = false;
+          // Join viewer
+          this.streamService.joinViewer(this.streamId!).subscribe();
+          // Start polling viewer count
+          this.pollViewerCount();
         },
         error: (err) => {
           this.error = 'Could not load stream';
@@ -89,6 +94,12 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.player) {
       this.player.destroy();
       this.player = null;
+    }
+    if (this.streamId) {
+      this.streamService.leaveViewer(this.streamId).subscribe();
+    }
+    if (this.viewerInterval) {
+      clearInterval(this.viewerInterval);
     }
   }
 
@@ -196,6 +207,19 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
       this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Stream link copied to clipboard!' });
     }).catch((err) => {
       this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error copying link to clipboard!' });
+    });
+  }
+
+  pollViewerCount(): void {
+    if (!this.streamId) return;
+    this.viewerInterval = setInterval(() => {
+      this.streamService.getViewerCount(this.streamId!).subscribe(count => {
+        this.currentViewers = count;
+      });
+    }, 5000); // Poll every 5 seconds
+    // Initial fetch
+    this.streamService.getViewerCount(this.streamId!).subscribe(count => {
+      this.currentViewers = count;
     });
   }
 }

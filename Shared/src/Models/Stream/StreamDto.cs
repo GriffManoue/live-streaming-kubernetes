@@ -14,4 +14,5 @@ public class StreamDto
     public string? StreamUrl { get; set; }
     public string? StreamKey { get; set; }
     public int Views { get; set; }
+    public int CurrentViewers { get; set; } // Real-time viewer count
 }
