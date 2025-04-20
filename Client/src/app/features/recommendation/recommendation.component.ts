@@ -7,6 +7,8 @@ import { LiveStream } from '../../models/stream/stream';
 import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { User } from '../../models/user/user';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-recommendation',
@@ -18,7 +20,7 @@ import { map, catchError } from 'rxjs/operators';
 export class RecommendationComponent implements OnInit {
   streams: LiveStream[] = [];
 
-  constructor(private streamService: StreamService) { }
+  constructor(private streamService: StreamService, private userService: UserService) { }
 
   ngOnInit(): void {
     this.streamService.getActiveStreams().subscribe(streams => {
