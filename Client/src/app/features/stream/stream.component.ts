@@ -13,7 +13,6 @@ import { UserService } from '../../services/user.service';
 import { FollowRequest } from '../../models/user/follow-request';
 import { User } from '../../models/user/user';
 import { MessageService } from 'primeng/api';
-import { LoginService } from '../../services/login.service';
 
 declare let shaka: any;
 

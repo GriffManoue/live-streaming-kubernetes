@@ -13,13 +13,7 @@ import { MessageService } from 'primeng/api';
 import { StreamService } from '../../services/stream.service';
 import { forkJoin, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-
-
-type LiveSidebarStreamer = User & {
-  isLive: boolean;
-  streamId?: string;
-  currentViewers?: number;
-};
+import { LiveStream } from '../../models/stream/stream';
 
 
 @Component({
@@ -38,7 +32,8 @@ type LiveSidebarStreamer = User & {
 export class SideBarComponent implements OnInit, OnDestroy {
   isLoggedIn: boolean = false;
 
-  streamers: LiveSidebarStreamer[] = [];
+  // Use array of { user, stream } objects
+  streamers: { user: User, stream: LiveStream | null }[] = [];
   followedStreamerIds: Set<string> = new Set();
   private viewerInterval: any;
 
@@ -76,31 +71,30 @@ export class SideBarComponent implements OnInit, OnDestroy {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (user && user.id) {
       this.userService.getFollowing(user.id).subscribe((following: User[]) => {
-        const liveRequests = following.map(f =>
+        const streamRequests = following.map(f =>
           this.streamService.getStreamByUserId(f.id).pipe(
-            map(stream => ({
-              ...f,
-              isLive: !!stream?.streamUrl,
-              streamId: stream?.id,
-              currentViewers: 0
-            }) as LiveSidebarStreamer),
-            catchError(() => of({ ...f, isLive: false } as LiveSidebarStreamer))
+            catchError(() => of(null))
           )
         );
-        forkJoin(liveRequests).subscribe((streamers: LiveSidebarStreamer[]) => {
-          const viewerCountRequests = streamers.map(s =>
-            s.isLive && s.streamId ? this.streamService.getViewerCount(s.streamId).pipe(
-              map(count => ({ ...s, currentViewers: count } as LiveSidebarStreamer)),
-              catchError(() => of({ ...s, currentViewers: 0 } as LiveSidebarStreamer))
-            ) : of(s)
+        forkJoin(streamRequests).subscribe((streams: (LiveStream | null)[]) => {
+          const streamerPairs = following.map((f, idx) => ({
+            user: f,
+            stream: streams[idx]
+          }));
+          // For live streams, fetch viewer counts
+          const viewerCountRequests = streamerPairs.map(pair =>
+            pair.stream && pair.stream.streamUrl
+              ? this.streamService.getViewerCount(pair.stream.id).pipe(
+                  map(count => ({ ...pair, stream: { ...pair.stream!, currentViewers: count } }))
+                )
+              : of(pair)
           );
-          forkJoin(viewerCountRequests).subscribe((finalArr: LiveSidebarStreamer[]) => {
-            this.streamers = finalArr.filter((s: any) => s && typeof s.username === 'string' && s.username.length > 0);
+          forkJoin(viewerCountRequests).subscribe((finalArr) => {
+            this.streamers = finalArr.filter((s: any) => s.user && typeof s.user.username === 'string' && s.user.username.length > 0);
             this.followedStreamerIds = new Set(following.map(f => f.id));
           });
         });
       });
-      console.log(this.streamers);
     }
   }
 

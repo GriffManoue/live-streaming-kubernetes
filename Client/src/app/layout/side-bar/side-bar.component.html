@@ -1,32 +1,32 @@
 <div *ngIf="isLoggedIn" class="static-sidebar fixed top-0 z-50">
     <div class="streamer-list" style="padding-top: 1rem;">
-        <p-card *ngFor="let streamer of streamers" 
+        <p-card *ngFor="let entry of streamers" 
                 styleClass="streamer-card mb-3">
             <div class="streamer-info">
                 <div class="flex align-items-center">
-                    <p-avatar [label]="streamer.username.charAt(0).toUpperCase()" 
+                    <p-avatar [label]="entry.user.username.charAt(0).toUpperCase()" 
                              styleClass="mr-2"
-                             [style]="{'background-color': streamer.isLive ? '#4caf50' : '#9e9e9e'}"
+                             [style]="{'background-color': entry.stream && entry.stream.streamUrl ? '#4caf50' : '#9e9e9e'}"
                              shape="circle"
                              size="large"></p-avatar>
                     <div>
-                        <h3 class="streamer-name m-0">{{streamer.username}}</h3>
-                        <span *ngIf="streamer.isLive" class="live-badge">LIVE</span>
-                        <span *ngIf="streamer.isLive" class="ml-2 text-xs text-green-600">{{streamer.currentViewers || 0}} viewers</span>
+                        <h3 class="streamer-name m-0">{{entry.user.username}}</h3>
+                        <span *ngIf="entry.stream && entry.stream.streamUrl" class="live-badge">LIVE</span>
+                        <span *ngIf="entry.stream && entry.stream.streamUrl" class="ml-2 text-xs text-green-600">{{entry.stream.currentViewers || 0}} viewers</span>
                     </div>
                 </div>
             </div>
             
             <ng-template pTemplate="footer">
                 <div class="streamer-actions">
-                    <p-button *ngIf="!followedStreamerIds.has(streamer.id)"
+                    <p-button *ngIf="!followedStreamerIds.has(entry.user.id)"
                               label="Follow" icon="pi pi-user-plus" styleClass="p-button-sm p-button-outlined mr-2"
-                              (click)="followStreamer(streamer)"></p-button>
-                    <p-button *ngIf="followedStreamerIds.has(streamer.id)"
+                              (click)="followStreamer(entry.user)"></p-button>
+                    <p-button *ngIf="followedStreamerIds.has(entry.user.id)"
                               label="Unfollow" icon="pi pi-user-minus" styleClass="p-button-sm p-button-outlined mr-2"
-                              (click)="unfollowStreamer(streamer)"></p-button>
-                    <p-button *ngIf="streamer.isLive" label="Watch" icon="pi pi-play" styleClass="p-button-sm"
-                              (click)="watchStreamer(streamer)"></p-button>
+                              (click)="unfollowStreamer(entry.user)"></p-button>
+                    <p-button *ngIf="entry.stream && entry.stream.streamUrl" label="Watch" icon="pi pi-play" styleClass="p-button-sm"
+                              (click)="watchStreamer(entry.user)"></p-button>
                 </div>
             </ng-template>
         </p-card>
