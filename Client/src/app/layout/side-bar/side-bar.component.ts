@@ -101,6 +101,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
           });
         });
       });
+      console.log(this.streamers);
     }
   }
 
