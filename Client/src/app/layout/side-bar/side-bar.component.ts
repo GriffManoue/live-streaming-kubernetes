@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 import { FollowRequest } from '../../models/user/follow-request';
 import { MessageService } from 'primeng/api';
 import { StreamService } from '../../services/stream.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
 
@@ -84,19 +84,18 @@ export class SideBarComponent implements OnInit, OnDestroy {
               streamId: stream?.id,
               currentViewers: 0
             }) as LiveSidebarStreamer),
-            catchError(() => [{ ...f, isLive: false }] as any)
+            catchError(() => of({ ...f, isLive: false } as LiveSidebarStreamer))
           )
         );
-        forkJoin(liveRequests).subscribe((streamersArr: any[]) => {
-          const streamers: LiveSidebarStreamer[] = streamersArr.map((sArr: any) => Array.isArray(sArr) ? sArr[0] : sArr);
+        forkJoin(liveRequests).subscribe((streamers: LiveSidebarStreamer[]) => {
           const viewerCountRequests = streamers.map(s =>
             s.isLive && s.streamId ? this.streamService.getViewerCount(s.streamId).pipe(
               map(count => ({ ...s, currentViewers: count } as LiveSidebarStreamer)),
-              catchError(() => [{ ...s, currentViewers: 0 }] as any)
-            ) : [Promise.resolve(s)]
+              catchError(() => of({ ...s, currentViewers: 0 } as LiveSidebarStreamer))
+            ) : of(s)
           );
-          forkJoin(viewerCountRequests).subscribe((finalArr: any[]) => {
-            this.streamers = finalArr.map((sArr: any) => Array.isArray(sArr) ? sArr[0] : sArr);
+          forkJoin(viewerCountRequests).subscribe((finalArr: LiveSidebarStreamer[]) => {
+            this.streamers = finalArr.filter((s: any) => s && typeof s.username === 'string' && s.username.length > 0);
             this.followedStreamerIds = new Set(following.map(f => f.id));
           });
         });
