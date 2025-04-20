@@ -189,4 +189,13 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
     });
 
   }
+
+  public copyLinkToClipboard(): void {
+    const link = this.streamData?.streamUrl || '';
+    navigator.clipboard.writeText(link).then(() => {
+      this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Stream link copied to clipboard!' });
+    }).catch((err) => {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error copying link to clipboard!' });
+    });
+  }
 }

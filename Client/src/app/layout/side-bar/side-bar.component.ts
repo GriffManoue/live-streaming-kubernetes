@@ -5,6 +5,11 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { LoginService } from '../../services/login.service';
+import { UserService } from '../../services/user.service';
+import { User } from '../../models/user/user';
+import { Router } from '@angular/router';
+import { FollowRequest } from '../../models/user/follow-request';
+import { MessageService } from 'primeng/api';
 
 
 @Component({
@@ -23,22 +28,46 @@ import { LoginService } from '../../services/login.service';
 export class SideBarComponent implements OnInit {
   isLoggedIn: boolean = false;
 
-  streamers: any[] = [];
+  streamers: User[] = [];
 
-  constructor(private loginService: LoginService) {}
+  constructor(
+    private loginService: LoginService,
+    private userService: UserService,
+    private router: Router,
+    private messageService: MessageService
+  ) {}
 
   ngOnInit() {
     this.loginService.isLoggedIn.subscribe(loggedIn => {
       this.isLoggedIn = loggedIn;
+      if (loggedIn) {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user && user.id) {
+          this.userService.getFollowing(user.id).subscribe((following: User[]) => {
+            this.streamers = following;
+          });
+        }
+      } else {
+        this.streamers = [];
+      }
     });
+  }
 
-    // Mock data - replace with actual API call to your streamer service
-    this.streamers = [
-      { id: 1, name: 'gamer123', followers: 1250, category: 'Gaming', isLive: true },
-      { id: 2, name: 'musician456', followers: 750, category: 'Music', isLive: false },
-      { id: 3, name: 'coder789', followers: 500, category: 'Technology', isLive: true },
-      { id: 4, name: 'artist101', followers: 320, category: 'Art', isLive: false },
-      { id: 5, name: 'chef555', followers: 890, category: 'Food', isLive: true }
-    ];
+  followStreamer(streamer: User) {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!user || !user.id) return;
+    const request: FollowRequest = { followerId: user.id, followingId: streamer.id };
+    this.userService.followUser(request).subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: `You are now following ${streamer.username}` });
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: `Failed to follow ${streamer.username}` });
+      }
+    });
+  }
+
+  watchStreamer(streamer: User) {
+    this.router.navigate(['/stream', streamer.id]);
   }
 }

@@ -4,15 +4,13 @@
                 styleClass="streamer-card mb-3">
             <div class="streamer-info">
                 <div class="flex align-items-center">
-                    <p-avatar [label]="streamer.name.charAt(0).toUpperCase()" 
+                    <p-avatar [label]="streamer.username.charAt(0).toUpperCase()" 
                              styleClass="mr-2"
                              [style]="{'background-color': streamer.isLive ? '#4caf50' : '#9e9e9e'}"
                              shape="circle"
                              size="large"></p-avatar>
                     <div>
-                        <h3 class="streamer-name m-0">{{streamer.name}}</h3>
-                        <p class="category-name m-0">{{streamer.category}}</p>
-                        <p class="followers m-0"><i class="pi pi-users"></i> {{streamer.followers}} followers</p>
+                        <h3 class="streamer-name m-0">{{streamer.username}}</h3>
                         <span *ngIf="streamer.isLive" class="live-badge">LIVE</span>
                     </div>
                 </div>
@@ -20,8 +18,10 @@
             
             <ng-template pTemplate="footer">
                 <div class="streamer-actions">
-                    <p-button label="Follow" icon="pi pi-user-plus" styleClass="p-button-sm p-button-outlined mr-2"></p-button>
-                    <p-button *ngIf="streamer.isLive" label="Watch" icon="pi pi-play" styleClass="p-button-sm"></p-button>
+                    <p-button label="Follow" icon="pi pi-user-plus" styleClass="p-button-sm p-button-outlined mr-2"
+                              (click)="followStreamer(streamer)"></p-button>
+                    <p-button *ngIf="streamer.isLive" label="Watch" icon="pi pi-play" styleClass="p-button-sm"
+                              (click)="watchStreamer(streamer)"></p-button>
                 </div>
             </ng-template>
         </p-card>
