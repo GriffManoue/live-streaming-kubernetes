@@ -13,6 +13,7 @@ import { UserService } from '../../services/user.service';
 import { FollowRequest } from '../../models/user/follow-request';
 import { User } from '../../models/user/user';
 import { MessageService } from 'primeng/api';
+import { LoginService } from '../../services/login.service';
 
 declare let shaka: any;
 
@@ -60,7 +61,12 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
           this.streamData = data;
           this.loading = false;
           // Join viewer
-          this.streamService.joinViewer(this.streamId!).subscribe();
+          var user: User = JSON.parse(localStorage.getItem('user') || '{}');
+          if (!user.id) {
+            this.error = 'User not logged in';
+            return;
+          }
+          this.streamService.joinViewer(this.streamId!, user.id ).subscribe();
           // Start polling viewer count
           this.pollViewerCount();
         },
@@ -96,7 +102,12 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
       this.player = null;
     }
     if (this.streamId) {
-      this.streamService.leaveViewer(this.streamId).subscribe();
+      var user: User = JSON.parse(localStorage.getItem('user') || '{}');
+      if (!user.id) {
+        this.error = 'User not logged in';
+        return;
+      }
+      this.streamService.leaveViewer(this.streamId, user.id).subscribe();
     }
     if (this.viewerInterval) {
       clearInterval(this.viewerInterval);

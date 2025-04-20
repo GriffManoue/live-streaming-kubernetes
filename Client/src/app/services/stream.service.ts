@@ -41,12 +41,12 @@ export class StreamService extends ServiceBase {
       );
   }
 
-  joinViewer(streamId: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/stream/${streamId}/viewer/join`, {});
+  joinViewer(streamId: string, viewerId: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/stream/${streamId}/viewer/join`, {viewerId});
   }
 
-  leaveViewer(streamId: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/stream/${streamId}/viewer/leave`, {});
+  leaveViewer(streamId: string, viewerId: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/stream/${streamId}/viewer/leave`, {viewerId});
   }
 
   getViewerCount(streamId: string): Observable<number> {

@@ -59,7 +59,10 @@ public class StreamService : IStreamService
             if (stream.UserId != Guid.Empty)
             {
                 var user = await _userServiceClient.GetUserByIdAsync(stream.UserId);
-                result.Add(MapToDto(stream, user));
+                if (user != null && user.IsLive)
+                {
+                    result.Add(MapToDto(stream, user));   
+                }
             }
         }
 
@@ -257,23 +260,30 @@ public class StreamService : IStreamService
         // We don't need to remove the StreamUrl or StreamKey, just mark the stream as inactive
         stream.Views = 0; // Reset views or any other properties as needed
 
+        var user = await _userServiceClient.GetUserByIdAsync(stream.UserId);
+        if (user == null)
+        {
+            throw new KeyNotFoundException($"User with ID {stream.UserId} not found");
+        }
+
+        user.IsLive = false; // Mark user as not live
+        await _userServiceClient.UpdateUserAsync(user.Id, user); // Update user status
+
         await _streamRepository.UpdateAsync(stream);
         await _cacheService.RemoveAsync("active_streams");
     }
 
     // Viewer tracking using Redis set
-    public async Task JoinViewerAsync(Guid streamId)
+    public async Task JoinViewerAsync(Guid streamId, string viewerId)
     {
         var key = $"stream:viewers:{streamId}";
-        var viewerId = Guid.NewGuid().ToString(); // For demo, use random. Replace with user/session ID if available.
         await _cacheService.SetAddAsync(key, viewerId);
         await _cacheService.ExpireAsync(key, TimeSpan.FromHours(6)); // Optional: expire after inactivity
     }
 
-    public async Task LeaveViewerAsync(Guid streamId)
+    public async Task LeaveViewerAsync(Guid streamId, string viewerId)
     {
         var key = $"stream:viewers:{streamId}";
-        var viewerId = Guid.NewGuid().ToString(); // Should match the one used in JoinViewerAsync
         await _cacheService.SetRemoveAsync(key, viewerId);
     }
 

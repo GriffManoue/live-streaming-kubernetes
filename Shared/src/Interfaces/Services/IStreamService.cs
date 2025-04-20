@@ -15,7 +15,7 @@ public interface IStreamService
     Task<string> GenerateStreamKeyAsync(Guid id);
     Task StartStreamAsync(string streamKey);
     Task EndStreamAsync(string streamKey);
-    Task JoinViewerAsync(Guid streamId);
-    Task LeaveViewerAsync(Guid streamId);
+    Task JoinViewerAsync(Guid streamId, string viewerId);
+    Task LeaveViewerAsync(Guid streamId, string viewerId);
     Task<int> GetViewerCountAsync(Guid streamId);
 }

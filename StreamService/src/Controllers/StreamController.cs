@@ -189,17 +189,17 @@ public class StreamController : ControllerBase
 
     [HttpPost("{id:guid}/viewer/join")]
     [AllowAnonymous]
-    public async Task<IActionResult> JoinViewer(Guid id)
+    public async Task<IActionResult> JoinViewer(Guid id, string viewerId)
     {
-        await _streamService.JoinViewerAsync(id);
+        await _streamService.JoinViewerAsync(id, viewerId);
         return Ok();
     }
 
     [HttpPost("{id:guid}/viewer/leave")]
     [AllowAnonymous]
-    public async Task<IActionResult> LeaveViewer(Guid id)
+    public async Task<IActionResult> LeaveViewer(Guid id, string viewerId)
     {
-        await _streamService.LeaveViewerAsync(id);
+        await _streamService.LeaveViewerAsync(id, viewerId);
         return Ok();
     }
 
