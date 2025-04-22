@@ -44,12 +44,12 @@ export class StreamService extends ServiceBase {
   }
 
   joinViewer(streamId: string, viewerId: string): Observable<void> {
-    // The backend expects viewerId as a query parameter, not in the body
+    console.log(`Joining viewer with ID: ${viewerId} to stream with ID: ${streamId}`);
     return this.http.post<void>(`${this.apiUrl}/stream/${streamId}/viewer/join?viewerId=${viewerId}`, {});
   }
 
   leaveViewer(streamId: string, viewerId: string): Observable<void> {
-    // The backend expects viewerId as a query parameter, not in the body
+    console.log(`Leaving viewer with ID: ${viewerId} from stream with ID: ${streamId}`);
     return this.http.post<void>(`${this.apiUrl}/stream/${streamId}/viewer/leave?viewerId=${viewerId}`, {});
   }
 
