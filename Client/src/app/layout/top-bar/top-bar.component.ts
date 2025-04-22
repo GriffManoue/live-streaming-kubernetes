@@ -33,45 +33,7 @@ export class TopBarComponent {
   isLoggedIn: boolean = false;
   userId: string = '';
   
-  get items(): MenuItem[] {
-    const disabled = !this.isLoggedIn;
-    return [
-      {
-        label: 'Home',
-        icon: 'pi pi-video',
-        routerLink: '/home',
-        routerLinkActiveOptions: { exact: true },
-        disabled
-      },
-      {
-        label: 'All Streams',
-        icon: 'pi pi-globe',
-        command: () => {
-          if (!disabled) {
-            this.router.navigate(['/home'], { queryParams: { all: 'true' } });
-          }
-        },
-        disabled
-      },
-      {
-        label: 'Categories',
-        icon: 'pi pi-list',
-        routerLink: '/categories',
-        routerLinkActiveOptions: { exact: true },
-        disabled,
-        items: Object.values(StreamCategory).map(category => ({
-          label: category,
-          icon: StreamCategoryIcons[category as StreamCategory],
-          command: () => {
-            if (!disabled) {
-              this.router.navigate(['/home'], { queryParams: { category }, skipLocationChange: false, replaceUrl: false });
-            }
-          },
-          disabled
-        }))
-      }
-    ];
-  }
+    items: MenuItem[] = [];
   userMenuItems: MenuItem[] = []; // Initialize as empty
   isDarkMode: boolean; // Initialize dark mode state
   
@@ -79,6 +41,43 @@ export class TopBarComponent {
   constructor(private loginService: LoginService, private router: Router) {
     this.loginService.isLoggedIn.subscribe(loggedIn => {
       this.isLoggedIn = loggedIn;
+      // Build menu items based on login state
+      this.items = [
+        {
+          label: 'Home',
+          icon: 'pi pi-video',
+          routerLink: '/home',
+          routerLinkActiveOptions: { exact: true },
+          disabled: !this.isLoggedIn
+        },
+        {
+          label: 'All Streams',
+          icon: 'pi pi-globe',
+          command: () => {
+            if (this.isLoggedIn) {
+              this.router.navigate(['/home'], { queryParams: { all: 'true' } });
+            }
+          },
+          disabled: !this.isLoggedIn
+        },
+        {
+          label: 'Categories',
+          icon: 'pi pi-list',
+          routerLink: '/categories',
+          routerLinkActiveOptions: { exact: true },
+          disabled: !this.isLoggedIn,
+          items: Object.values(StreamCategory).map(category => ({
+            label: category,
+            icon: StreamCategoryIcons[category as StreamCategory],
+            command: () => {
+              if (this.isLoggedIn) {
+                this.router.navigate(['/home'], { queryParams: { category }, skipLocationChange: false, replaceUrl: false });
+              }
+            },
+            disabled: !this.isLoggedIn
+          }))
+        }
+      ];
       if (this.isLoggedIn) {
         // Get the user ID from localStorage
         const user = JSON.parse(localStorage.getItem('user') || '{}');
