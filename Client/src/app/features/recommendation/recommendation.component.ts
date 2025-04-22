@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { StreamService } from '../../services/stream.service';
 import { LiveStream } from '../../models/stream/stream';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { User } from '../../models/user/user';
@@ -21,33 +21,52 @@ import { LoginService } from '../../services/login.service';
 export class RecommendationComponent implements OnInit {
   streams: LiveStream[] = [];
 
-  constructor(private streamService: StreamService) { }
+  constructor(private streamService: StreamService, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-    const userJson = localStorage.getItem('user');
-    let userId: string | null = null;
-    if (userJson) {
-      try {
-        const user = JSON.parse(userJson);
-        userId = user.id;
-      } catch {
-        userId = null;
+    this.route.queryParamMap.subscribe(params => {
+      const showAll = params.get('all') === 'true';
+      if (showAll) {
+        // Show all streams
+        this.streamService.getActiveStreams().subscribe(streams => {
+          const viewerCountObservables = streams.map(s =>
+            this.streamService.getViewerCount(s.id).pipe(
+              map(count => count as number),
+              catchError(() => [0] as any)
+            )
+          );
+          forkJoin(viewerCountObservables).subscribe(viewerCounts => {
+            this.streams = streams.map((s, i) => ({ ...s, currentViewers: viewerCounts[i] as number }));
+          });
+        });
+      } else {
+        // Show recommendations (default behavior)
+        const userJson = localStorage.getItem('user');
+        let userId: string | null = null;
+        if (userJson) {
+          try {
+            const user = JSON.parse(userJson);
+            userId = user.id;
+          } catch {
+            userId = null;
+          }
+        }
+        if (!userId) {
+          this.streams = [];
+          return;
+        }
+        this.streamService.getRecommendations(userId, 10).subscribe(streams => {
+          const viewerCountObservables = streams.map(s =>
+            this.streamService.getViewerCount(s.id).pipe(
+              map(count => count as number),
+              catchError(() => [0] as any)
+            )
+          );
+          forkJoin(viewerCountObservables).subscribe(viewerCounts => {
+            this.streams = streams.map((s, i) => ({ ...s, currentViewers: viewerCounts[i] as number }));
+          });
+        });
       }
-    }
-    if (!userId) {
-      this.streams = [];
-      return;
-    }
-    this.streamService.getRecommendations(userId, 10).subscribe(streams => {
-      const viewerCountObservables = streams.map(s =>
-        this.streamService.getViewerCount(s.id).pipe(
-          map(count => count as number),
-          catchError(() => [0] as any)
-        )
-      );
-      forkJoin(viewerCountObservables).subscribe(viewerCounts => {
-        this.streams = streams.map((s, i) => ({ ...s, currentViewers: viewerCounts[i] as number }));
-      });
     });
   }
 }

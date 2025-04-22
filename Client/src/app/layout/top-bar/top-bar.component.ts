@@ -41,6 +41,13 @@ export class TopBarComponent {
       routerLinkActiveOptions: { exact: true }
     },
     {
+      label: 'All Streams',
+      icon: 'pi pi-globe',
+      command: () => {
+        this.router.navigate(['/home'], { queryParams: { all: 'true' } });
+      }
+    },
+    {
       label: 'Categories',
       icon: 'pi pi-list',
       routerLink: '/categories',
