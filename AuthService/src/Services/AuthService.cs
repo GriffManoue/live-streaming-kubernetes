@@ -114,7 +114,7 @@ public class AuthService : IAuthService
             return new AuthResult
             {
                 Success = false,
-                Error = "Invalid username or password"
+                Error = "User not found"
             };
 
         // Verify password
