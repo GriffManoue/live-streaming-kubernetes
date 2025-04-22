@@ -26,17 +26,25 @@ export class RecommendationComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(params => {
       const showAll = params.get('all') === 'true';
+      const selectedCategory = params.get('category');
+      const filterByCategory = (streams: LiveStream[]) => {
+        if (selectedCategory) {
+          return streams.filter(s => s.streamCategory === selectedCategory);
+        }
+        return streams;
+      };
       if (showAll) {
         // Show all streams
         this.streamService.getActiveStreams().subscribe(streams => {
-          const viewerCountObservables = streams.map(s =>
+          const filtered = filterByCategory(streams);
+          const viewerCountObservables = filtered.map(s =>
             this.streamService.getViewerCount(s.id).pipe(
               map(count => count as number),
               catchError(() => [0] as any)
             )
           );
           forkJoin(viewerCountObservables).subscribe(viewerCounts => {
-            this.streams = streams.map((s, i) => ({ ...s, currentViewers: viewerCounts[i] as number }));
+            this.streams = filtered.map((s, i) => ({ ...s, currentViewers: viewerCounts[i] as number }));
           });
         });
       } else {
@@ -56,14 +64,15 @@ export class RecommendationComponent implements OnInit {
           return;
         }
         this.streamService.getRecommendations(userId, 10).subscribe(streams => {
-          const viewerCountObservables = streams.map(s =>
+          const filtered = filterByCategory(streams);
+          const viewerCountObservables = filtered.map(s =>
             this.streamService.getViewerCount(s.id).pipe(
               map(count => count as number),
               catchError(() => [0] as any)
             )
           );
           forkJoin(viewerCountObservables).subscribe(viewerCounts => {
-            this.streams = streams.map((s, i) => ({ ...s, currentViewers: viewerCounts[i] as number }));
+            this.streams = filtered.map((s, i) => ({ ...s, currentViewers: viewerCounts[i] as number }));
           });
         });
       }

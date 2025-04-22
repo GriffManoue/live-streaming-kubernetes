@@ -55,8 +55,9 @@ export class TopBarComponent {
       items: Object.values(StreamCategory).map(category => ({
         label: category,
         icon: StreamCategoryIcons[category as StreamCategory],
-        routerLink: `/categories/${category}`,
-        routerLinkActiveOptions: { exact: true }
+        command: () => {
+          this.router.navigate(['/home'], { queryParams: { category } });
+        }
       }))
     }
   ];
