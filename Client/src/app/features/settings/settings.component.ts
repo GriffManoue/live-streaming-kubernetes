@@ -48,8 +48,12 @@ export class SettingsComponent implements OnInit {
       const userId = params['id'];
       this.streamService.getStreamByUserId(userId).subscribe({
         next: (stream) => {
-          this.stream = stream;
-          this.updateFormWithStreamData();
+          if (stream) {
+            this.stream = stream;
+            this.updateFormWithStreamData();
+          } else {
+            this.createNewStream(userId);
+          }
         },
         error: (error) => {
           console.error('Error fetching stream:', error);
