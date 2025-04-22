@@ -56,4 +56,8 @@ export class StreamService extends ServiceBase {
   getViewerCount(streamId: string): Observable<number> {
     return this.http.get<number>(`${this.apiUrl}/stream/${streamId}/viewers`);
   }
+
+  getRecommendations(userId: string, count: number = 6): Observable<LiveStream[]> {
+    return this.http.get<LiveStream[]>(`${this.apiUrl}/stream/${userId}/reccommendations?count=${count}`);
+  }
 }

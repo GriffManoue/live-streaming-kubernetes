@@ -210,4 +210,23 @@ public class StreamController : ControllerBase
         var count = await _streamService.GetViewerCountAsync(id);
         return Ok(count);
     }
+
+    [HttpGet("{id:guid}/reccommendations")]
+    [AllowAnonymous]
+    public async Task<ActionResult<IEnumerable<StreamDto>>> GetRecommendations(Guid id, [FromQuery] int count = 6)
+    {
+        try
+        {
+            var recommendations = await _streamService.GetReccommendedStreamsAsync(id, count);
+            return Ok(recommendations);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
 }

@@ -279,18 +279,59 @@ public class StreamService : IStreamService
         var key = $"stream:viewers:{streamId}";
         await _cacheService.SetAddAsync(key, viewerId);
         await _cacheService.ExpireAsync(key, TimeSpan.FromHours(6)); // Optional: expire after inactivity
+
+        var stream = await _streamRepository.GetByIdAsync(streamId);
+        if (stream != null)
+        {
+            stream.Views++; // Increment view count
+            await _streamRepository.UpdateAsync(stream);
+        }
     }
 
     public async Task LeaveViewerAsync(Guid streamId, string viewerId)
     {
         var key = $"stream:viewers:{streamId}";
         await _cacheService.SetRemoveAsync(key, viewerId);
+        var stream = await _streamRepository.GetByIdAsync(streamId);
+        if (stream != null)
+        {
+            stream.Views--; // Decrement view count
+            await _streamRepository.UpdateAsync(stream);
+        }
     }
 
     public async Task<int> GetViewerCountAsync(Guid streamId)
     {
         var key = $"stream:viewers:{streamId}";
         return await _cacheService.SetCountAsync(key);
+    }
+
+    public async Task<IEnumerable<StreamDto>> GetReccommendedStreamsAsync(Guid userId, int count = 6)
+    {
+        var streams = await _streamRepository.GetAllAsync();
+        var user = await _userServiceClient.GetUserByIdAsync(userId);
+        if (user == null)
+        {
+            throw new KeyNotFoundException($"User with ID {userId} not found");
+        }
+
+        var recommendedStreams = streams
+            .Where(s => s.UserId != userId) // Exclude the current user's streams
+            .OrderByDescending(s => s.Views)
+            .Take(count)
+            .ToList();
+
+        var result = new List<StreamDto>();
+        foreach (var stream in recommendedStreams)
+        {
+            var streamUser = await _userServiceClient.GetUserByIdAsync(stream.UserId);
+            if (streamUser != null && streamUser.IsLive)
+            {
+                result.Add(MapToDto(stream, streamUser));   
+            }
+        }
+
+        return result;
     }
 
     private StreamDto MapToDto(LiveStream stream, UserDTO? user)

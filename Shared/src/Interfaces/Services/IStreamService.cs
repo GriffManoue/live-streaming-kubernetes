@@ -18,4 +18,6 @@ public interface IStreamService
     Task JoinViewerAsync(Guid streamId, string viewerId);
     Task LeaveViewerAsync(Guid streamId, string viewerId);
     Task<int> GetViewerCountAsync(Guid streamId);
+    Task<IEnumerable<StreamDto>> GetReccommendedStreamsAsync(Guid userId, int count = 6);
+
 }
