@@ -9,26 +9,22 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
 
-  // Lazy load feature components
+  // Lazy load feature modules
   {
     path: 'home',
-    loadComponent: () => import('./features/recommendation/recommendation.component').then(m => m.RecommendationComponent),
-    canActivate: [AuthGuard]
+    loadChildren: () => import('./features/recommendation/recommendation.module').then(m => m.RecommendationModule)
   },
   {
-    path: 'stream/:streamId',
-    loadComponent: () => import('./features/stream/stream.component').then(m => m.StreamComponent),
-    canActivate: [AuthGuard]
+    path: 'stream',
+    loadChildren: () => import('./features/stream/stream.module').then(m => m.StreamModule)
   },
   {
-    path: 'settings/:id',
-    loadComponent: () => import('./features/settings/settings.component').then(m => m.SettingsComponent),
-    canActivate: [AuthGuard]
+    path: 'settings',
+    loadChildren: () => import('./features/settings/settings.module').then(m => m.SettingsModule)
   },
   {
-    path: 'profile/:id',
-    loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent),
-    canActivate: [AuthGuard]
+    path: 'profile',
+    loadChildren: () => import('./features/profile/profile.module').then(m => m.ProfileModule)
   },
 
   { path: '**', redirectTo: 'home'} // Redirect to home 
