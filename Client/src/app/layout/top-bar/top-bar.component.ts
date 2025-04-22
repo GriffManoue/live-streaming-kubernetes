@@ -33,34 +33,45 @@ export class TopBarComponent {
   isLoggedIn: boolean = false;
   userId: string = '';
   
-  items: MenuItem[] = [
-    {
-      label: 'Home',
-      icon: 'pi pi-video',
-      routerLink: '/home',
-      routerLinkActiveOptions: { exact: true }
-    },
-    {
-      label: 'All Streams',
-      icon: 'pi pi-globe',
-      command: () => {
-        this.router.navigate(['/home'], { queryParams: { all: 'true' } });
-      }
-    },
-    {
-      label: 'Categories',
-      icon: 'pi pi-list',
-      routerLink: '/categories',
-      routerLinkActiveOptions: { exact: true },
-      items: Object.values(StreamCategory).map(category => ({
-        label: category,
-        icon: StreamCategoryIcons[category as StreamCategory],
+  get items(): MenuItem[] {
+    const disabled = !this.isLoggedIn;
+    return [
+      {
+        label: 'Home',
+        icon: 'pi pi-video',
+        routerLink: '/home',
+        routerLinkActiveOptions: { exact: true },
+        disabled
+      },
+      {
+        label: 'All Streams',
+        icon: 'pi pi-globe',
         command: () => {
-          this.router.navigate(['/home'], { queryParams: { category }, skipLocationChange: false, replaceUrl: false });
-        }
-      }))
-    }
-  ];
+          if (!disabled) {
+            this.router.navigate(['/home'], { queryParams: { all: 'true' } });
+          }
+        },
+        disabled
+      },
+      {
+        label: 'Categories',
+        icon: 'pi pi-list',
+        routerLink: '/categories',
+        routerLinkActiveOptions: { exact: true },
+        disabled,
+        items: Object.values(StreamCategory).map(category => ({
+          label: category,
+          icon: StreamCategoryIcons[category as StreamCategory],
+          command: () => {
+            if (!disabled) {
+              this.router.navigate(['/home'], { queryParams: { category }, skipLocationChange: false, replaceUrl: false });
+            }
+          },
+          disabled
+        }))
+      }
+    ];
+  }
   userMenuItems: MenuItem[] = []; // Initialize as empty
   isDarkMode: boolean; // Initialize dark mode state
   
