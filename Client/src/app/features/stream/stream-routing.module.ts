@@ -5,7 +5,7 @@ import { AuthGuard } from '../../guards/auth.guard';
 
 const routes: Routes = [
   {
-    path: '',
+    path: ':streamId',
     component: StreamComponent,
     canActivate: [AuthGuard]
   }
