@@ -24,7 +24,6 @@ export class RecommendationComponent implements OnInit {
   constructor(private streamService: StreamService) { }
 
   ngOnInit(): void {
-    // Parse user from localStorage and extract id
     const userJson = localStorage.getItem('user');
     let userId: string | null = null;
     if (userJson) {
