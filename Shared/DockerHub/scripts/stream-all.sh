@@ -61,4 +61,10 @@ while true; do
   sleep 1
 done &
 
+# Stream 10
+while true; do
+  ffmpeg -re -i F:\stream10.mkv -c:v libx264 -preset veryfast -b:v 1500k -c:a aac -b:a 128k -f flv rtmp://localhost:1935/live/1ccd3e6b-c593-44d0-981d-7d887bab2f67
+  sleep 1
+done &
+
 echo "Started ffmpeg streams to rtmp://localhost:1935/live/ (looping each file)"

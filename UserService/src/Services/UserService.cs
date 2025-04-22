@@ -101,10 +101,16 @@ public class UserService : IUserService
         var user = await _userRepository.GetByIdAsync(userDto.Id)
             ?? throw new KeyNotFoundException($"User with ID {userDto.Id} not found");
 
+        // Only hash the password if it has changed (i.e., if the provided password does not match the stored hash)
+        if (!_passwordHasher.VerifyPassword(userDto.Password, user.Password))
+        {
+            user.Password = _passwordHasher.HashPassword(userDto.Password);
+        }
+        // If the password matches the hash, keep the existing hash
+
         // Update user properties (except relationships)
         user.Username = userDto.Username;
         user.Email = userDto.Email;
-        user.Password = _passwordHasher.HashPassword(userDto.Password);
         user.FirstName = userDto.FirstName;
         user.LastName = userDto.LastName;
         user.IsLive = userDto.IsLive;
@@ -128,7 +134,7 @@ public class UserService : IUserService
         {
             Id = user.Id,
             Username = user.Username,
-            Password = user.Password, // Note: In a real application, you might not want to return the password
+            Password = user.Password, 
             Email = user.Email,
             StreamId = user.Stream?.Id ?? Guid.Empty, // Handle null Stream
             FirstName = user.FirstName,
