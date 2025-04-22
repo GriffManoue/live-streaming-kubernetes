@@ -56,7 +56,9 @@ export class TopBarComponent {
         label: category,
         icon: StreamCategoryIcons[category as StreamCategory],
         command: () => {
-          this.router.navigate(['/home'], { queryParams: { category } });
+          this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+            this.router.navigate(['/home'], { queryParams: { category }, skipLocationChange: false, replaceUrl: false });
+          });
         }
       }))
     }
