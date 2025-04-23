@@ -49,4 +49,16 @@ spec:
             configMapKeyRef:
               name: auth-config
               key: jwt-expiry-minutes
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
         # Add additional environment variables and secrets as needed

@@ -63,11 +63,11 @@ spec:
           httpGet:
             path: /health/live
             port: 8080
-          initialDelaySeconds: 30
+          initialDelaySeconds: 5
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health/ready
             port: 8080
-          initialDelaySeconds: 15
-          periodSeconds: 5
+          initialDelaySeconds: 10
+          periodSeconds: 10
