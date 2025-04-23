@@ -28,7 +28,7 @@ public class StreamDbHandlerClient : IStreamDbHandlerClient
     {
         try
         {
-            var url = $"{_baseUrl}stream/{streamId}";
+            var url = $"{_baseUrl}streamdbhandler/{streamId}";
             _logger?.LogInformation("Getting stream with ID {StreamId} from {Url}", streamId, url);
             return await _httpClient.GetFromJsonAsync<StreamDto>(url);
         }
@@ -48,7 +48,7 @@ public class StreamDbHandlerClient : IStreamDbHandlerClient
     {
         try
         {
-            var url = $"{_baseUrl}stream?userId={userId}";
+            var url = $"{_baseUrl}streamdbhandler?userId={userId}";
             
             _logger?.LogInformation("Creating new stream at {Url}", url);
             
@@ -82,7 +82,7 @@ public class StreamDbHandlerClient : IStreamDbHandlerClient
     {
         try
         {
-            var url = $"{_baseUrl}stream/active";
+            var url = $"{_baseUrl}streamdbhandler/active";
             _logger?.LogInformation("Getting active streams from {Url}", url);
             var streams = await _httpClient.GetFromJsonAsync<IEnumerable<StreamDto>>(url);
             return streams ?? Enumerable.Empty<StreamDto>();
@@ -103,7 +103,7 @@ public class StreamDbHandlerClient : IStreamDbHandlerClient
     {
         try
         {
-            var url = $"{_baseUrl}stream/user/{userId}";
+            var url = $"{_baseUrl}streamdbhandler/user/{userId}";
             _logger?.LogInformation("Getting stream for user ID {UserId} from {Url}", userId, url);
             return await _httpClient.GetFromJsonAsync<StreamDto>(url);
         }
@@ -123,7 +123,7 @@ public class StreamDbHandlerClient : IStreamDbHandlerClient
     {
         try
         {
-            var url = $"{_baseUrl}stream/{id}";
+            var url = $"{_baseUrl}streamdbhandler/{id}";
             _logger?.LogInformation("Updating stream with ID {StreamId} at {Url}", id, url);
             var response = await _httpClient.PutAsJsonAsync(url, streamDto);
             response.EnsureSuccessStatusCode();
@@ -151,7 +151,7 @@ public class StreamDbHandlerClient : IStreamDbHandlerClient
     {
         try
         {
-            var url = $"{_baseUrl}stream/all";
+            var url = $"{_baseUrl}streamdbhandler/all";
             _logger?.LogInformation("Getting all streams from {Url}", url);
             var streams = await _httpClient.GetFromJsonAsync<IEnumerable<StreamDto>>(url);
             return streams ?? Enumerable.Empty<StreamDto>();

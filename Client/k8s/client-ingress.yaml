@@ -45,7 +45,7 @@ spec:
                   number: 80
 
           # Route to Stream Service
-          - path: /api/streamservice/api/follower/4d954f14-7300-4a40-bcc4-05fdf836397d/following
+          - path: /api/streamservice
             pathType: Prefix
             backend:
               service:
