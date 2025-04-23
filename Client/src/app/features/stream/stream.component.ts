@@ -9,10 +9,12 @@ import { AvatarModule } from 'primeng/avatar';
 import { StreamService } from '../../services/stream.service';
 import { LiveStream } from '../../models/stream/stream';
 import { StreamCategory } from '../../models/enums/stream-categories';
-import { UserService } from '../../services/user.service';
 import { FollowRequest } from '../../models/user/follow-request';
 import { User } from '../../models/user/user';
 import { MessageService } from 'primeng/api';
+import { StreamDbHandlerService } from '../../services/stream-db-handler.service';
+import { ViewerService } from '../../services/viewer.service';
+import { FollowerService } from '../../services/follower.service';
 
 declare let shaka: any;
 
@@ -46,16 +48,17 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private route: ActivatedRoute,
-    private streamService: StreamService,
-    private userService: UserService,
+    private streamDbService: StreamDbHandlerService,
     private messageService: MessageService,
+    private viewerService: ViewerService,
+    private followerService: FollowerService
   ) { }
 
   ngOnInit(): void {
     this.streamId = this.route.snapshot.paramMap.get('streamId');
 
     if (this.streamId) {
-      this.streamService.getStreamById(this.streamId).subscribe({
+      this.streamDbService.getStreamById(this.streamId).subscribe({
         next: (data) => {
           this.streamData = data;
           this.loading = false;
@@ -65,7 +68,7 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
             this.error = 'User not logged in';
             return;
           }
-          this.streamService.joinViewer(this.streamId!, user.id ).subscribe();
+          this.viewerService.joinStream(this.streamId!, user.id ).subscribe();
           // Start polling viewer count
           this.pollViewerCount();
         },
@@ -81,7 +84,7 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Check if the user is following the streamer
     let user: User = JSON.parse(localStorage.getItem('user') || '{}');
-    this.userService.getFollowing(user.id).subscribe({
+    this.followerService.getFollowing(user.id).subscribe({
       next: (following) => {
         this.isFollowing = following.some((f: User) => f.id === this.streamData?.userId);
       }
@@ -106,7 +109,7 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
         this.error = 'User not logged in';
         return;
       }
-      this.streamService.leaveViewer(this.streamId, user.id).subscribe();
+      this.viewerService.leaveStream(this.streamId, user.id).subscribe();
     }
     if (this.viewerInterval) {
       clearInterval(this.viewerInterval);
@@ -180,7 +183,7 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     console.log ('Follow request:', followRequest);
-    this.userService.followUser(followRequest).subscribe({
+    this.followerService.followUser(followRequest).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Successfully followed user!' });
         this.isFollowing = true; // Update the following status
@@ -199,7 +202,7 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     console.log ('Unfollow request:', followRequest);
-    this.userService.unfollowUser(followRequest).subscribe({
+    this.followerService.unfollowUser(followRequest).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Successfully unfollowed user!' });
         this.isFollowing = false; // Update the following status
@@ -223,12 +226,12 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
   pollViewerCount(): void {
     if (!this.streamId) return;
     this.viewerInterval = setInterval(() => {
-      this.streamService.getViewerCount(this.streamId!).subscribe(count => {
+      this.viewerService.getViewerCount(this.streamId!).subscribe(count => {
         this.currentViewers = count;
       });
     }, 5000); // Poll every 5 seconds
     // Initial fetch
-    this.streamService.getViewerCount(this.streamId!).subscribe(count => {
+    this.viewerService.getViewerCount(this.streamId!).subscribe(count => {
       this.currentViewers = count;
     });
   }

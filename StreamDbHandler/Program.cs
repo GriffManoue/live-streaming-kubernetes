@@ -112,8 +112,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddHttpContextAccessor();
 
 // Add application services
-builder.Services.AddScoped<IStreamService, StreamDbHandler.Services.StreamService>();
-builder.Services.AddScoped<IUserContext, UserContext>();
+builder.Services.AddScoped<IStreamDbHandlerService, StreamDbHandlerService>();
 
 var app = builder.Build();
 

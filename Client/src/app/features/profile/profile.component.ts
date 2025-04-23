@@ -6,12 +6,12 @@ import { CardModule } from 'primeng/card';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 
- import { UserService } from '../../services/user.service';
  import { User } from '../../models/user/user';
 import { PasswordModule } from 'primeng/password';
 import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
 import { MessageService } from 'primeng/api'; 
+import { UserDbHandlerService } from '../../services/user-db-handler.service';
 
 @Component({
   selector: 'app-profile',
@@ -40,7 +40,7 @@ export class ProfileComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    private userService: UserService,
+    private userDbService: UserDbHandlerService,
     private messageService: MessageService 
   ) {
     this.initializeForm();
@@ -93,7 +93,7 @@ export class ProfileComponent implements OnInit {
     this.loading = true;
     this.profileError = false;
     console.log(`Fetching data for user ID: ${userId}`);
-    this.userService.getUserById(userId).subscribe({
+    this.userDbService.getUserById(userId).subscribe({
       next: (userData) => {
         this.user = userData;
         this.updateFormWithUserData();
@@ -142,7 +142,7 @@ export class ProfileComponent implements OnInit {
       password: this.f['password'].value,
     };
 
-    this.userService.updateUser(this.userId, updatedUserData).subscribe({
+    this.userDbService.updateUser(this.userId, updatedUserData).subscribe({
         next: (result) => {
           this.loading = false;
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Profile updated successfully!' }); 

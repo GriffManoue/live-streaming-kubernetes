@@ -13,8 +13,6 @@ public interface IRepository<T> where T : class
     Task UpdateAsync(T entity);
     Task DeleteAsync(Guid id);
     Task SaveChangesAsync();
-    
-    // New methods for include expressions
     Task<T?> GetByIdWithIncludesAsync(Guid id, params Expression<Func<T, object>>[] includeProperties);
     Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includeProperties);
     Task<IEnumerable<T>> GetAllWithIncludesAsync(params Expression<Func<T, object>>[] includeProperties);

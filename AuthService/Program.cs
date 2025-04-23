@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shared.Data;
 using Shared.Interfaces;
+using Shared.Interfaces.Clients;
 using Shared.Services;
 using StackExchange.Redis;
 using StreamDbHandler.Services;
@@ -65,7 +66,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     return ConnectionMultiplexer.Connect(configOptions);
 });
 
-builder.Services.AddHttpClient<StreamDbHandler.Services.IStreamServiceClient, StreamDbHandler.Services.StreamServiceClient>(client =>
+builder.Services.AddHttpClient<IStreamDbHandlerClient, StreamDbHandlerClient>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
 });

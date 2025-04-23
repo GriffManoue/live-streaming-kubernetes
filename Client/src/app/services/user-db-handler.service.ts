@@ -8,10 +8,10 @@ import { User } from '../models/user/user';
 @Injectable({
   providedIn: 'root'
 })
-export class UserService extends ServiceBase {
+export class UserDbHandlerService extends ServiceBase {
 
   constructor(http: HttpClient) {
-    super(http );
+    super(http);
   }
 
   getUserById(id: string): Observable<User> {
@@ -26,20 +26,15 @@ export class UserService extends ServiceBase {
     return this.http.put<User>(`${this.apiUrl}/user/${id}`, user);
   }
 
-  getFollowers(id: string): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/user/${id}/followers`);
+  getUserByIdWithIncludes(id: string): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/user/includes/${id}`);
   }
 
-  getFollowing(id: string): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/user/${id}/following`);
+  createUser(user: User): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/user`, user);
   }
 
-  followUser(request: FollowRequest): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/user/follow`, request);
+  getUserByEmail(email: string): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/user/email/${email}`);
   }
-
-  unfollowUser(request: FollowRequest): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/user/unfollow`, request);
-  }
-
 }

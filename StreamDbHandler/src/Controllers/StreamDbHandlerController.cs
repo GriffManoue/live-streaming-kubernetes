@@ -10,17 +10,16 @@ namespace StreamDbHandler.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class StreamController : ControllerBase
+public class StreamDbHandlerController : ControllerBase
 {
-    private readonly IStreamService _streamService;
+    private readonly IStreamDbHandlerService _streamService;
     
-    public StreamController(IStreamService streamService)
+    public StreamDbHandlerController(IStreamDbHandlerService streamService)
     {
         _streamService = streamService;
     }
     
     [HttpGet("{id:guid}")]
-    [AllowAnonymous]
     public async Task<ActionResult<StreamDto>> GetStreamById(Guid id)
     {
         try
@@ -39,7 +38,6 @@ public class StreamController : ControllerBase
     }
     
     [HttpGet]
-    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<StreamDto>>> GetActiveStreams()
     {
         try
@@ -54,7 +52,6 @@ public class StreamController : ControllerBase
     }
     
     [HttpGet("user/{userId:guid}")]
-    [AllowAnonymous]
     public async Task<ActionResult<StreamDto>> GetStreamByUserId(Guid userId)
     {
         try
@@ -77,7 +74,6 @@ public class StreamController : ControllerBase
     }
     
     [HttpPost]
-    [AllowAnonymous] // Allow anonymous access for service-to-service communication
     public async Task<ActionResult<StreamDto>> CreateStream([FromQuery] Guid? userId = null)
     {
         try
@@ -132,97 +128,13 @@ public class StreamController : ControllerBase
         }
     }
 
-    [HttpPost("{id:guid}/generateStreamKey")]
-    public async Task<ActionResult<string>> GenerateStreamKey(Guid id)
+    [HttpGet("all")]
+    public async Task<ActionResult<IEnumerable<StreamDto>>> GetAllStreams()
     {
         try
         {
-            var streamKey = await _streamService.GenerateStreamKeyAsync(id);
-            return Ok(new { streamKey });  // Return as JSON object with property name
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
-        }
-    }
-
-    [HttpPost("start/{streamKey}")]
-    [AllowAnonymous]
-    public async Task<ActionResult> StartStream(string streamKey)
-    {
-        try
-        {
-            await _streamService.StartStreamAsync(streamKey);
-            return Ok();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
-        }
-    }
-
-    [HttpPost("end/{streamKey}")]
-    public async Task<ActionResult> EndStream(string streamKey)
-    {
-        try
-        {
-            await _streamService.EndStreamAsync(streamKey);
-            return Ok();
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
-        }
-    }
-
-    [HttpPost("{id:guid}/viewer/join")]
-    [AllowAnonymous]
-    public async Task<IActionResult> JoinViewer(Guid id, [FromQuery] string viewerId)
-    {
-        await _streamService.JoinViewerAsync(id, viewerId);
-        return Ok();
-    }
-
-    [HttpPost("{id:guid}/viewer/leave")]
-    [AllowAnonymous]
-    public async Task<IActionResult> LeaveViewer(Guid id, [FromQuery] string viewerId)
-    {
-        await _streamService.LeaveViewerAsync(id, viewerId);
-        return Ok();
-    }
-
-    [HttpGet("{id:guid}/viewers")]
-    [AllowAnonymous]
-    public async Task<ActionResult<int>> GetViewerCount(Guid id)
-    {
-        var count = await _streamService.GetViewerCountAsync(id);
-        return Ok(count);
-    }
-
-    [HttpGet("{id:guid}/reccommendations")]
-    [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<StreamDto>>> GetRecommendations(Guid id, [FromQuery] int count = 6)
-    {
-        try
-        {
-            var recommendations = await _streamService.GetReccommendedStreamsAsync(id, count);
-            return Ok(recommendations);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(ex.Message);
+            var streams = await _streamService.GetAllStreamsAsync();
+            return Ok(streams);
         }
         catch (Exception ex)
         {

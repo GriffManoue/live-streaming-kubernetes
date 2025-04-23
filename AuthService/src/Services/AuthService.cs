@@ -5,44 +5,56 @@ using Shared.Models.Domain;
 using StreamDbHandler.Services;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Shared.Interfaces.Clients;
 
 namespace AuthService.Services;
 
 public class AuthService : IAuthService
 {
     private readonly ICacheService _cacheService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
-    private readonly IRepository<User> _userRepository;
-    private readonly StreamDbHandler.Services.IStreamServiceClient _streamServiceClient;
+    private readonly IStreamDbHandlerClient _streamServiceClient;
     private readonly ILogger<AuthService> _logger;
+    private readonly IUserDbHandlerClient _userDbHandlerClient;
 
     public AuthService(
-        IRepository<User> userRepository,
         ITokenService tokenService,
         IPasswordHasher passwordHasher,
-        IHttpContextAccessor httpContextAccessor,
-        StreamDbHandler.Services.IStreamServiceClient streamServiceClient,
+        IStreamDbHandlerClient streamServiceClient,
         ICacheService cacheService,
-        ILogger<AuthService> logger)
+        ILogger<AuthService> logger,
+        IUserDbHandlerClient userDbHandlerClient)
     {
-        _userRepository = userRepository;
         _tokenService = tokenService;
         _passwordHasher = passwordHasher;
-        _httpContextAccessor = httpContextAccessor;
         _streamServiceClient = streamServiceClient;
         _cacheService = cacheService;
         _logger = logger;
+        _userDbHandlerClient = userDbHandlerClient;
+    }
+
+    private User MapToUser(UserDTO dto)
+    {
+        return new User
+        {
+            Id = dto.Id,
+            Username = dto.Username,
+            Password = dto.Password,
+            Email = dto.Email,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            CreatedAt = dto.CreatedAt,
+            IsLive = dto.IsLive,
+            Followers = new List<User>(),
+            Following = new List<User>()
+        };
     }
 
     public async Task<AuthResult> RegisterAsync(RegisterRequest request)
     {
-        
-        // Check if user with the same username exists using the repository
-        var userWithSameUsername = await _userRepository.FirstOrDefaultAsync(
-            u => u.Username.ToLower() == request.Username.ToLower());
-            
+        // Check if user with the same username exists using IUserDbHandlerClient
+        var userWithSameUsername = await _userDbHandlerClient.GetUserByUsernameAsync(request.Username);
         if (userWithSameUsername != null)
             return new AuthResult
             {
@@ -51,9 +63,7 @@ public class AuthService : IAuthService
             };
 
         // Check if user with the same email exists
-        var userWithSameEmail = await _userRepository.FirstOrDefaultAsync(
-            u => u.Email.ToLower() == request.Email.ToLower());
-            
+        var userWithSameEmail = await _userDbHandlerClient.GetUserByEmailAsync(request.Email);
         if (userWithSameEmail != null)
             return new AuthResult
             {
@@ -62,61 +72,51 @@ public class AuthService : IAuthService
             };
 
         // Create new user
-        var userId = Guid.NewGuid();
-        var user = new User
+        var userDto = new UserDTO
         {
-            Id = userId,
+            Id = Guid.NewGuid(),
             Username = request.Username,
             Email = request.Email,
             Password = _passwordHasher.HashPassword(request.Password),
             FirstName = request.FirstName,
             LastName = request.LastName,
             IsLive = false,
-            Followers = new List<User>(),
-            Following = new List<User>(),
             CreatedAt = DateTime.UtcNow,
+            FollowerIds = new List<Guid>(),
+            FollowingIds = new List<Guid>()
         };
-
-        // Save the user first
-        await _userRepository.AddAsync(user);
-        
+        var createdUser = await _userDbHandlerClient.CreateUserAsync(userDto);
         try
         {
             // Create the stream in StreamService - pass the user object so the StreamService can use its ID
-            var stream = await _streamServiceClient.CreateStreamAsync(user);
+            var stream = await _streamServiceClient.CreateStreamAsync(createdUser.Id);
         }
         catch (Exception ex)
         {
-            // Log the error but continue - stream can be created later
-            _logger.LogError(ex, "Failed to create stream for user {UserId}: {Message}", userId, ex.Message);
-            Console.WriteLine($"Failed to create stream for user {userId}: {ex.Message}");
+            _logger.LogError(ex, "Failed to create stream for user {UserId}: {Message}", createdUser.Id, ex.Message);
+            Console.WriteLine($"Failed to create stream for user {createdUser.Id}: {ex.Message}");
         }
-
         // Generate token
-        var token = _tokenService.GenerateToken(user);
-
+        var token = _tokenService.GenerateToken(MapToUser(createdUser));
         return new AuthResult
         {
             Success = true,
             Token = token,
             ExpiresAt = DateTime.UtcNow.AddHours(1),
-            UserId = user.Id
+            UserId = createdUser.Id
         };
     }
 
     public async Task<AuthResult> LoginAsync(LoginRequest request)
     {
-        // Find user by username using the enhanced repository
-        var user = await _userRepository.FirstOrDefaultAsync(
-            u => u.Username.ToLower() == request.Username.ToLower());
-
+        // Find user by username using IUserDbHandlerClient
+        var user = await _userDbHandlerClient.GetUserByUsernameAsync(request.Username);
         if (user == null)
             return new AuthResult
             {
                 Success = false,
                 Error = "User not found"
             };
-
         // Verify password
         if (!_passwordHasher.VerifyPassword(request.Password, user.Password))
             return new AuthResult
@@ -124,10 +124,8 @@ public class AuthService : IAuthService
                 Success = false,
                 Error = "Invalid username or password"
             };
-
         // Generate token
-        var token = _tokenService.GenerateToken(user);
-
+        var token = _tokenService.GenerateToken(MapToUser(user));
         return new AuthResult
         {
             Success = true,
@@ -145,7 +143,6 @@ public class AuthService : IAuthService
                 Success = false,
                 Error = "Token is required"
             };
-
         // Check if token is in the blacklist
         var blacklistKey = $"revoked_token:{token}";
         var isRevoked = await _cacheService.GetAsync<bool>(blacklistKey);
@@ -155,32 +152,27 @@ public class AuthService : IAuthService
                 Success = false,
                 Error = "Token has been revoked"
             };
-
         if (!_tokenService.ValidateToken(token))
             return new AuthResult
             {
                 Success = false,
                 Error = "Invalid or expired token"
             };
-
         var principal = _tokenService.GetPrincipalFromToken(token);
         var userIdClaim = principal.FindFirst("sub")?.Value;
-
         if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             return new AuthResult
             {
                 Success = false,
                 Error = "Invalid token"
             };
-
-        var user = await _userRepository.GetByIdAsync(userId);
+        var user = await _userDbHandlerClient.GetUserByIdAsync(userId);
         if (user == null)
             return new AuthResult
             {
                 Success = false,
                 Error = "User not found"
             };
-
         return new AuthResult
         {
             Success = true,
@@ -214,17 +206,5 @@ public class AuthService : IAuthService
         // Store the token in the blacklist with expiration
         var blacklistKey = $"revoked_token:{token}";
         await _cacheService.SetAsync(blacklistKey, true, timeUntilExpiration);
-    }
-
-    private async Task<User?> GetCurrentUserAsync()
-    {
-        var httpContext = _httpContextAccessor.HttpContext;
-        if (httpContext == null) return null;
-
-        var userIdClaim = httpContext.User.FindFirst("sub")?.Value;
-        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId)) return null;
-
-        // Use the enhanced repository to get the user by ID directly
-        return await _userRepository.GetByIdAsync(userId);
     }
 }

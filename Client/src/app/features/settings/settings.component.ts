@@ -12,6 +12,7 @@ import { StreamCategory } from '../../models/enums/stream-categories';
 import { ActivatedRoute } from '@angular/router';
 import { StreamService } from '../../services/stream.service';
 import { MessageService } from 'primeng/api'; 
+import { StreamDbHandlerService } from '../../services/stream-db-handler.service';
 
 @Component({
   selector: 'app-settings',
@@ -37,8 +38,9 @@ export class SettingsComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
+    private streamDbService: StreamDbHandlerService,
     private streamService: StreamService,
-    private messageService: MessageService 
+    private messageService: MessageService
   ) {
     this.initializeForm();
   }
@@ -46,7 +48,7 @@ export class SettingsComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       const userId = params['id'];
-      this.streamService.getStreamByUserId(userId).subscribe({
+      this.streamDbService.getStreamByUserId(userId).subscribe({
         next: (stream) => {
           if (stream) {
             this.stream = stream;
@@ -68,7 +70,7 @@ export class SettingsComponent implements OnInit {
   }
 
   private createNewStream(userId: string) {
-    this.streamService.createStream().subscribe({
+    this.streamDbService.createStream().subscribe({
       next: (newStream) => {
         this.stream = newStream;
         this.updateFormWithStreamData();
@@ -111,7 +113,7 @@ export class SettingsComponent implements OnInit {
         streamCategory: this.streamForm.get('streamCategory')?.value
       };
 
-      this.streamService.updateStream(this.stream.id, updatedStream).subscribe({
+      this.streamDbService.updateStream(this.stream.id, updatedStream).subscribe({
         next: (result) => {
           console.log('Stream updated successfully', result);
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Stream settings saved successfully!' });

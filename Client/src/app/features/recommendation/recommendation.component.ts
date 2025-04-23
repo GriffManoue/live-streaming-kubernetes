@@ -7,9 +7,8 @@ import { LiveStream } from '../../models/stream/stream';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { User } from '../../models/user/user';
-import { UserService } from '../../services/user.service';
-import { LoginService } from '../../services/login.service';
+import { StreamDbHandlerService } from '../../services/stream-db-handler.service';
+import { ViewerService } from '../../services/viewer.service';
 
 @Component({
   selector: 'app-recommendation',
@@ -21,7 +20,12 @@ import { LoginService } from '../../services/login.service';
 export class RecommendationComponent implements OnInit {
   streams: LiveStream[] = [];
 
-  constructor(private streamService: StreamService, private route: ActivatedRoute) { }
+  constructor(
+    private streamDbService: StreamDbHandlerService, 
+    private streamService: StreamService,
+    private viewerService: ViewerService,
+    private route: ActivatedRoute
+  ) { }
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(params => {
@@ -35,10 +39,10 @@ export class RecommendationComponent implements OnInit {
       };
       if (showAll) {
         // Show all streams
-        this.streamService.getActiveStreams().subscribe(streams => {
+        this.streamDbService.getActiveStreams().subscribe(streams => {
           const filtered = filterByCategory(streams);
           const viewerCountObservables = filtered.map(s =>
-            this.streamService.getViewerCount(s.id).pipe(
+            this.viewerService.getViewerCount(s.id).pipe(
               map(count => count as number),
               catchError(() => [0] as any)
             )
@@ -66,7 +70,7 @@ export class RecommendationComponent implements OnInit {
         this.streamService.getRecommendations(userId, 10).subscribe(streams => {
           const filtered = filterByCategory(streams);
           const viewerCountObservables = filtered.map(s =>
-            this.streamService.getViewerCount(s.id).pipe(
+            this.viewerService.getViewerCount(s.id).pipe(
               map(count => count as number),
               catchError(() => [0] as any)
             )

@@ -5,15 +5,17 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { LoginService } from '../../services/login.service';
-import { UserService } from '../../services/user.service';
 import { User } from '../../models/user/user';
 import { Router } from '@angular/router';
 import { FollowRequest } from '../../models/user/follow-request';
 import { MessageService } from 'primeng/api';
-import { StreamService } from '../../services/stream.service';
 import { forkJoin, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { LiveStream } from '../../models/stream/stream';
+import { StreamDbHandlerService } from '../../services/stream-db-handler.service';
+import { ViewerService } from '../../services/viewer.service';
+import { UserDbHandlerService } from '../../services/user-db-handler.service';
+import { FollowerService } from '../../services/follower.service';
 
 
 @Component({
@@ -39,10 +41,11 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
   constructor(
     private loginService: LoginService,
-    private userService: UserService,
+    private followerService: FollowerService,
     private router: Router,
     private messageService: MessageService,
-    private streamService: StreamService
+    private streamDbService: StreamDbHandlerService,
+    private viewerService: ViewerService
   ) {}
 
   ngOnInit() {
@@ -70,9 +73,9 @@ export class SideBarComponent implements OnInit, OnDestroy {
   private fetchSidebarStreamers() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (user && user.id) {
-      this.userService.getFollowing(user.id).subscribe((following: User[]) => {
+      this.followerService.getFollowing(user.id).subscribe((following: User[]) => {
         const streamRequests = following.map(f =>
-          this.streamService.getStreamByUserId(f.id).pipe(
+          this.streamDbService.getStreamByUserId(f.id).pipe(
             catchError(() => of(null))
           )
         );
@@ -84,7 +87,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
           // For live streams, fetch viewer counts
           const viewerCountRequests = streamerPairs.map(pair =>
             pair.stream && pair.stream.streamUrl
-              ? this.streamService.getViewerCount(pair.stream.id).pipe(
+              ? this.viewerService.getViewerCount(pair.stream.id).pipe(
                   map(count => ({ ...pair, stream: { ...pair.stream!, currentViewers: count } }))
                 )
               : of(pair)
@@ -102,7 +105,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!user || !user.id) return;
     const request: FollowRequest = { followerId: user.id, followingId: streamer.id };
-    this.userService.followUser(request).subscribe({
+    this.followerService.followUser(request).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: `You are now following ${streamer.username}` });
       },
@@ -116,7 +119,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!user || !user.id) return;
     const request: FollowRequest = { followerId: user.id, followingId: streamer.id };
-    this.userService.unfollowUser(request).subscribe({
+    this.followerService.unfollowUser(request).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: `You have unfollowed ${streamer.username}` });
         this.followedStreamerIds.delete(streamer.id);
@@ -128,7 +131,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   watchStreamer(streamer: User) {
-    this.streamService.getStreamByUserId(streamer.id).subscribe({
+    this.streamDbService.getStreamByUserId(streamer.id).subscribe({
       next: (stream) => {
         if (stream) {
           this.router.navigate(['/stream', stream.id]);

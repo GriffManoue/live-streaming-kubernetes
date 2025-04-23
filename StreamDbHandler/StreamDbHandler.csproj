@@ -36,9 +36,4 @@
       <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="src\Services\" />
-      <Folder Include="src\Controllers\" />
-    </ItemGroup>
-
 </Project>

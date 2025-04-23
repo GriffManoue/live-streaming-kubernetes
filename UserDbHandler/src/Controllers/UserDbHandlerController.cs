@@ -10,9 +10,9 @@ namespace UserDbHandler.Controllers;
 [Route("api/[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IUserDbHandlerService _userService;
     
-    public UserController(IUserService userService)
+    public UserController(IUserDbHandlerService userService)
     {
         _userService = userService;
     }
@@ -76,42 +76,14 @@ public class UserController : ControllerBase
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
-    
-    [HttpGet("{id:guid}/followers")]
-    public async Task<ActionResult<IEnumerable<UserDTO>>> GetFollowers(Guid id)
+
+    [HttpGet("includes/{id:guid}")]
+    public async Task<ActionResult<UserDTO>> GetUserByIdWithIncludes(Guid id)
     {
         try
         {
-            var followers = await _userService.GetFollowersAsync(id);
-            return Ok(followers);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
-        }
-    }
-    
-    [HttpGet("{id:guid}/following")]
-    public async Task<ActionResult<IEnumerable<UserDTO>>> GetFollowing(Guid id)
-    {
-        try
-        {
-            var following = await _userService.GetFollowingAsync(id);
-            return Ok(following);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
-        }
-    }
-    
-    [HttpPost("follow")]
-    public async Task<ActionResult> FollowUser([FromBody] FollowRequest request)
-    {
-        try
-        {
-            await _userService.FollowUserAsync(request.FollowerId, request.FollowingId);
-            return Ok();
+            var user = await _userService.GetUserByIdWithIncludesAsync(id);
+            return Ok(user);
         }
         catch (KeyNotFoundException ex)
         {
@@ -122,14 +94,30 @@ public class UserController : ControllerBase
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
-    
-    [HttpPost("unfollow")]
-    public async Task<ActionResult> UnfollowUser([FromBody] FollowRequest request)
+
+    [HttpPost]
+    public async Task<ActionResult<UserDTO>> CreateUser([FromBody] UserDTO userDto)
     {
         try
         {
-            await _userService.UnfollowUserAsync(request.FollowerId, request.FollowingId);
-            return Ok();
+            var createdUser = await _userService.CreateUserAsync(userDto);
+            return Ok(createdUser);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+    [HttpGet("email/{email}")]
+    public async Task<ActionResult<UserDTO>> GetUserByEmail(string email)
+    {
+        try
+        {
+            var user = await _userService.GetUserByEmailAsync(email);
+            if (user == null)
+                return NotFound();
+            return Ok(user);
         }
         catch (Exception ex)
         {
@@ -138,8 +126,4 @@ public class UserController : ControllerBase
     }
 }
 
-public class FollowRequest
-{
-    public Guid FollowerId { get; set; }
-    public Guid FollowingId { get; set; }
-}
+

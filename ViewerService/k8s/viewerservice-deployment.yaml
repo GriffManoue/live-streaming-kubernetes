@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: viewer-service
+  labels:
+    app: viewer-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: viewer-service
+  template:
+    metadata:
+      labels:
+        app: viewer-service
+    spec:
+      containers:
+      - name: viewer-service
+        image: bugapeti/viewerservice:latest # TODO: update with your image
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"

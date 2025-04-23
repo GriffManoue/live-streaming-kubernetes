@@ -7,17 +7,9 @@ namespace Shared.Interfaces;
 
 public interface IStreamService
 {
-    Task<StreamDto> GetStreamByIdAsync(Guid id);
-    Task<IEnumerable<StreamDto>> GetActiveStreamsAsync();
-    Task<StreamDto> GetStreamByUserIdAsync(Guid userId);
-    Task<StreamDto> CreateStreamAsync(Guid? specifiedUserId = null);
-    Task<StreamDto> UpdateStreamAsync(Guid id, StreamDto streamDto);
     Task<string> GenerateStreamKeyAsync(Guid id);
     Task StartStreamAsync(string streamKey);
     Task EndStreamAsync(string streamKey);
-    Task JoinViewerAsync(Guid streamId, string viewerId);
-    Task LeaveViewerAsync(Guid streamId, string viewerId);
-    Task<int> GetViewerCountAsync(Guid streamId);
     Task<IEnumerable<StreamDto>> GetReccommendedStreamsAsync(Guid userId, int count = 6);
 
 }
