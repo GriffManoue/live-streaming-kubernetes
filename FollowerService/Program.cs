@@ -1,7 +1,9 @@
 using System.Text;
+using FollowerService.src.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Shared.src.Interfaces.Services;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +20,9 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "FollowerService API", Version = "v1" });
 });
+
+// Make sure to use the correct namespace and class name for your implementation
+builder.Services.AddScoped<IFollowerService, FollowerService.src.Services.FollowerService>();
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>

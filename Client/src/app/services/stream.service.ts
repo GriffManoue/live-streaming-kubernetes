@@ -15,21 +15,21 @@ export class StreamService extends ServiceBase {
   }
 
   generateStreamKey(id: string): Observable<string> {
-    return this.http.post<{ streamKey: string }>(`${this.apiUrl}/stream/${id}/generateStreamKey`, {})
+    return this.http.post<{ streamKey: string }>(`${this.apiUrl}/streamservice/${id}/generateStreamKey`, {})
       .pipe(
         map(response => response.streamKey)
       );
   }
 
   getRecommendations(userId: string, count: number = 6): Observable<LiveStream[]> {
-    return this.http.get<LiveStream[]>(`${this.apiUrl}/stream/${userId}/reccommendations?count=${count}`);
+    return this.http.get<LiveStream[]>(`${this.apiUrl}/streamservice/${userId}/reccommendations?count=${count}`);
   }
 
   startStream(streamKey: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/stream/start/${streamKey}`, {});
+    return this.http.post<void>(`${this.apiUrl}/streamservice/start/${streamKey}`, {});
   }
 
   endStream(streamKey: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/stream/end/${streamKey}`, {});
+    return this.http.post<void>(`${this.apiUrl}/streamservice/end/${streamKey}`, {});
   }
 }

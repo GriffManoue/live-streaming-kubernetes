@@ -22,7 +22,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: user-service
+                name: user-db-handler
                 port:
                   number: 80
 
@@ -35,21 +35,48 @@ spec:
                 port:
                   number: 80
 
+          # Route to Stream Db Handler Service
+          - path: /api/streamdbhandler
+            pathType: Prefix
+            backend:
+              service:
+                name: stream-db-handler
+                port:
+                  number: 80
+
           # Route to Stream Service
-          - path: /api/stream
+          - path: /api/streamservice/api/follower/4d954f14-7300-4a40-bcc4-05fdf836397d/following
             pathType: Prefix
             backend:
               service:
                 name: stream-service
                 port:
                   number: 80
-          
-          # Route to RTMPController Service
-          - path: /api/rtmp
+
+          # Route to Viewer Service
+          - path: /api/viewer
             pathType: Prefix
             backend:
               service:
-                name: stream-service
+                name: viewer-service
+                port:
+                  number: 80
+
+          # Route to Follower Service
+          - path: /api/follower
+            pathType: Prefix
+            backend:
+              service:
+                name: follower-service
+                port:
+                  number: 80
+
+          # Route to Database Management Service
+          - path: /api/dbmanagement
+            pathType: Prefix
+            backend:
+              service:
+                name: db-management
                 port:
                   number: 80
 

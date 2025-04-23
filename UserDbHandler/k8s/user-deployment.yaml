@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: user-db-handler
-        image: bugapeti/userservice:latest
+        image: bugapeti/userdbhandler-k8s:latest
         ports:
         - containerPort: 8080
         env:
