@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shared.src.Interfaces.Services;
+using StreamDbHandler.Services;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,13 @@ builder.Services.AddSwaggerGen(c =>
 
 // Make sure to use the correct namespace and class name for your implementation
 builder.Services.AddScoped<IFollowerService, FollowerService.src.Services.FollowerService>();
+
+// Register HttpClient for IUserDbHandlerClient
+builder.Services.AddHttpClient<IUserDbHandlerClient, UserDbHandlerClient>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+    // Optionally set BaseAddress here if needed
+});
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
