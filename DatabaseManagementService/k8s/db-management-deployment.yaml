@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: db-management
-        image: bugapeti/databasemanagementservice:latest
+        image: bugapeti/databasemanagementservice-k8s:latest
         ports:
         - containerPort: 80
         env:

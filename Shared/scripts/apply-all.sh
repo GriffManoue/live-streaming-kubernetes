@@ -7,8 +7,11 @@ kubectl apply -f DatabaseManagementService/k8s
 
 sleep 5
 
-kubectl apply -f UserService/k8s/
+kubectl apply -f UserDbHandlerService/k8s/
+kubectl apply -f ViewerService/k8s/
+kubectl apply -f FollowerService/k8s/
 kubectl apply -f AuthService/k8s/
+kubectl apply -f StreamDbHandler/k8s/
 kubectl apply -f StreamService/k8s/
 kubectl apply -f Nginx-RTMP/k8s
 kubectl apply -f Client/k8s/

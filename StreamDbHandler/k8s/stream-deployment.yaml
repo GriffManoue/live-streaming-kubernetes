@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: stream-db-handler
-        image: bugapeti/streamservice:latest //TODO
+        image: bugapeti/streamdbhandler-k8s:latest
         ports:
         - containerPort: 8080
         env:

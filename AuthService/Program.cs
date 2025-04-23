@@ -27,6 +27,17 @@ builder.Services.AddScoped<IAuthService, AuthService.Services.AuthService>();
 // Add IHttpContextAccessor
 builder.Services.AddHttpContextAccessor();
 
+// Configure HttpClients for microservice communication
+builder.Services.AddHttpClient<IStreamDbHandlerClient, StreamDbHandlerClient>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
+builder.Services.AddHttpClient<IUserDbHandlerClient, UserDbHandlerClient>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
 // Add OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
@@ -53,11 +64,6 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     configOptions.ConnectRetry = 5;
     configOptions.ReconnectRetryPolicy = new ExponentialRetry(5000);
     return ConnectionMultiplexer.Connect(configOptions);
-});
-
-builder.Services.AddHttpClient<IStreamDbHandlerClient, StreamDbHandlerClient>(client =>
-{
-    client.Timeout = TimeSpan.FromSeconds(30);
 });
 
 builder.Services.AddSingleton<ICacheService, RedisCacheService>();
