@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Shared.Interfaces;
 
-namespace StreamDbHandler.Controllers;
+namespace StreamService.Controllers;
 
 [ApiController]
 [Route("api/rtmp")]

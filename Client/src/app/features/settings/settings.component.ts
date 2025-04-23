@@ -111,7 +111,7 @@ export class SettingsComponent implements OnInit {
         streamName: this.streamForm.get('streamName')?.value,
         streamDescription: this.streamForm.get('streamDescription')?.value,
         streamCategory: this.streamForm.get('streamCategory')?.value,
-        streamKey: this.stream.streamKey 
+        streamKey: this.streamForm.get('streamToken')?.value || this.stream.streamKey,
       };
 
       this.streamDbService.updateStream(this.stream.id, updatedStream).subscribe({
