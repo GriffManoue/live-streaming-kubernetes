@@ -25,12 +25,15 @@ builder.Services.AddSwaggerGen(c =>
 // Make sure to use the correct namespace and class name for your implementation
 builder.Services.AddScoped<IFollowerService, FollowerService.src.Services.FollowerService>();
 
-// Register HttpClient for IUserDbHandlerClient
+// Register JwtTokenHandler for DI
+builder.Services.AddTransient<Shared.Services.JwtTokenHandler>();
+
+// Register HttpClient for IUserDbHandlerClient with JwtTokenHandler
 builder.Services.AddHttpClient<IUserDbHandlerClient, UserDbHandlerClient>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
     // Optionally set BaseAddress here if needed
-});
+}).AddHttpMessageHandler<Shared.Services.JwtTokenHandler>();
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
