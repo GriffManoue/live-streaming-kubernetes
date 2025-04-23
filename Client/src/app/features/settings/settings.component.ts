@@ -89,7 +89,7 @@ export class SettingsComponent implements OnInit {
       streamName: ['', Validators.required],
       streamDescription: [''],
       streamCategory: ['', Validators.required],
-      streamToken: ['']
+      streamToken: [{ value: '', disabled: true }]
     });
   }
 
