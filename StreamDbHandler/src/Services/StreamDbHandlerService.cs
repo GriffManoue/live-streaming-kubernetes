@@ -153,6 +153,11 @@ public class StreamDbHandlerService : IStreamDbHandlerService
             stream.StreamUrl = streamDto.StreamUrl;
         }
 
+        if (!string.IsNullOrEmpty(streamDto.StreamKey))
+        {
+            stream.StreamKey = streamDto.StreamKey;
+        }
+
         stream.Views = streamDto.Views;
 
         await _streamRepository.UpdateAsync(stream);
