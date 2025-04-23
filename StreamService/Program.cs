@@ -54,7 +54,8 @@ builder.Services.AddHttpClient<IStreamDbHandlerClient, StreamDbHandlerClient>(cl
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:StreamService:BaseUrl"] ?? "http://stream-db-handler/api/");
     client.Timeout = TimeSpan.FromSeconds(30);
-});
+})
+.AddHttpMessageHandler<JwtTokenHandler>();
 
 builder.Services.AddLogging();
 builder.Services.AddHealthChecks();
