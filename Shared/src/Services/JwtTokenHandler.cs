@@ -13,7 +13,7 @@ namespace Shared.Services
         {
             _httpContextAccessor = httpContextAccessor;
             // Get the service JWT from configuration or environment variable
-            _serviceJwtToken = configuration["Jwt:SecretKey"] ?? string.Empty;
+            _serviceJwtToken = configuration["Jwt:ServiceToken"] ?? string.Empty;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)

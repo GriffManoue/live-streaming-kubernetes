@@ -34,6 +34,11 @@ spec:
             secretKeyRef:
               name: redis-secrets
               key: redis-connection-string
+        - name: Jwt__ServiceToken
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secrets
+              key: service-token
         - name: Jwt__SecretKey
           valueFrom:
             secretKeyRef:
