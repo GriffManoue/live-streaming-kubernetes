@@ -16,13 +16,12 @@ spec:
     spec:
       containers:
       - name: stream-service
-        image: bugapeti/streamservice:latest # TODO: update with your image
+        image: bugapeti/streamservice-k8s:latest
         ports:
         - containerPort: 8080
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: "Production"
-        # Add other environment variables as needed, similar to StreamDbHandler
         resources:
           requests:
             memory: "64Mi"

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: viewer-service
-        image: bugapeti/viewerservice:latest # TODO: update with your image
+        image: bugapeti/viewerservice-k8s:latest
         ports:
         - containerPort: 8080
         env:

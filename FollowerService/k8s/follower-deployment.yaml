@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: follower-service
-        image: bugapeti/followerservice:latest
+        image: bugapeti/followerservice-k8s:latest
         ports:
         - containerPort: 8080
         resources:
