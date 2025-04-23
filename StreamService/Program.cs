@@ -47,7 +47,7 @@ builder.Services.AddHttpClient<IStreamDbHandlerClient, StreamDbHandlerClient>(cl
 // Add HttpContextAccessor for user context support
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddLogging();
-
+builder.Services.AddHealthChecks();
 // Register your main service for dependency injection
 builder.Services.AddScoped<IStreamService, StreamService.src.Services.StreamService>();
 
