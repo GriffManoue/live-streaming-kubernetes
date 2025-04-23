@@ -30,7 +30,7 @@ builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<U
 builder.Services.AddScoped<IRepository<User>, Repository<User>>();
 
 // Add application services
-builder.Services.AddScoped<IUserService, UserDbHandler.Services.UserService>();
+builder.Services.AddScoped<IUserDbHandlerService, UserDbHandlerService>();
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 
 // Add OpenAPI/Swagger
