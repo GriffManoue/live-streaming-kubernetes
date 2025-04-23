@@ -2,7 +2,7 @@ using Shared.Interfaces;
 using Shared.models.Enums;
 using Shared.Models.Auth;
 using Shared.Models.Domain;
-using StreamService.Services;
+using StreamDbHandler.Services;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 
@@ -15,7 +15,7 @@ public class AuthService : IAuthService
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
     private readonly IRepository<User> _userRepository;
-    private readonly IStreamServiceClient _streamServiceClient;
+    private readonly StreamDbHandler.Services.IStreamServiceClient _streamServiceClient;
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
@@ -23,7 +23,7 @@ public class AuthService : IAuthService
         ITokenService tokenService,
         IPasswordHasher passwordHasher,
         IHttpContextAccessor httpContextAccessor,
-        IStreamServiceClient streamServiceClient,
+        StreamDbHandler.Services.IStreamServiceClient streamServiceClient,
         ICacheService cacheService,
         ILogger<AuthService> logger)
     {

@@ -7,9 +7,9 @@ using Microsoft.Extensions.Logging;
 using Shared.Models.Domain;
 using Shared.Models.Stream;
 
-namespace StreamService.Services;
+namespace StreamDbHandler.Services;
 
-public class StreamServiceClient : IStreamServiceClient
+public class StreamServiceClient : StreamDbHandler.Services.IStreamServiceClient
 {
     private readonly string _baseUrl;
     private readonly HttpClient _httpClient;

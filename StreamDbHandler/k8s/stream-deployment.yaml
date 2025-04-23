@@ -1,27 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: stream-service
+  name: stream-db-handler
   labels:
-    app: stream-service
+    app: stream-db-handler
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: stream-service
+      app: stream-db-handler
   template:
     metadata:
       labels:
-        app: stream-service
+        app: stream-db-handler
     spec:
       containers:
-      - name: stream-service
-        image: bugapeti/streamservice:latest
+      - name: stream-db-handler
+        image: bugapeti/streamservice:latest //TODO
         ports:
         - containerPort: 8080
         env:
         - name: ASPNETCORE_ENVIRONMENT
-          value: "Development"
+          value: "Production"
         - name: ConnectionStrings__DefaultConnection
           valueFrom:
             secretKeyRef:

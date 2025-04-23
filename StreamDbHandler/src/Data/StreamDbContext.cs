@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Shared.Data;
 using Shared.Models.Domain;
 
-namespace StreamService.Data;
+namespace StreamDbHandler.Data;
 
 public class StreamDbContext : BaseDbContext
 {

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Shared.Interfaces;
 using Shared.Models.Stream;
 
-namespace StreamService.Controllers;
+namespace StreamDbHandler.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

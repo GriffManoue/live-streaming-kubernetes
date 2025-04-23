@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Shared.Models.Domain;
 using Shared.Models.Stream;
 
-namespace StreamService.Services;
+namespace StreamDbHandler.Services;
 
 public interface IStreamServiceClient
 {

@@ -1,7 +1,5 @@
 using System.Text;
-using AuthService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
@@ -11,8 +9,8 @@ using Shared.Interfaces;
 using Shared.Models.Domain;
 using Shared.Services;
 using StackExchange.Redis;
-using StreamService.Data;
-using StreamService.Services;
+using StreamDbHandler.Data;
+using StreamDbHandler.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,7 +67,7 @@ builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<S
 // Register repositories for Stream-specific entities
 builder.Services.AddScoped<IRepository<LiveStream>, Repository<LiveStream>>();
 // Add HttpClient for the UserService
-builder.Services.AddHttpClient<IUserServiceClient, UserServiceClient>(client =>
+builder.Services.AddHttpClient<StreamDbHandler.Services.IUserServiceClient, StreamDbHandler.Services.UserServiceClient>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
 });
@@ -114,7 +112,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddHttpContextAccessor();
 
 // Add application services
-builder.Services.AddScoped<IStreamService, StreamService.Services.StreamService>();
+builder.Services.AddScoped<IStreamService, StreamDbHandler.Services.StreamService>();
 builder.Services.AddScoped<IUserContext, UserContext>();
 
 var app = builder.Build();

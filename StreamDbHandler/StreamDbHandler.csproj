@@ -5,6 +5,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <AssemblyName>StreamDbHandler</AssemblyName>
+        <RootNamespace>StreamDbHandler</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

@@ -2,12 +2,8 @@ using Shared.Interfaces;
 using Shared.models.Enums;
 using Shared.Models.Domain;
 using Shared.Models.Stream;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace StreamService.Services;
+namespace StreamDbHandler.Services;
 
 public class StreamService : IStreamService
 {
@@ -170,25 +166,6 @@ public class StreamService : IStreamService
         var user = await _userServiceClient.GetUserByIdAsync(stream.UserId);
 
         return MapToDto(stream, user);
-    }
-
-    public async Task<string> GenerateStremKeyAsync(Guid id)
-    {
-        var stream = await _streamRepository.GetByIdAsync(id);
-        if (stream == null)
-        {
-            throw new KeyNotFoundException($"Stream with ID {id} not found");
-        }
-
-        // Generate a new stream key
-        var streamKey = Guid.NewGuid().ToString();
-
-        // Update the stream with the new key
-        stream.StreamUrl = streamKey;
-
-        await _streamRepository.UpdateAsync(stream);
-
-        return streamKey;
     }
 
     public async Task<string> GenerateStreamKeyAsync(Guid id)

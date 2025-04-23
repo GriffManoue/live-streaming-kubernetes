@@ -1,7 +1,4 @@
-using System;
-using System.Threading.Tasks;
-
-namespace StreamService.Services;
+namespace StreamDbHandler.Services;
 
 public interface IUserServiceClient
 {

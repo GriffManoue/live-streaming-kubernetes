@@ -11,7 +11,7 @@ using Shared.Data;
 using Shared.Interfaces;
 using Shared.Services;
 using StackExchange.Redis;
-using StreamService.Services;
+using StreamDbHandler.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,7 +65,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     return ConnectionMultiplexer.Connect(configOptions);
 });
 
-builder.Services.AddHttpClient<IStreamServiceClient, StreamServiceClient>(client =>
+builder.Services.AddHttpClient<StreamDbHandler.Services.IStreamServiceClient, StreamDbHandler.Services.StreamServiceClient>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
 });

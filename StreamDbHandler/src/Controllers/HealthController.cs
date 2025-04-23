@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Threading.Tasks;
 
-namespace StreamService.Controllers;
+namespace StreamDbHandler.Controllers;
 
 [ApiController]
 [Route("health")]

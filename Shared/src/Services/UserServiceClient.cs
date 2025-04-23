@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Shared.Models.Stream;
 
-namespace StreamService.Services;
+namespace StreamDbHandler.Services;
 
 public class UserServiceClient : IUserServiceClient
 {

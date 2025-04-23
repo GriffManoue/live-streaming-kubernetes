@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: stream-service
+  name: stream-db-handler
 spec:
   selector:
-    app: stream-service
+    app: stream-db-handler
   ports:
   - port: 80
     targetPort: 8080
