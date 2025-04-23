@@ -4,7 +4,8 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import { routes } from './app.routes';
 import ColorPreset from '../ColorPreset';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from './services/auth-interceptor.service';
 import { MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
@@ -13,6 +14,11 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimationsAsync(),
     provideHttpClient(),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    },
     MessageService, 
     providePrimeNG({
         theme: {
