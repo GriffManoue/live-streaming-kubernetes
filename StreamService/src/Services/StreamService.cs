@@ -12,14 +12,14 @@ public class StreamService : IStreamService
     private readonly IStreamDbHandlerClient _streamDbHandlerClient;
     private readonly ILogger<StreamService> _logger;
 
-    private readonly IUserServiceClient _userServiceClient;
+    private readonly IUserDbHandlerClient _userServiceClient;
 
     private readonly ICacheService _cacheService;
 
     public StreamService(
         ILogger<StreamService> logger, 
         IStreamDbHandlerClient streamDbHandlerClient, 
-        IUserServiceClient userServiceClient,
+        IUserDbHandlerClient userServiceClient,
         ICacheService cacheService)
     {
         _logger = logger;

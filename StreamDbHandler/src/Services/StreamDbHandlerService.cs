@@ -9,12 +9,12 @@ public class StreamDbHandlerService : IStreamDbHandlerService
 {
     private readonly IRepository<LiveStream> _streamRepository;
     private readonly ICacheService _cacheService;
-    private readonly IUserServiceClient _userServiceClient;
+    private readonly IUserDbHandlerClient _userServiceClient;
 
     public StreamDbHandlerService(
         IRepository<LiveStream> streamRepository,
         ICacheService cacheService,
-        IUserServiceClient userServiceClient
+        IUserDbHandlerClient userServiceClient
         )
     {
         _streamRepository = streamRepository;

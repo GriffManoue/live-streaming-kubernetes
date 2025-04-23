@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shared.Data;
 using Shared.Interfaces;
+using Shared.Interfaces.Clients;
 using Shared.Models.Domain;
 using Shared.Services;
 using StackExchange.Redis;
@@ -67,7 +68,12 @@ builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<S
 // Register repositories for Stream-specific entities
 builder.Services.AddScoped<IRepository<LiveStream>, Repository<LiveStream>>();
 // Add HttpClient for the UserDbHandler
-builder.Services.AddHttpClient<StreamDbHandler.Services.IUserServiceClient, StreamDbHandler.Services.UserServiceClient>(client =>
+builder.Services.AddHttpClient<IUserDbHandlerClient, UserDbHandlerClient>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
+builder.Services.AddHttpClient<IStreamDbHandlerClient, StreamDbHandlerClient>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
 });

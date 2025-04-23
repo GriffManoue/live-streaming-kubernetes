@@ -1,5 +1,4 @@
 using System.Text;
-using AuthService.Data;
 using AuthService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -18,13 +17,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-
-// Add UserDbContext
-builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Register UserDbContext as IDbContext for dependency injection
-builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<AuthDbContext>());
 
 // Register the open generic repository
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -46,9 +38,6 @@ builder.Services.AddSwaggerGen(c =>
 
 // Add Health Checks with more resilient configuration
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<AuthDbContext>(
-        failureStatus: HealthStatus.Degraded,
-        tags: new[] { "ready" })
     .AddRedis(
         builder.Configuration.GetConnectionString("Redis") ?? "localhost",
         "redis",
