@@ -18,3 +18,10 @@ spec:
         ports:
         - containerPort: 1935
         - containerPort: 8080
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
