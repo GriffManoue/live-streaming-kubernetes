@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using DatabaseManagementService.Data;
 using DatabaseManagementService.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +25,27 @@ builder.Services.AddSwaggerGen(c =>
 // Add health checks
 builder.Services.AddHealthChecks();
 
+// Add JWT Authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "streaming-platform",
+        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "streaming-users",
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? "your-256-bit-secret-key-here-at-least-32-chars"))
+    };
+});
+
 var app = builder.Build();
 
 app.MapOpenApi();
@@ -34,6 +58,7 @@ app.UseSwaggerUI(c =>
 
 
 app.UseAuthorization();
+app.UseAuthentication();
 app.MapControllers();
 app.MapHealthChecks("/health");
 

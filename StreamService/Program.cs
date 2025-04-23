@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using Shared.Interfaces;
 using Shared.Interfaces.Clients;
 using Shared.Services;
 using StreamDbHandler.Services;
 using StackExchange.Redis;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 // Program.cs for StreamService
 // --------------------------------------------------
@@ -58,6 +61,27 @@ builder.Services.AddHealthChecks();
 
 // Register application services
 builder.Services.AddScoped<IStreamService, StreamService.src.Services.StreamService>();
+
+// Add JWT Authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "streaming-platform",
+        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "streaming-users",
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? "your-256-bit-secret-key-here-at-least-32-chars"))
+    };
+});
 
 var app = builder.Build();
 
