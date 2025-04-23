@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Interfaces;
 using Shared.Models.Stream;
@@ -18,6 +19,7 @@ namespace StreamService.src.Controllers
             _streamService = streamService;
         }
 
+        [Authorize]
         [HttpPost("{id:guid}/generateStreamKey")]
         public async Task<ActionResult<string>> GenerateStreamKey(Guid id)
         {
@@ -72,6 +74,7 @@ namespace StreamService.src.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("{userId:guid}/reccommendations")]
         public async Task<ActionResult<IEnumerable<StreamDto>>> GetRecommendations(Guid userId, [FromQuery] int count = 6)
         {

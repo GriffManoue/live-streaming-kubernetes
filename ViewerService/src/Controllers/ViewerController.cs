@@ -15,6 +15,7 @@ namespace ViewerService.src.Controllers
             _viewerService = viewerService;
         }
 
+        [Authorize]
         [HttpGet("{streamId:guid}/count")]
         public async Task<IActionResult> GetViewerCount(Guid streamId)
         {

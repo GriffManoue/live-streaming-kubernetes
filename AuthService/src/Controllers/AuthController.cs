@@ -90,7 +90,7 @@ public class AuthController : ControllerBase
         }
     }
     
-    [Authorize] // Add Authorize attribute
+    [Authorize]
     [HttpPost("revoke")]
     public async Task<ActionResult> RevokeToken([FromBody] string token)
     {

@@ -18,7 +18,8 @@ public class StreamDbHandlerController : ControllerBase
     {
         _streamService = streamService;
     }
-    
+
+    [Authorize]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<StreamDto>> GetStreamById(Guid id)
     {
@@ -37,6 +38,7 @@ public class StreamDbHandlerController : ControllerBase
         }
     }
     
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<StreamDto>>> GetActiveStreams()
     {
@@ -51,6 +53,7 @@ public class StreamDbHandlerController : ControllerBase
         }
     }
     
+    [Authorize]
     [HttpGet("user/{userId:guid}")]
     public async Task<ActionResult<StreamDto>> GetStreamByUserId(Guid userId)
     {

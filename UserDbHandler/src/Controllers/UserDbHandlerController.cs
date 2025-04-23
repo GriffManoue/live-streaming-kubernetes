@@ -17,7 +17,8 @@ public class UserController : ControllerBase
     {
         _userService = userService;
     }
-    
+
+    [Authorize]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<UserDTO>> GetUserById(Guid id)
     {
@@ -79,6 +80,7 @@ public class UserController : ControllerBase
         }
     }
 
+    [Authorize] // Add Authorize attribute
     [HttpGet("includes/{id:guid}")]
     public async Task<ActionResult<UserDTO>> GetUserByIdWithIncludes(Guid id)
     {
@@ -97,6 +99,7 @@ public class UserController : ControllerBase
         }
     }
 
+    [Authorize] // Add Authorize attribute
     [HttpPost]
     public async Task<ActionResult<UserDTO>> CreateUser([FromBody] UserDTO userDto)
     {
@@ -111,6 +114,7 @@ public class UserController : ControllerBase
         }
     }
 
+    [Authorize] // Add Authorize attribute
     [HttpGet("email/{email}")]
     public async Task<ActionResult<UserDTO>> GetUserByEmail(string email)
     {

@@ -16,6 +16,7 @@ namespace FollowerService.src.Controllers
             _followerService = followerService;
         }
 
+        [Authorize]
         [HttpGet("{userId:guid}/followers")]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetFollowers(Guid userId)
         {
@@ -30,6 +31,7 @@ namespace FollowerService.src.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("{userId:guid}/following")]
         public async Task<ActionResult<IEnumerable<UserDTO>>> GetFollowing(Guid userId)
         {
