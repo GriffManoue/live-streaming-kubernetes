@@ -4,7 +4,8 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import { routes } from './app.routes';
 import ColorPreset from '../ColorPreset';
-import { provideHttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { AuthInterceptor } from './services/auth-interceptor.service';
 import { MessageService } from 'primeng/api';
 
@@ -13,12 +14,8 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideAnimationsAsync(),
-    provideHttpClient(),
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true
-    },
+    AuthInterceptor,
+    provideHttpClient(withInterceptorsFromDi()),
     MessageService, 
     providePrimeNG({
         theme: {
