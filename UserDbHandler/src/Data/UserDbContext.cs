@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Shared.Models.Domain;
 using Shared.Data;
 
-namespace UserService.Data;
+namespace UserDbHandler.Data;
 
 public class UserDbContext : BaseDbContext
 {

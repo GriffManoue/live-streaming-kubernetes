@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Shared.Interfaces;
 using Shared.Models.Domain;
 
-namespace UserService.Services;
+namespace UserDbHandler.Services;
 
 public class UserService : IUserService
 {

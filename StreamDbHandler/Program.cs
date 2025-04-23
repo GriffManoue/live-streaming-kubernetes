@@ -66,7 +66,7 @@ builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<S
 
 // Register repositories for Stream-specific entities
 builder.Services.AddScoped<IRepository<LiveStream>, Repository<LiveStream>>();
-// Add HttpClient for the UserService
+// Add HttpClient for the UserDbHandler
 builder.Services.AddHttpClient<StreamDbHandler.Services.IUserServiceClient, StreamDbHandler.Services.UserServiceClient>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);

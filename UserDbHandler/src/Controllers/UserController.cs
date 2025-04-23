@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Interfaces;
 
-namespace UserService.Controllers;
+namespace UserDbHandler.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

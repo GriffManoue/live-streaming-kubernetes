@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Threading.Tasks;
 
-namespace UserService.Controllers;
+namespace UserDbHandler.Controllers;
 
 [ApiController]
 [Route("health")]

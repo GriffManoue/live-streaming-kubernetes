@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-service
+  name: user-db-handler
   labels:
-    app: user-service
+    app: user-db-handler
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user-service
+      app: user-db-handler
   template:
     metadata:
       labels:
-        app: user-service
+        app: user-db-handler
     spec:
       containers:
-      - name: user-service
+      - name: user-db-handler
         image: bugapeti/userservice:latest
         ports:
         - containerPort: 8080

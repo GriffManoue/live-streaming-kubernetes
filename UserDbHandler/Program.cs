@@ -10,7 +10,8 @@ using Shared.Interfaces;
 using Shared.Models.Domain;
 using Shared.Services;
 using StackExchange.Redis;
-using UserService.Data;
+using UserDbHandler.Data;
+using UserDbHandler.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,14 +30,14 @@ builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<U
 builder.Services.AddScoped<IRepository<User>, Repository<User>>();
 
 // Add application services
-builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
+builder.Services.AddScoped<IUserService, UserDbHandler.Services.UserService>();
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 
 // Add OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "UserService API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "UserDbHandler API", Version = "v1" });
 });
 
 builder.Services.AddAuthentication(options =>
@@ -106,7 +107,7 @@ if (app.Environment.IsDevelopment())
     if (!isRunningInContainer) app.UseHttpsRedirection();
 
     app.UseSwagger();
-    app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserService API v1"); });
+    app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserDbHandler API v1"); });
 }
 
 // IMPORTANT: Place UseCors before Authentication/Authorization

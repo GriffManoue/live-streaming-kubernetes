@@ -5,6 +5,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <AssemblyName>UserDbHandler</AssemblyName>
+        <RootNamespace>UserDbHandler</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

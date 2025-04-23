@@ -1,7 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService", "UserService\UserService.csproj", "{99D45FB2-23A1-4D1A-9A4A-3C6B0BDC0CBA}"
-EndProject
+# 
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3FFC5C53-EBB2-4E60-8B81-AA5A95465D1D}"
 	ProjectSection(SolutionItems) = preProject
 		compose.yaml = compose.yaml
@@ -15,16 +14,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseManagementService",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StreamDbHandler", "StreamDbHandler\StreamDbHandler.csproj", "{917DB67C-E14A-46B4-A0F3-661C0B704A2B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserDbHandler", "UserDbHandler\UserDbHandler.csproj", "{B96A804A-257F-45DC-B5B6-7850F75EACF8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{99D45FB2-23A1-4D1A-9A4A-3C6B0BDC0CBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{99D45FB2-23A1-4D1A-9A4A-3C6B0BDC0CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{99D45FB2-23A1-4D1A-9A4A-3C6B0BDC0CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{99D45FB2-23A1-4D1A-9A4A-3C6B0BDC0CBA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5A61FA46-18CF-4165-A0A4-268A9000DD61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5A61FA46-18CF-4165-A0A4-268A9000DD61}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A61FA46-18CF-4165-A0A4-268A9000DD61}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -41,6 +38,10 @@ Global
 		{917DB67C-E14A-46B4-A0F3-661C0B704A2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{917DB67C-E14A-46B4-A0F3-661C0B704A2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{917DB67C-E14A-46B4-A0F3-661C0B704A2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B96A804A-257F-45DC-B5B6-7850F75EACF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B96A804A-257F-45DC-B5B6-7850F75EACF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B96A804A-257F-45DC-B5B6-7850F75EACF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B96A804A-257F-45DC-B5B6-7850F75EACF8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
