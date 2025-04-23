@@ -25,6 +25,9 @@ builder.Services.AddSwaggerGen(c =>
 // Make sure to use the correct namespace and class name for your implementation
 builder.Services.AddScoped<IFollowerService, FollowerService.src.Services.FollowerService>();
 
+// Register IHttpContextAccessor for JwtTokenHandler
+builder.Services.AddHttpContextAccessor();
+
 // Register JwtTokenHandler for DI
 builder.Services.AddTransient<Shared.Services.JwtTokenHandler>();
 
