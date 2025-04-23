@@ -73,6 +73,7 @@ public class StreamDbHandlerController : ControllerBase
         }
     }
     
+    [Authorize] // Add Authorize attribute
     [HttpPost]
     public async Task<ActionResult<StreamDto>> CreateStream([FromQuery] Guid? userId = null)
     {
@@ -100,6 +101,7 @@ public class StreamDbHandlerController : ControllerBase
         }
     }
     
+    [Authorize] // Add Authorize attribute
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<StreamDto>> UpdateStream(Guid id, [FromBody] StreamDto streamDto)
     {
@@ -128,6 +130,7 @@ public class StreamDbHandlerController : ControllerBase
         }
     }
 
+    [Authorize] // Add Authorize attribute
     [HttpGet("all")]
     public async Task<ActionResult<IEnumerable<StreamDto>>> GetAllStreams()
     {

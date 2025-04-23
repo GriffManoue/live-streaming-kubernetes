@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization; // Add this using directive
 using Microsoft.AspNetCore.Mvc;
 using Shared.Interfaces;
 
@@ -53,6 +54,7 @@ public class UserController : ControllerBase
         }
     }
     
+    [Authorize] // Add Authorize attribute
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<UserDTO>> UpdateUser(Guid id, [FromBody] UserDTO userDto)
     {
@@ -125,5 +127,3 @@ public class UserController : ControllerBase
         }
     }
 }
-
-

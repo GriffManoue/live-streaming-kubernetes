@@ -29,4 +29,24 @@ spec:
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: "Development"
+        - name: Jwt__SecretKey
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secrets
+              key: secret-key
+        - name: Jwt__Issuer
+          valueFrom:
+            configMapKeyRef:
+              name: auth-config
+              key: jwt-issuer
+        - name: Jwt__Audience
+          valueFrom:
+            configMapKeyRef:
+              name: auth-config
+              key: jwt-audience
+        - name: Jwt__ExpiryMinutes
+          valueFrom:
+            configMapKeyRef:
+              name: auth-config
+              key: jwt-expiry-minutes
         # Add additional environment variables and secrets as needed

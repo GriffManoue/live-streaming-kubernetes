@@ -28,15 +28,18 @@ builder.Services.AddScoped<IAuthService, AuthService.Services.AuthService>();
 builder.Services.AddHttpContextAccessor();
 
 // Configure HttpClients for microservice communication
+// Register the JwtTokenHandler
+builder.Services.AddTransient<JwtTokenHandler>();
+
 builder.Services.AddHttpClient<IStreamDbHandlerClient, StreamDbHandlerClient>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
-});
+}).AddHttpMessageHandler<JwtTokenHandler>(); // Add the handler
 
 builder.Services.AddHttpClient<IUserDbHandlerClient, UserDbHandlerClient>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
-});
+}).AddHttpMessageHandler<JwtTokenHandler>(); // Add the handler
 
 // Add OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();

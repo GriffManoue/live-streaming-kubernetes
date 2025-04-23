@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization; // Add this using directive
 using Microsoft.AspNetCore.Mvc;
 using Shared.src.Interfaces.Services;
 using Shared.src.Models.User;
@@ -43,6 +44,7 @@ namespace FollowerService.src.Controllers
             }
         }
 
+        [Authorize] // Add Authorize attribute
         [HttpPost("follow")]
         public async Task<ActionResult> FollowUser([FromBody] FollowRequest request)
         {
@@ -61,6 +63,7 @@ namespace FollowerService.src.Controllers
             }
         }
 
+        [Authorize] // Add Authorize attribute
         [HttpPost("unfollow")]
         public async Task<ActionResult> UnfollowUser([FromBody] FollowRequest request)
         {

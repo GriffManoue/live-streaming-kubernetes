@@ -67,16 +67,19 @@ builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<S
 
 // Register repositories for Stream-specific entities
 builder.Services.AddScoped<IRepository<LiveStream>, Repository<LiveStream>>();
+// Register the JwtTokenHandler
+builder.Services.AddTransient<JwtTokenHandler>();
+
 // Add HttpClient for the UserDbHandler
 builder.Services.AddHttpClient<IUserDbHandlerClient, UserDbHandlerClient>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
-});
+}).AddHttpMessageHandler<JwtTokenHandler>(); // Add the handler
 
 builder.Services.AddHttpClient<IStreamDbHandlerClient, StreamDbHandlerClient>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
-});
+}).AddHttpMessageHandler<JwtTokenHandler>(); // Add the handler
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>

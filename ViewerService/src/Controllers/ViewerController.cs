@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization; // Add this using directive
 using Microsoft.AspNetCore.Mvc;
 using Shared.src.Interfaces.Services;
 
@@ -21,6 +22,7 @@ namespace ViewerService.src.Controllers
             return Ok(count);
         }
 
+        [Authorize] // Add Authorize attribute
         [HttpPost("{streamId:guid}/join")]
         public async Task<IActionResult> JoinViewer(Guid streamId, [FromQuery] string viewerId)
         {
@@ -28,6 +30,7 @@ namespace ViewerService.src.Controllers
             return Ok();
         }
 
+        [Authorize] // Add Authorize attribute
         [HttpPost("{streamId:guid}/leave")]
         public async Task<IActionResult> LeaveViewer(Guid streamId, [FromQuery] string viewerId)
         {
