@@ -14,6 +14,8 @@ spec:
       labels:
         app: stream-service
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
       - name: stream-service
         image: bugapeti/streamservice-k8s:latest

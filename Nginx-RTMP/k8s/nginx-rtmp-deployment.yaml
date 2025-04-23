@@ -12,6 +12,8 @@ spec:
       labels:
         app: nginx-rtmp
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
       - name: nginx-rtmp
         image: bugapeti/nginx-rtmp-k8s:latest

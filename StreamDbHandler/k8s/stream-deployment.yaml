@@ -14,6 +14,8 @@ spec:
       labels:
         app: stream-db-handler
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
       - name: stream-db-handler
         image: bugapeti/streamdbhandler-k8s:latest

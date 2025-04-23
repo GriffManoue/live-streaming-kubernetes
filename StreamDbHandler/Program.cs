@@ -13,21 +13,25 @@ using StackExchange.Redis;
 using StreamDbHandler.Data;
 using StreamDbHandler.Services;
 
+// Program.cs for StreamDbHandler
+// --------------------------------------------------
+// Service registration and configuration for StreamDbHandler
+// --------------------------------------------------
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add controllers
 builder.Services.AddControllers();
 
 // Add OpenAPI/Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
-
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "StreamService API", Version = "v1" });
 });
 
-// Add Health Checks with more resilient configuration
+// Add Health Checks and Redis
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<StreamDbContext>(
         failureStatus: HealthStatus.Degraded,
@@ -38,8 +42,6 @@ builder.Services.AddHealthChecks()
         HealthStatus.Degraded,
         new[] { "ready" },
         TimeSpan.FromSeconds(5));
-
-// Add Redis caching service (shared)
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
     var configOptions = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis") ?? "localhost");
@@ -50,101 +52,77 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 });
 builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 
-// Add StreamDbContext
+// Add StreamDbContext and register as IDbContext
 builder.Services.AddDbContext<StreamDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"), npgsqlOptions =>
     {
-        npgsqlOptions.EnableRetryOnFailure(
-            5,
-            TimeSpan.FromSeconds(30),
-            null);
+        npgsqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(30), null);
     });
 });
-
-// Register StreamDbContext as IDbContext for dependency injection
 builder.Services.AddScoped<IDbContext>(provider => provider.GetRequiredService<StreamDbContext>());
 
-// Register repositories for Stream-specific entities
+// Register repositories and services
 builder.Services.AddScoped<IRepository<LiveStream>, Repository<LiveStream>>();
-// Register the JwtTokenHandler
+builder.Services.AddScoped<IStreamDbHandlerService, StreamDbHandlerService>();
+
+// Register IHttpContextAccessor for DI (needed for JwtTokenHandler)
+builder.Services.AddHttpContextAccessor();
+
+// Register JwtTokenHandler for DI
 builder.Services.AddTransient<JwtTokenHandler>();
 
-// Add HttpClient for the UserDbHandler
+// Register HttpClients with JwtTokenHandler for outgoing requests
 builder.Services.AddHttpClient<IUserDbHandlerClient, UserDbHandlerClient>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
-}).AddHttpMessageHandler<JwtTokenHandler>(); // Add the handler
-
+}).AddHttpMessageHandler<JwtTokenHandler>();
 builder.Services.AddHttpClient<IStreamDbHandlerClient, StreamDbHandlerClient>(client =>
 {
     client.Timeout = TimeSpan.FromSeconds(30);
-}).AddHttpMessageHandler<JwtTokenHandler>(); // Add the handler
+}).AddHttpMessageHandler<JwtTokenHandler>();
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "streaming-platform",
-            ValidAudience = builder.Configuration["Jwt:Audience"] ?? "streaming-users",
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ??
-                                       "your-256-bit-secret-key-here-at-least-32-chars"))
-        };
-    });
-    
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "streaming-platform",
+        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "streaming-users",
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? "your-256-bit-secret-key-here-at-least-32-chars"))
+    };
+});
 
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
-        builder =>
+        policyBuilder =>
         {
-            builder
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader();
+            policyBuilder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
         });
 });
 
-// Register IHttpContextAccessor for dependency injection
-builder.Services.AddHttpContextAccessor();
-
-// Add application services
-builder.Services.AddScoped<IStreamDbHandlerService, StreamDbHandlerService>();
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
+app.MapOpenApi();
+app.UseSwagger();
+app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserService API v1"); });
 
-    // Only use HTTPS redirection in local development, not in containers
-    var isRunningInContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
-    if (!isRunningInContainer) app.UseHttpsRedirection();
-
-    app.UseSwagger();
-    app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserService API v1"); });
-}
-
-// IMPORTANT: Place UseCors before Authentication/Authorization
+app.UseHttpsRedirection();
 app.UseCors("AllowAll");
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 app.MapHealthChecks("/health");
-
 app.Run();

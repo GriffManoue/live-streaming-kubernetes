@@ -13,21 +13,6 @@ options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")
 
 builder.Services.AddScoped<IMigrationService, PostgreSqlMigrationService>();
 
-builder.Logging.AddConsole();
-
-// Add CORS policy
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll",
-        builder =>
-        {
-            builder
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader();
-        });
-});
-
 // Add swagger
 builder.Services.AddSwaggerGen(c =>
 {
@@ -39,33 +24,14 @@ builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.MapOpenApi();
+app.UseHttpsRedirection();
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.MapOpenApi();
-    using (var scope = app.Services.CreateScope())
-    {
-        var migrationService = scope.ServiceProvider.GetRequiredService<IMigrationService>();
-        await migrationService.ApplyMigrationsAsync();
-    }
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "DatabaseManagementService API v1");
+});
 
-
-    // Only use HTTPS redirection in local development, not in containers
-    var isRunningInContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
-    if (!isRunningInContainer)
-    {
-        app.UseHttpsRedirection();
-    }
-
-     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "DatabaseManagementService API v1");
-    });
-}
-
-// IMPORTANT: Add CORS middleware
-app.UseCors("AllowAll");
 
 app.UseAuthorization();
 app.MapControllers();
