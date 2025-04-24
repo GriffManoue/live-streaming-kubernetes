@@ -29,7 +29,7 @@ builder.Services.AddSwaggerGen(c =>
 // Register Redis multiplexer and cache service
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    var configOptions = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis") ?? "localhost");
+    var configOptions = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis") ?? throw new InvalidOperationException("Redis connection string not configured."));
     configOptions.AbortOnConnectFail = false;
     configOptions.ConnectRetry = 5;
     configOptions.ReconnectRetryPolicy = new ExponentialRetry(5000);
