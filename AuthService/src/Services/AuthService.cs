@@ -103,7 +103,7 @@ public class AuthService : IAuthService
             Id = Guid.NewGuid(),
             Username = request.Username,
             Email = request.Email,
-            Password = _passwordHasher.HashPassword(request.Password),
+            Password = request.Password,
             FirstName = request.FirstName,
             LastName = request.LastName,
             IsLive = false,
