@@ -4,4 +4,4 @@ metadata:
   name: service-url-config
 data:
   userDbHandler: http://user-db-handler/api
-  streamDbHandler: http://stream-db-handler/api"
+  streamDbHandler: http://stream-db-handler/api
