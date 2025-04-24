@@ -46,13 +46,13 @@ builder.Services.AddTransient<JwtTokenHandler>();
 // Register HttpClients with JwtTokenHandler for outgoing requests
 builder.Services.AddHttpClient<IUserDbHandlerClient, UserDbHandlerClient>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["Services:UserService:BaseUrl"] ?? "http://user-db-handler/api/");
+    client.BaseAddress = new Uri(builder.Configuration["Services:UserService:BaseUrl"] ?? "http://user-db-handler/api");
     client.Timeout = TimeSpan.FromSeconds(30);
 }).AddHttpMessageHandler<JwtTokenHandler>();
 
 builder.Services.AddHttpClient<IStreamDbHandlerClient, StreamDbHandlerClient>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["Services:StreamService:BaseUrl"] ?? "http://stream-db-handler/api/");
+    client.BaseAddress = new Uri(builder.Configuration["Services:StreamService:BaseUrl"] ?? "http://stream-db-handler/api");
     client.Timeout = TimeSpan.FromSeconds(30);
 })
 .AddHttpMessageHandler<JwtTokenHandler>();

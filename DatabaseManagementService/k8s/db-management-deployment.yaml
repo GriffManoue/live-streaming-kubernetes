@@ -29,6 +29,26 @@ spec:
             secretKeyRef:
               name: db-secrets
               key: postgres-connection-string
+        - name: Jwt__SecretKey
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secrets
+              key: secret-key
+        - name: Jwt__Issuer
+          valueFrom:
+            configMapKeyRef:
+              name: auth-config
+              key: jwt-issuer
+        - name: Jwt__Audience
+          valueFrom:
+            configMapKeyRef:
+              name: auth-config
+              key: jwt-audience
+        - name: Jwt__ExpiryMinutes
+          valueFrom:
+            configMapKeyRef:
+              name: auth-config
+              key: jwt-expiry-minutes
         resources:
           limits:
             cpu: "500m"
