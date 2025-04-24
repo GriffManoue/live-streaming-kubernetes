@@ -49,6 +49,16 @@ spec:
             configMapKeyRef:
               name: auth-config
               key: jwt-expiry-minutes
+        - name: ServiceUrls__UserDbHandler__BaseUrl
+          valueFrom:
+             configMapKeyRef:
+              name: service-url-config
+              key: user-db-handler-url
+        - name: ServiceUrls__StreamDbHandler__BaseUrl
+          valueFrom:
+             configMapKeyRef:
+              name: service-url-config
+              key: stream-db-handler-url
         resources:
           requests:
             memory: "64Mi"

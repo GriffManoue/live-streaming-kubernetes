@@ -20,7 +20,12 @@ public class StreamDbHandlerClient : IStreamDbHandlerClient
         _logger = logger;
         
         // Read from configuration with fallback to the default value
-        _baseUrl = configuration["Services:StreamDbHandler:BaseUrl"] ?? "http://stream-db-handler/api/"; //Todo: Add url to configuration 
+        var baseUrl = configuration["Services:StreamDbHandler:BaseUrl"];
+        if (string.IsNullOrEmpty(baseUrl))
+        {
+            throw new InvalidOperationException("StreamDbHandler base URL is not configured.");
+        }
+        _baseUrl = baseUrl;
         _logger?.LogInformation("StreamDbHandlerClient initialized with base URL: {BaseUrl}", _baseUrl);
     }
 

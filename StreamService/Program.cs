@@ -46,13 +46,13 @@ builder.Services.AddTransient<JwtTokenHandler>();
 // Register HttpClients with JwtTokenHandler for outgoing requests
 builder.Services.AddHttpClient<IUserDbHandlerClient, UserDbHandlerClient>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["Services:UserService:BaseUrl"] ?? "http://user-db-handler/api");
+    client.BaseAddress = new Uri(builder.Configuration["Services:UserDbHandler:BaseUrl"] ?? throw new InvalidOperationException("UserDbHandler base URL not configured."));
     client.Timeout = TimeSpan.FromSeconds(30);
 }).AddHttpMessageHandler<JwtTokenHandler>();
 
 builder.Services.AddHttpClient<IStreamDbHandlerClient, StreamDbHandlerClient>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["Services:StreamService:BaseUrl"] ?? "http://stream-db-handler/api");
+    client.BaseAddress = new Uri(builder.Configuration["Services:StreamDbHandler:BaseUrl"] ?? throw new InvalidOperationException("StreamDbHandler base URL not configured."));
     client.Timeout = TimeSpan.FromSeconds(30);
 })
 .AddHttpMessageHandler<JwtTokenHandler>();
@@ -71,16 +71,19 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    var secretKey = builder.Configuration["Jwt:SecretKey"];
+    if (string.IsNullOrEmpty(secretKey))
+        throw new InvalidOperationException("JWT SecretKey is not configured.");
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "streaming-platform",
-        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "streaming-users",
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? "your-256-bit-secret-key-here-at-least-32-chars"))
+            Encoding.UTF8.GetBytes(secretKey))
     };
 });
 

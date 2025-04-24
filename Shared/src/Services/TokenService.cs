@@ -18,9 +18,9 @@ public class TokenService : ITokenService
     public TokenService(IConfiguration configuration)
     {
         _secretKey = configuration["Jwt:SecretKey"] ?? throw new ArgumentNullException("Jwt:SecretKey");
-        _issuer = configuration["Jwt:Issuer"] ?? "streaming-platform";
-        _audience = configuration["Jwt:Audience"] ?? "streaming-users";
-        _expiryMinutes = int.TryParse(configuration["Jwt:ExpiryMinutes"], out var minutes) ? minutes : 60;
+        _issuer = configuration["Jwt:Issuer"] ?? throw new ArgumentNullException("Jwt:Issuer");
+        _audience = configuration["Jwt:Audience"] ?? throw new ArgumentNullException("Jwt:Audience");
+        _expiryMinutes = int.TryParse(configuration["Jwt:ExpiryMinutes"], out var minutes) ? minutes : throw new ArgumentNullException("Jwt:ExpiryMinutes");
     }
 
     public string GenerateToken(User user)

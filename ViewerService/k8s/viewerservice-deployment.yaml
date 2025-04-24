@@ -24,6 +24,11 @@ spec:
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: "Production"
+        - name: ConnectionStrings__Redis
+          valueFrom:
+            secretKeyRef:
+              name: redis-secrets
+              key: redis-connection-string
         - name: Jwt__ServiceToken
           valueFrom:
             secretKeyRef:

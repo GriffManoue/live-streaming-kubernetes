@@ -30,7 +30,7 @@ spec:
             cpu: "500m"
         env:
         - name: ASPNETCORE_ENVIRONMENT
-          value: "Development"
+          value: "Production"
         - name: Jwt__ServiceToken
           valueFrom:
             secretKeyRef:
@@ -68,4 +68,4 @@ spec:
             port: 8080
           initialDelaySeconds: 10
           periodSeconds: 10
-        # Add additional environment variables and secrets as needed
+

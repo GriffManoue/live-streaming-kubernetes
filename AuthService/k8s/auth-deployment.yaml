@@ -23,12 +23,7 @@ spec:
         - containerPort: 8080
         env:
         - name: ASPNETCORE_ENVIRONMENT
-          value: "Development"
-        - name: ConnectionStrings__DefaultConnection
-          valueFrom:
-            secretKeyRef:
-              name: db-secrets
-              key: postgres-connection-string
+          value: "Production"
         - name: ConnectionStrings__Redis
           valueFrom:
             secretKeyRef:
@@ -59,6 +54,11 @@ spec:
             configMapKeyRef:
               name: auth-config
               key: jwt-expiry-minutes
+        - name: ServiceUrls__UserDbHandler__BaseUrl
+          valueFrom:
+            configMapKeyRef:
+              name: service-url-config
+              key: userDbHandler
         resources:
           limits:
             cpu: "500m"

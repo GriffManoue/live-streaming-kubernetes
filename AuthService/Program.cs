@@ -54,16 +54,21 @@ builder.Services.AddHttpClient<IUserDbHandlerClient, UserDbHandlerClient>(client
 }).AddHttpMessageHandler<JwtTokenHandler>();
 
 // Add Health Checks and Redis
+var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
+if (string.IsNullOrEmpty(redisConnectionString))
+{
+    throw new InvalidOperationException("Redis connection string 'Redis' not found in configuration.");
+}
 builder.Services.AddHealthChecks()
     .AddRedis(
-        builder.Configuration.GetConnectionString("Redis") ?? "localhost",
+        redisConnectionString,
         "redis",
         HealthStatus.Degraded,
         new[] { "ready" },
         TimeSpan.FromSeconds(5));
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    var configOptions = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis") ?? "localhost");
+    var configOptions = ConfigurationOptions.Parse(redisConnectionString);
     configOptions.AbortOnConnectFail = false;
     configOptions.ConnectRetry = 5;
     configOptions.ReconnectRetryPolicy = new ExponentialRetry(5000);
@@ -86,11 +91,16 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "streaming-platform",
-        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "streaming-users",
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? "your-256-bit-secret-key-here-at-least-32-chars"))
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"]
     };
+
+    var secretKey = builder.Configuration["Jwt:SecretKey"];
+    if (string.IsNullOrEmpty(secretKey))
+        throw new InvalidOperationException("JWT SecretKey is not configured.");
+
+    options.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(
+        Encoding.UTF8.GetBytes(secretKey));
 });
 
 var app = builder.Build();

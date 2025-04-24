@@ -45,9 +45,14 @@ builder.Services.AddHttpClient<IStreamDbHandlerClient, StreamDbHandlerClient>(cl
 }).AddHttpMessageHandler<JwtTokenHandler>();
 
 // Register Redis multiplexer and cache service
+var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
+if (string.IsNullOrEmpty(redisConnectionString))
+{
+    throw new InvalidOperationException("Redis connection string 'Redis' not found in configuration.");
+}
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    var configOptions = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis") ?? "localhost");
+    var configOptions = ConfigurationOptions.Parse(redisConnectionString);
     configOptions.AbortOnConnectFail = false;
     configOptions.ConnectRetry = 5;
     configOptions.ReconnectRetryPolicy = new ExponentialRetry(5000);
@@ -65,16 +70,19 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    var secretKey = builder.Configuration["Jwt:SecretKey"];
+    if (string.IsNullOrEmpty(secretKey))
+        throw new InvalidOperationException("JWT SecretKey is not configured.");
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "streaming-platform",
-        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "streaming-users",
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? "your-256-bit-secret-key-here-at-least-32-chars"))
+            Encoding.UTF8.GetBytes(secretKey))
     };
 });
 

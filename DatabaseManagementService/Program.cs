@@ -39,11 +39,16 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "streaming-platform",
-        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "streaming-users",
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"] ?? "your-256-bit-secret-key-here-at-least-32-chars"))
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
     };
+
+    var secretKey = builder.Configuration["Jwt:SecretKey"];
+    if (string.IsNullOrEmpty(secretKey))
+        throw new InvalidOperationException("JWT SecretKey is not configured.");
+
+    options.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(
+        Encoding.UTF8.GetBytes(secretKey));
 });
 
 var app = builder.Build();

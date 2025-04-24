@@ -22,7 +22,7 @@ public class UserDbHandlerClient : IUserDbHandlerClient
         _httpClient = httpClient;
         _httpClient.Timeout = TimeSpan.FromSeconds(15); // Add timeout to prevent long-running requests
         _logger = logger;
-        _baseUrl = configuration["ServiceUrls:UserDbHandler:BaseUrl"] ?? "http://user-db-handler/api"; //Todo add url to config
+        _baseUrl = configuration["ServiceUrls:UserDbHandler:BaseUrl"] ?? throw new ArgumentNullException("ServiceUrls:UserDbHandler:BaseUrl is null");
         _logger?.LogInformation("UserServiceClient initialized with base URL: {BaseUrl}", _baseUrl);
     }
 
