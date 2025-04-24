@@ -1,73 +1,55 @@
-# KubeStream Client (Angular Frontend)
+# KubeStream Client (Angular)
 
-This is the Angular frontend application for the **Live Streaming Kubernetes Application**. It provides the user interface for interacting with the platform.
+This is the frontend application for KubeStream, a live streaming platform running on Kubernetes. The client is built with Angular and provides a modern, responsive interface for users to watch streams, manage their profiles, and interact with the platform.
 
-For details on the overall project architecture, backend services, and setup instructions for the entire application (including backend and infrastructure), please refer to the [main project README](../README.md).
+## Features
+- User registration and login
+- Browse and watch live streams (HLS playback via Shaka Player)
+- Start and manage your own streams
+- User profile management
+- Follow/unfollow other users
+- Real-time viewer counts and stream recommendations
+- Responsive design
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.3.
+## Project Structure
+- `src/` — Main Angular source code
+  - `app/` — Components, services, routing, and modules
+  - `assets/` — Static assets (images, styles)
+  - `environments/` — Environment-specific configs
+- `public/` — Public static files
+- `k8s/` — Kubernetes manifests for deploying the client
+- `angular.json` — Angular CLI configuration
 
-## Key Features
+## Getting Started
 
--   User Registration and Login
--   Browsing active live streams
--   Viewing live streams using HLS (via Shaka Player)
--   User profile and stream settings management (including generating stream keys)
--   (Planned: Following users, chat, etc.)
+### Prerequisites
+- [Node.js & npm](https://nodejs.org/)
+- [Angular CLI](https://angular.io/cli)
 
-## Development server
+### Installation
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the development server:
+   ```bash
+   ng serve
+   ```
+   The app will be available at [http://localhost:4200](http://localhost:4200).
 
-Ensure the backend services are running (see main README). Then, to start the local development server for the client:
+## Deployment
+- Use the provided `k8s/` manifests to deploy the client as a containerized service in your Kubernetes cluster.
+- The `Dockerfile` and `nginx.conf` are set up for serving the built Angular app with Nginx.
 
-```bash
-# Navigate to this directory (Client/) if you aren't already here
-npm install # If you haven't installed dependencies yet
-ng serve
-```
+## Useful Commands
+- `ng generate component <name>` — Generate a new component
+- `ng generate service <name>` — Generate a new service
+- `ng build` — Build the project
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files. 
+## Learn More
+- [Angular Documentation](https://angular.io/docs)
+- [Shaka Player Documentation](https://shaka-player-demo.appspot.com/docs/)
 
-## Code scaffolding
+---
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+For backend and infrastructure setup, see the main project README.
