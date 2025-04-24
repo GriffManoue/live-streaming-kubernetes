@@ -56,6 +56,11 @@ spec:
             configMapKeyRef:
               name: auth-config
               key: jwt-expiry-minutes
+        - name: ServiceUrls__UserDbHandler__BaseUrl
+          valueFrom:
+            configMapKeyRef:
+              name: service-url-config
+              key: userDbHandler
         livenessProbe:
           httpGet:
             path: /health/live

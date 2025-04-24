@@ -59,6 +59,11 @@ spec:
             configMapKeyRef:
               name: service-url-config
               key: userDbHandler
+        - name: ServiceUrls__StreamDbHandler__BaseUrl
+          valueFrom:
+            configMapKeyRef:
+              name: service-url-config
+              key: streamDbHandler
         resources:
           limits:
             cpu: "500m"

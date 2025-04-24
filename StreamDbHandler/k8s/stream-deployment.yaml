@@ -69,6 +69,11 @@ spec:
             configMapKeyRef:
               name: rtmp-config
               key: stream-key-prefix
+        - name: ServiceUrls__UserDbHandler__BaseUrl
+          valueFrom:
+            configMapKeyRef:
+              name: service-url-config
+              key: userDbHandler
         resources:
           limits:
             cpu: "500m"

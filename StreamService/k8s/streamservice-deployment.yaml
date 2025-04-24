@@ -53,12 +53,12 @@ spec:
           valueFrom:
              configMapKeyRef:
               name: service-url-config
-              key: user-db-handler-url
+              key: userDbHandler
         - name: ServiceUrls__StreamDbHandler__BaseUrl
           valueFrom:
              configMapKeyRef:
               name: service-url-config
-              key: stream-db-handler-url
+              key: streamDbHandler
         resources:
           requests:
             memory: "64Mi"

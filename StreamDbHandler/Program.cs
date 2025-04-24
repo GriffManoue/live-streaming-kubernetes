@@ -82,10 +82,6 @@ builder.Services.AddHttpClient<IUserDbHandlerClient, UserDbHandlerClient>(client
 {
     client.Timeout = TimeSpan.FromSeconds(30);
 }).AddHttpMessageHandler<JwtTokenHandler>();
-builder.Services.AddHttpClient<IStreamDbHandlerClient, StreamDbHandlerClient>(client =>
-{
-    client.Timeout = TimeSpan.FromSeconds(30);
-}).AddHttpMessageHandler<JwtTokenHandler>();
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
