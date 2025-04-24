@@ -24,6 +24,11 @@ spec:
         env:
         - name: ASPNETCORE_ENVIRONMENT
           value: "Production"
+        - name: Jwt__ServiceToken
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secrets
+              key: service-token
         - name: Jwt__SecretKey
           valueFrom:
             secretKeyRef:
