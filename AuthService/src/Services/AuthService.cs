@@ -54,7 +54,21 @@ public class AuthService : IAuthService
     public async Task<AuthResult> RegisterAsync(RegisterRequest request)
     {
         // Check if user with the same username exists using IUserDbHandlerClient
-        var userWithSameUsername = await _userDbHandlerClient.GetUserByUsernameAsync(request.Username);
+        UserDTO? userWithSameUsername = null;
+        try
+        {
+            userWithSameUsername = await _userDbHandlerClient.GetUserByUsernameAsync(request.Username);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            // User not found, this is expected for registration
+            userWithSameUsername = null;
+        }
+        catch (KeyNotFoundException)
+        {
+            // User not found, this is expected for registration
+            userWithSameUsername = null;
+        }
         if (userWithSameUsername != null)
             return new AuthResult
             {
@@ -63,7 +77,19 @@ public class AuthService : IAuthService
             };
 
         // Check if user with the same email exists
-        var userWithSameEmail = await _userDbHandlerClient.GetUserByEmailAsync(request.Email);
+        UserDTO? userWithSameEmail = null;
+        try
+        {
+            userWithSameEmail = await _userDbHandlerClient.GetUserByEmailAsync(request.Email);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            userWithSameEmail = null;
+        }
+        catch (KeyNotFoundException)
+        {
+            userWithSameEmail = null;
+        }
         if (userWithSameEmail != null)
             return new AuthResult
             {
