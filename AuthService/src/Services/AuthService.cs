@@ -136,19 +136,32 @@ public class AuthService : IAuthService
     public async Task<AuthResult> LoginAsync(LoginRequest request)
     {
         // Find user by username using IUserDbHandlerClient
-        var user = await _userDbHandlerClient.GetUserByUsernameAsync(request.Username);
+        UserDTO? user = null;
+        try
+        {
+            user = await _userDbHandlerClient.GetUserByUsernameAsync(request.Username);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            // User not found
+            user = null;
+        }
+        catch (KeyNotFoundException)
+        {
+            user = null;
+        }
         if (user == null)
             return new AuthResult
             {
                 Success = false,
-                Error = "User not found"
+                Error = "Invalid username"
             };
         // Verify password
         if (!_passwordHasher.VerifyPassword(request.Password, user.Password))
             return new AuthResult
             {
                 Success = false,
-                Error = "Invalid username or password"
+                Error = "Invalid password"
             };
         // Generate token
         var token = _tokenService.GenerateToken(MapToUser(user));
