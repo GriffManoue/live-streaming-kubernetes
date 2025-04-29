@@ -21,20 +21,14 @@ public class FollowerService : IFollowerService
         if (followerId == followingId)
             throw new ArgumentException("Users cannot follow themselves");
 
-        var follower = await _userDbHandlerClient.GetUserByIdWithFollowersAsync(followerId)
-            ?? throw new KeyNotFoundException($"Follower with ID {followerId} not found");
+        // Get the user to be followed
         var following = await _userDbHandlerClient.GetUserByIdWithFollowersAsync(followingId)
             ?? throw new KeyNotFoundException($"User to follow with ID {followingId} not found");
 
-        // Check if already following
-        if (follower.Following.Any(u => u.Id == followingId))
-            return; // Already following, nothing to do
+        // If already followed, do nothing
+        if (following.User.FollowerIds.Contains(followerId))
+            return;
 
-        // Update follower's Following list
-        follower.User.FollowerIds.Add(followingId);
-        await _userDbHandlerClient.UpdateUserAsync(followerId, follower.User);
-
-        // Update followed user's Followers list
         following.User.FollowerIds.Add(followerId);
         await _userDbHandlerClient.UpdateUserAsync(followingId, following.User);
     }
@@ -58,21 +52,14 @@ public class FollowerService : IFollowerService
         if (followerId == followingId)
             throw new ArgumentException("Users cannot unfollow themselves");
 
-        var follower = await _userDbHandlerClient.GetUserByIdWithFollowersAsync(followerId)
-            ?? throw new KeyNotFoundException($"Follower with ID {followerId} not found");
-        var following = await _userDbHandlerClient.GetUserByIdAsync(followingId)
+        // Get the user to be unfollowed
+        var following = await _userDbHandlerClient.GetUserByIdWithFollowersAsync(followingId)
             ?? throw new KeyNotFoundException($"User to unfollow with ID {followingId} not found");
 
-        var followingList = follower.Following.ToList();
-        var toRemove = followingList.FirstOrDefault(u => u.Id == followingId);
-        if (toRemove == null)
-            return; // Not following, nothing to do
+        if (!following.User.FollowerIds.Contains(followerId))
+            return;
 
-
-        follower.User.FollowerIds.Remove(followingId);
-        following.FollowerIds.Remove(followerId);
-
-        await _userDbHandlerClient.UpdateUserAsync(followerId, follower.User);
-        await _userDbHandlerClient.UpdateUserAsync(followingId, following);
+        following.User.FollowerIds.Remove(followerId);
+        await _userDbHandlerClient.UpdateUserAsync(followingId, following.User);
     }
 }

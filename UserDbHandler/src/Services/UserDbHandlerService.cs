@@ -76,13 +76,6 @@ public class UserDbHandlerService : IUserDbHandlerService
                 {
                     user.Followers.Add(follower);
                 }
-                // Optionally, update the follower's Following collection if needed
-                // (but avoid updating both sides unless necessary)
-                // if (!follower.Following.Any(u => u.Id == user.Id))
-                // {
-                //     follower.Following.Add(user);
-                //     await _userRepository.UpdateAsync(follower);
-                // }
                 Console.WriteLine($"Follower found: {follower.Username}");
             }
         }
