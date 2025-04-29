@@ -71,6 +71,7 @@ public class UserDbHandlerService : IUserDbHandlerService
             if (follower != null)
             {
                 followers.Add(follower);
+                Console.WriteLine($"Follower found: {follower.Username}");
             }
         }
         foreach (var followingId in userDto.FollowingIds)
@@ -79,6 +80,7 @@ public class UserDbHandlerService : IUserDbHandlerService
             if (followingUser != null)
             {
                 following.Add(followingUser);
+                Console.WriteLine($"Following user found: {followingUser.Username}");
             }
         }
 

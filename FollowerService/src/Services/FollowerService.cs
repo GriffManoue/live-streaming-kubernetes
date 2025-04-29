@@ -26,14 +26,10 @@ public class FollowerService : IFollowerService
         var following = await _userDbHandlerClient.GetUserByIdWithFollowersAsync(followingId)
             ?? throw new KeyNotFoundException($"User to follow with ID {followingId} not found");
 
-
-        Console.WriteLine($"Follower: {follower.User.Username}, Following: {following.User.Username}");
-
         // Check if already following
         if (follower.Following.Any(u => u.Id == followingId))
             return; // Already following, nothing to do
 
-        Console.WriteLine($"Follower: {follower.User.Username}, Following: {following.User.Username}");
         // Update follower's Following list
         follower.User.FollowerIds.Add(followingId);
         await _userDbHandlerClient.UpdateUserAsync(followerId, follower.User);
