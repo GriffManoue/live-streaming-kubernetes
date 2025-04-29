@@ -23,17 +23,24 @@ public class FollowerService : IFollowerService
 
         var follower = await _userDbHandlerClient.GetUserByIdWithFollowersAsync(followerId)
             ?? throw new KeyNotFoundException($"Follower with ID {followerId} not found");
-        var following = await _userDbHandlerClient.GetUserByIdAsync(followingId)
+        var following = await _userDbHandlerClient.GetUserByIdWithFollowersAsync(followingId)
             ?? throw new KeyNotFoundException($"User to follow with ID {followingId} not found");
 
         // Check if already following
         if (follower.Following.Any(u => u.Id == followingId))
             return; // Already following, nothing to do
 
+        // Update follower's Following list
         var followingList = follower.Following.ToList();
-        followingList.Add(following);
-        follower = new UserWithFollowersDTO(follower.User, follower.Followers, followingList);
-        await _userDbHandlerClient.UpdateUserAsync(followerId, follower.User);
+        followingList.Add(following.User);
+        var updatedFollower = new UserWithFollowersDTO(follower.User, follower.Followers, followingList);
+        await _userDbHandlerClient.UpdateUserAsync(followerId, updatedFollower.User);
+
+        // Update followed user's Followers list
+        var followersList = following.Followers.ToList();
+        followersList.Add(follower.User);
+        var updatedFollowing = new UserWithFollowersDTO(following.User, followersList, following.Following);
+        await _userDbHandlerClient.UpdateUserAsync(followingId, updatedFollowing.User);
     }
 
     public async Task<IEnumerable<UserDTO>> GetFollowersAsync(Guid userId)
