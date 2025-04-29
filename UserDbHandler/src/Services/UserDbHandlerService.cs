@@ -51,6 +51,7 @@ public class UserDbHandlerService : IUserDbHandlerService
         // Only hash the password if it has changed (i.e., if the provided password does not match the stored hash)
         if (!_passwordHasher.VerifyPassword(userDto.Password, user.Password))
         {
+            Console.WriteLine($"Password for user {userDto.Username} has changed. Hashing new password.");
             user.Password = _passwordHasher.HashPassword(userDto.Password);
         }
         // If the password matches the hash, keep the existing hash
