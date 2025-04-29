@@ -22,7 +22,7 @@ public class UserDbHandlerService : IUserDbHandlerService
 
     public async Task<UserDTO> GetUserByIdAsync(Guid id)
     {
-        Console.WriteLine($"Fetching user with ID: {id}");
+       
         if (id == Guid.Empty)
             throw new ArgumentException("User ID cannot be empty", nameof(id));
 
@@ -51,7 +51,6 @@ public class UserDbHandlerService : IUserDbHandlerService
         // Only hash the password if it has changed (i.e., if the provided password does not match the stored hash)
         if (userDto.Password != user.Password)
         {
-            Console.WriteLine($"Password for user {userDto.Username} has changed. Hashing new password.");
             user.Password = _passwordHasher.HashPassword(userDto.Password);
         }
         // If the password matches the hash, keep the existing hash

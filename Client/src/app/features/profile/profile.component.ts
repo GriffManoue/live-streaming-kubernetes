@@ -92,7 +92,6 @@ export class ProfileComponent implements OnInit {
   private fetchUserData(userId: string) {
     this.loading = true;
     this.profileError = false;
-    console.log(`Fetching data for user ID: ${userId}`);
     this.userDbService.getUserById(userId).subscribe({
       next: (userData) => {
         this.user = userData;
