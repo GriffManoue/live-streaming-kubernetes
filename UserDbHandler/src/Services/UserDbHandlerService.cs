@@ -49,7 +49,7 @@ public class UserDbHandlerService : IUserDbHandlerService
             ?? throw new KeyNotFoundException($"User with ID {userDto.Id} not found");
 
         // Only hash the password if it has changed (i.e., if the provided password does not match the stored hash)
-        if (!_passwordHasher.VerifyPassword(userDto.Password, user.Password))
+        if (userDto.Password != user.Password)
         {
             Console.WriteLine($"Password for user {userDto.Username} has changed. Hashing new password.");
             user.Password = _passwordHasher.HashPassword(userDto.Password);
@@ -64,7 +64,6 @@ public class UserDbHandlerService : IUserDbHandlerService
         user.IsLive = userDto.IsLive;
 
         List<User> followers = new List<User>();
-        List<User> following = new List<User>();
 
         foreach (var followerId in userDto.FollowerIds)
         {
@@ -72,18 +71,13 @@ public class UserDbHandlerService : IUserDbHandlerService
             if (follower != null)
             {
                 followers.Add(follower);
+                follower.Following.Add(user);
+                await _userRepository.UpdateAsync(follower);
                 Console.WriteLine($"Follower found: {follower.Username}");
             }
         }
-        foreach (var followingId in userDto.FollowingIds)
-        {
-            var followingUser = await _userRepository.GetByIdAsync(followingId);
-            if (followingUser != null)
-            {
-                following.Add(followingUser);
-                Console.WriteLine($"Following user found: {followingUser.Username}");
-            }
-        }
+
+        user.Followers = followers;
 
         // Update the user in the database
         await _userRepository.UpdateAsync(user);
