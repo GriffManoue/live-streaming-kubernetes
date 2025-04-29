@@ -63,21 +63,29 @@ public class UserDbHandlerService : IUserDbHandlerService
         user.LastName = userDto.LastName;
         user.IsLive = userDto.IsLive;
 
-        List<User> followers = new List<User>();
+        // Clear existing followers to avoid duplicates
+        user.Followers.Clear();
 
         foreach (var followerId in userDto.FollowerIds)
         {
             var follower = await _userRepository.GetByIdAsync(followerId);
             if (follower != null)
             {
-                followers.Add(follower);
-                follower.Following.Add(user);
-                await _userRepository.UpdateAsync(follower);
+                // Only add if not already present
+                if (!user.Followers.Any(f => f.Id == follower.Id))
+                {
+                    user.Followers.Add(follower);
+                }
+                // Optionally, update the follower's Following collection if needed
+                // (but avoid updating both sides unless necessary)
+                // if (!follower.Following.Any(u => u.Id == user.Id))
+                // {
+                //     follower.Following.Add(user);
+                //     await _userRepository.UpdateAsync(follower);
+                // }
                 Console.WriteLine($"Follower found: {follower.Username}");
             }
         }
-
-        user.Followers = followers;
 
         // Update the user in the database
         await _userRepository.UpdateAsync(user);
