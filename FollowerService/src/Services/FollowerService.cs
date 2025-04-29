@@ -67,8 +67,12 @@ public class FollowerService : IFollowerService
         var toRemove = followingList.FirstOrDefault(u => u.Id == followingId);
         if (toRemove == null)
             return; // Not following, nothing to do
-        followingList.Remove(toRemove);
-        follower = new UserWithFollowersDTO(follower.User, follower.Followers, followingList);
+
+
+        follower.User.FollowerIds.Remove(followingId);
+        following.FollowerIds.Remove(followerId);
+
         await _userDbHandlerClient.UpdateUserAsync(followerId, follower.User);
+        await _userDbHandlerClient.UpdateUserAsync(followingId, following);
     }
 }
