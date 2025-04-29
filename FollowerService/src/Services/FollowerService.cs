@@ -31,16 +31,12 @@ public class FollowerService : IFollowerService
             return; // Already following, nothing to do
 
         // Update follower's Following list
-        var followingList = follower.Following.ToList();
-        followingList.Add(following.User);
-        var updatedFollower = new UserWithFollowersDTO(follower.User, follower.Followers, followingList);
-        await _userDbHandlerClient.UpdateUserAsync(followerId, updatedFollower.User);
+        follower.User.FollowerIds.Add(followingId);
+        await _userDbHandlerClient.UpdateUserAsync(followerId, follower.User);
 
         // Update followed user's Followers list
-        var followersList = following.Followers.ToList();
-        followersList.Add(follower.User);
-        var updatedFollowing = new UserWithFollowersDTO(following.User, followersList, following.Following);
-        await _userDbHandlerClient.UpdateUserAsync(followingId, updatedFollowing.User);
+        following.User.FollowerIds.Add(followerId);
+        await _userDbHandlerClient.UpdateUserAsync(followingId, following.User);
     }
 
     public async Task<IEnumerable<UserDTO>> GetFollowersAsync(Guid userId)

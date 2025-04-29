@@ -62,6 +62,26 @@ public class UserDbHandlerService : IUserDbHandlerService
         user.LastName = userDto.LastName;
         user.IsLive = userDto.IsLive;
 
+        List<User> followers = new List<User>();
+        List<User> following = new List<User>();
+
+        foreach (var followerId in userDto.FollowerIds)
+        {
+            var follower = await _userRepository.GetByIdAsync(followerId);
+            if (follower != null)
+            {
+                followers.Add(follower);
+            }
+        }
+        foreach (var followingId in userDto.FollowingIds)
+        {
+            var followingUser = await _userRepository.GetByIdAsync(followingId);
+            if (followingUser != null)
+            {
+                following.Add(followingUser);
+            }
+        }
+
         // Update the user in the database
         await _userRepository.UpdateAsync(user);
 
