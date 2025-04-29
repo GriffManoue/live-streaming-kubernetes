@@ -66,16 +66,13 @@ public class UserDbHandlerService : IUserDbHandlerService
         // Clear existing followers to avoid duplicates
         user.Followers.Clear();
 
-        foreach (var followerId in userDto.FollowerIds)
+        // Add only unique followers
+        foreach (var followerId in userDto.FollowerIds.Distinct())
         {
             var follower = await _userRepository.GetByIdAsync(followerId);
             if (follower != null)
             {
-                // Only add if not already present
-                if (!user.Followers.Any(f => f.Id == follower.Id))
-                {
-                    user.Followers.Add(follower);
-                }
+                user.Followers.Add(follower);
                 Console.WriteLine($"Follower found: {follower.Username}");
             }
         }
