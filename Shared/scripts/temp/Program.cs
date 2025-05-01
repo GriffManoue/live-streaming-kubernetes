@@ -33,6 +33,6 @@ class Program
         );
 
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-        Console.WriteLine("Service JWT:\n" + jwt);
+        
     }
 }

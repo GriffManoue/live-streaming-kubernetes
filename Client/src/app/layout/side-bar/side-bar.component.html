@@ -9,10 +9,9 @@
                              [style]="{'background-color': entry.stream && entry.stream.streamUrl ? '#4caf50' : '#9e9e9e'}"
                              shape="circle"
                              size="large"></p-avatar>
-                    <div>
-                        <h3 class="streamer-name m-0">{{entry.user.username}}</h3>
-                        <span *ngIf="entry.stream && entry.stream.streamUrl" class="live-badge">LIVE</span>
-                        <span *ngIf="entry.stream && entry.stream.streamUrl" class="ml-2 text-xs text-green-600">{{entry.stream.currentViewers || 0}} viewers</span>
+                    <div>                        <h3 class="streamer-name m-0">{{entry.user.username}}</h3>
+                        <span *ngIf="entry.user.isLive" class="live-badge">LIVE</span>
+                        <span *ngIf="entry.user.isLive" class="ml-2 text-xs text-green-600">{{entry.stream?.currentViewers || 0}} viewers</span>
                     </div>
                 </div>
             </div>
@@ -25,7 +24,7 @@
                     <p-button *ngIf="followedStreamerIds.has(entry.user.id)"
                               label="Unfollow" icon="pi pi-user-minus" styleClass="p-button-sm p-button-outlined mr-2"
                               (click)="unfollowStreamer(entry.user)"></p-button>
-                    <p-button *ngIf="entry.stream && entry.stream.streamUrl" label="Watch" icon="pi pi-play" styleClass="p-button-sm"
+                    <p-button *ngIf="entry.user.isLive" label="Watch" icon="pi pi-play" styleClass="p-button-sm"
                               (click)="watchStreamer(entry.user)"></p-button>
                 </div>
             </ng-template>

@@ -154,5 +154,47 @@ public class UserDbHandlerClient : IUserDbHandlerClient
             _logger?.LogError(ex, "Error getting user by email: {Message}", ex.Message);
             return null;
         }
+    }    public async Task FollowUserAsync(Guid followerId, Guid followingId)
+    {
+        try
+        {
+            var url = $"{_baseUrl}/user/follow";
+            var request = new FollowRequest
+            {
+                FollowerId = followerId,
+                FollowingId = followingId
+            };
+            
+            _logger?.LogInformation("Following user {FollowingId} by {FollowerId} at {Url}", followingId, followerId, url);
+            var response = await _httpClient.PostAsJsonAsync(url, request);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Error following user: {Message}", ex.Message);
+            throw;
+        }
+    }
+
+    public async Task UnfollowUserAsync(Guid followerId, Guid followingId)
+    {
+        try
+        {
+            var url = $"{_baseUrl}/user/unfollow";
+            var request = new FollowRequest
+            {
+                FollowerId = followerId,
+                FollowingId = followingId
+            };
+            
+            _logger?.LogInformation("Unfollowing user {FollowingId} by {FollowerId} at {Url}", followingId, followerId, url);
+            var response = await _httpClient.PostAsJsonAsync(url, request);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Error unfollowing user: {Message}", ex.Message);
+            throw;
+        }
     }
 }

@@ -120,7 +120,7 @@ public class AuthService : IAuthService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to create stream for user {UserId}: {Message}", createdUser.Id, ex.Message);
-            Console.WriteLine($"Failed to create stream for user {createdUser.Id}: {ex.Message}");
+          
         }
         // Generate token
         var token = _tokenService.GenerateToken(MapToUser(createdUser));

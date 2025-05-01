@@ -82,7 +82,7 @@ public class StreamDbHandlerController : ControllerBase
     {
         try
         {
-            Console.WriteLine("Creating stream...");
+          
             var stream = await _streamService.CreateStreamAsync(userId);
             return CreatedAtAction(nameof(GetStreamById), new { id = stream.Id }, stream);
         }

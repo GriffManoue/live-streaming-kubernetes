@@ -161,9 +161,9 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
      
         // Load the stream
         await this.player.load(this.streamData?.streamUrl);
-        console.log('Stream loaded successfully');
+       
       } catch (error) {
-        console.error('Error loading the stream:', error);
+        
         this.error = 'Error loading the stream';
       }
     }, 1500);
@@ -182,7 +182,7 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
       followingId: this.streamData?.userId || ''
     }
 
-    console.log ('Follow request:', followRequest);
+     
     this.followerService.followUser(followRequest).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Successfully followed user!' });
@@ -201,7 +201,7 @@ export class StreamComponent implements OnInit, OnDestroy, AfterViewInit {
       followingId: this.streamData?.userId || ''
     }
 
-    console.log ('Unfollow request:', followRequest);
+   
     this.followerService.unfollowUser(followRequest).subscribe({
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Successfully unfollowed user!' });

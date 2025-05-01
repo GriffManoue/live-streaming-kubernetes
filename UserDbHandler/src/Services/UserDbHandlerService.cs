@@ -22,7 +22,7 @@ public class UserDbHandlerService : IUserDbHandlerService
 
     public async Task<UserDTO> GetUserByIdAsync(Guid id)
     {
-        Console.WriteLine($"Fetching user with ID: {id}");
+       
         if (id == Guid.Empty)
             throw new ArgumentException("User ID cannot be empty", nameof(id));
 
@@ -49,7 +49,7 @@ public class UserDbHandlerService : IUserDbHandlerService
             ?? throw new KeyNotFoundException($"User with ID {userDto.Id} not found");
 
         // Only hash the password if it has changed (i.e., if the provided password does not match the stored hash)
-        if (!_passwordHasher.VerifyPassword(userDto.Password, user.Password))
+        if (userDto.Password != user.Password)
         {
             user.Password = _passwordHasher.HashPassword(userDto.Password);
         }
@@ -61,6 +61,7 @@ public class UserDbHandlerService : IUserDbHandlerService
         user.FirstName = userDto.FirstName;
         user.LastName = userDto.LastName;
         user.IsLive = userDto.IsLive;
+
 
         // Update the user in the database
         await _userRepository.UpdateAsync(user);
@@ -127,6 +128,64 @@ public class UserDbHandlerService : IUserDbHandlerService
             FollowerIds = user.Followers?.Select(f => f.Id).ToList() ?? new List<Guid>(),
             FollowingIds = user.Following?.Select(f => f.Id).ToList() ?? new List<Guid>()
         };
+    }    public async Task FollowUserAsync(Guid followerId, Guid followingId)
+    {
+        if (followerId == Guid.Empty)
+            throw new ArgumentException("Follower ID cannot be empty", nameof(followerId));
+        
+        if (followingId == Guid.Empty)
+            throw new ArgumentException("Following ID cannot be empty", nameof(followingId));
+        
+        if (followerId == followingId)
+            throw new ArgumentException("A user cannot follow themselves", nameof(followerId));
+        
+        // Get both users with their relationships
+        var follower = await _userRepository.GetByIdWithIncludesAsync(followerId, u => u.Following)
+            ?? throw new KeyNotFoundException($"Follower with ID {followerId} not found");
+        
+        var following = await _userRepository.GetByIdWithIncludesAsync(followingId, u => u.Followers)
+            ?? throw new KeyNotFoundException($"User to follow with ID {followingId} not found");
+        
+        // Check if already following
+        if (follower.Following.Any(f => f.Id == followingId))
+            return; // Already following, no action needed
+        
+        // Add the following relationship
+        follower.Following.Add(following);
+        
+        // Save changes
+        await _userRepository.SaveChangesAsync();
+    }
+
+    public async Task UnfollowUserAsync(Guid followerId, Guid followingId)
+    {
+        if (followerId == Guid.Empty)
+            throw new ArgumentException("Follower ID cannot be empty", nameof(followerId));
+        
+        if (followingId == Guid.Empty)
+            throw new ArgumentException("Following ID cannot be empty", nameof(followingId));
+        
+        if (followerId == followingId)
+            throw new ArgumentException("A user cannot unfollow themselves", nameof(followerId));
+        
+        // Get follower with their following relationships
+        var follower = await _userRepository.GetByIdWithIncludesAsync(followerId, u => u.Following)
+            ?? throw new KeyNotFoundException($"Follower with ID {followerId} not found");
+        
+        // Get the user to unfollow
+        var following = await _userRepository.GetByIdAsync(followingId)
+            ?? throw new KeyNotFoundException($"User to unfollow with ID {followingId} not found");
+        
+        // Check if actually following
+        var existingRelationship = follower.Following.FirstOrDefault(f => f.Id == followingId);
+        if (existingRelationship == null)
+            return; // Not following, no action needed
+        
+        // Remove the following relationship
+        follower.Following.Remove(existingRelationship);
+        
+        // Save changes
+        await _userRepository.SaveChangesAsync();
     }
 
     // Helper method to map from User to UserWithFollowersDTO
@@ -138,4 +197,6 @@ public class UserDbHandlerService : IUserDbHandlerService
             user.Following?.Select(MapToUserDTO) ?? Enumerable.Empty<UserDTO>()
         );
     }
+
+
 }

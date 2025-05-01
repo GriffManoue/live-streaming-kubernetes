@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization; // Add this using directive
 using Microsoft.AspNetCore.Mvc;
 using Shared.Interfaces;
+using Shared.src.Models.User;
 
 namespace UserDbHandler.Controllers;
 
@@ -112,9 +113,7 @@ public class UserController : ControllerBase
         {
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
-    }
-
-    [Authorize] // Add Authorize attribute
+    }    [Authorize] // Add Authorize attribute
     [HttpGet("email/{email}")]
     public async Task<ActionResult<UserDTO>> GetUserByEmail(string email)
     {
@@ -124,6 +123,52 @@ public class UserController : ControllerBase
             if (user == null)
                 return NotFound();
             return Ok(user);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+    
+    [Authorize]
+    [HttpPost("follow")]
+    public async Task<ActionResult> FollowUser([FromBody] FollowRequest request)
+    {
+        try
+        {
+            await _userService.FollowUserAsync(request.FollowerId, request.FollowingId);
+            return Ok();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+    [Authorize]
+    [HttpPost("unfollow")]
+    public async Task<ActionResult> UnfollowUser([FromBody] FollowRequest request)
+    {
+        try
+        {
+            await _userService.UnfollowUserAsync(request.FollowerId, request.FollowingId);
+            return Ok();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
         }
         catch (Exception ex)
         {

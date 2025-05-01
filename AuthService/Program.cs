@@ -115,6 +115,4 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
 
-Console.WriteLine("Starting AuthService...");
-Console.WriteLine($"Environment: {app.Environment.EnvironmentName}");
 app.Run();

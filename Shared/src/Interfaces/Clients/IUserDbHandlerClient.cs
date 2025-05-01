@@ -12,4 +12,7 @@ public interface IUserDbHandlerClient
     Task<UserWithFollowersDTO> GetUserByIdWithFollowersAsync(Guid id);
     Task<UserDTO> CreateUserAsync(UserDTO user);
     Task<UserDTO?> GetUserByEmailAsync(string email);
+
+    Task FollowUserAsync(Guid followerId, Guid followingId);
+    Task UnfollowUserAsync(Guid followerId, Guid followingId);
 }

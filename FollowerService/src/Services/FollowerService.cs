@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Shared.src.Interfaces.Services;
 using Shared.src.Models.User;
 using StreamDbHandler.Services;
@@ -14,26 +17,22 @@ public class FollowerService : IFollowerService
     {
         _userDbHandlerClient = userDbHandlerClient;
         _logger = logger;
-    }
-
-    public async Task FollowUserAsync(Guid followerId, Guid followingId)
+    }    public async Task FollowUserAsync(Guid followerId, Guid followingId)
     {
         if (followerId == followingId)
             throw new ArgumentException("Users cannot follow themselves");
 
-        var follower = await _userDbHandlerClient.GetUserByIdWithFollowersAsync(followerId)
-            ?? throw new KeyNotFoundException($"Follower with ID {followerId} not found");
-        var following = await _userDbHandlerClient.GetUserByIdAsync(followingId)
-            ?? throw new KeyNotFoundException($"User to follow with ID {followingId} not found");
-
-        // Check if already following
-        if (follower.Following.Any(u => u.Id == followingId))
-            return; // Already following, nothing to do
-
-        var followingList = follower.Following.ToList();
-        followingList.Add(following);
-        follower = new UserWithFollowersDTO(follower.User, follower.Followers, followingList);
-        await _userDbHandlerClient.UpdateUserAsync(followerId, follower.User);
+        try
+        {
+            // Use the direct follow method from UserDbHandlerClient
+            await _userDbHandlerClient.FollowUserAsync(followerId, followingId);
+            _logger.LogInformation("User {FollowerId} successfully followed user {FollowingId}", followerId, followingId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error when user {FollowerId} tried to follow user {FollowingId}", followerId, followingId);
+            throw;
+        }
     }
 
     public async Task<IEnumerable<UserDTO>> GetFollowersAsync(Guid userId)
@@ -48,24 +47,21 @@ public class FollowerService : IFollowerService
         var user = await _userDbHandlerClient.GetUserByIdWithFollowersAsync(userId)
             ?? throw new KeyNotFoundException($"User with ID {userId} not found");
         return user.Following;
-    }
-
-    public async Task UnfollowUserAsync(Guid followerId, Guid followingId)
+    }    public async Task UnfollowUserAsync(Guid followerId, Guid followingId)
     {
         if (followerId == followingId)
             throw new ArgumentException("Users cannot unfollow themselves");
 
-        var follower = await _userDbHandlerClient.GetUserByIdWithFollowersAsync(followerId)
-            ?? throw new KeyNotFoundException($"Follower with ID {followerId} not found");
-        var following = await _userDbHandlerClient.GetUserByIdAsync(followingId)
-            ?? throw new KeyNotFoundException($"User to unfollow with ID {followingId} not found");
-
-        var followingList = follower.Following.ToList();
-        var toRemove = followingList.FirstOrDefault(u => u.Id == followingId);
-        if (toRemove == null)
-            return; // Not following, nothing to do
-        followingList.Remove(toRemove);
-        follower = new UserWithFollowersDTO(follower.User, follower.Followers, followingList);
-        await _userDbHandlerClient.UpdateUserAsync(followerId, follower.User);
+        try
+        {
+            // Use the direct unfollow method from UserDbHandlerClient
+            await _userDbHandlerClient.UnfollowUserAsync(followerId, followingId);
+            _logger.LogInformation("User {FollowerId} successfully unfollowed user {FollowingId}", followerId, followingId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error when user {FollowerId} tried to unfollow user {FollowingId}", followerId, followingId);
+            throw;
+        }
     }
 }

@@ -74,11 +74,11 @@ export class SettingsComponent implements OnInit {
       next: (newStream) => {
         this.stream = newStream;
         this.updateFormWithStreamData();
-        console.log('Created new stream:', newStream);
+  
         this.messageService.add({ severity: 'info', summary: 'Info', detail: 'New stream settings created.' });
       },
       error: (error) => {
-        console.error('Error creating new stream:', error);
+       
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to create new stream settings.' });
       }
     });
@@ -116,7 +116,7 @@ export class SettingsComponent implements OnInit {
 
       this.streamDbService.updateStream(this.stream.id, updatedStream).subscribe({
         next: (result) => {
-          console.log('Stream updated successfully', result);
+       
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Stream settings saved successfully!' });
         },
         error: (error) => {
@@ -139,7 +139,7 @@ export class SettingsComponent implements OnInit {
     if (tokenValue) {
       navigator.clipboard.writeText(tokenValue)
         .then(() => {
-          console.log('Token copied to clipboard');
+          
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Stream token copied to clipboard!' });
         })
         .catch(err => {
@@ -158,7 +158,7 @@ export class SettingsComponent implements OnInit {
           this.streamForm.get('streamToken')?.setValue(newToken);
           this.stream.streamKey = newToken;
           this.stream.streamUrl = `http://localhost:8080/hls/${newToken}.m3u8`;
-          console.log('Generated new token:', newToken);
+         
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'New stream token generated successfully!' });
         },
         error: (err) => {
