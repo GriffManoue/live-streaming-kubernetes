@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export abstract class ServiceBase {
-  protected apiUrl: string = 'http://ubuntu@152.66.245.139:22902/api'; // Base URL for the API
+  protected apiUrl: string = 'http://ubuntu@152.66.245.139:30348/api'; // Base URL for the API
 
   constructor(protected http: HttpClient, apiUrl?: string) {
     if (apiUrl) {
