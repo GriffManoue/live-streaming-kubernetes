@@ -61,6 +61,12 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "DatabaseManagementService API v1");
 });
 
+using (var scope = app.Services.CreateScope())
+{
+    var migrationService = scope.ServiceProvider.GetRequiredService<IMigrationService>();
+    await migrationService.ApplyMigrationsAsync();
+}
+
 
 app.UseAuthorization();
 app.UseAuthentication();
