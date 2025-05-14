@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 
 export abstract class ServiceBase {
   protected apiUrl: string = 'http://localhost:8080/api'; // Base URL for the API
-//http://ubuntu@152.66.245.139:22902/api
+//http://152.66.245.139:22902/api
   constructor(protected http: HttpClient, apiUrl?: string) {
     if (apiUrl) {
       this.apiUrl = apiUrl;
