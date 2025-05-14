@@ -157,7 +157,7 @@ export class SettingsComponent implements OnInit {
         next: (newToken) => {
           this.streamForm.get('streamToken')?.setValue(newToken);
           this.stream.streamKey = newToken;
-          this.stream.streamUrl = `http://ubuntu@152.66.245.139:22901/hls/${newToken}.m3u8`;
+          this.stream.streamUrl = `http://localhost:32707/hls/${newToken}.m3u8`;
          
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'New stream token generated successfully!' });
         },
