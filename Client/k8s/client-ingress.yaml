@@ -79,6 +79,13 @@ spec:
                 name: db-management
                 port:
                   number: 80
+          - path: /hls
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-rtmp-service
+                port:
+                  number: 8080
 
             
         
